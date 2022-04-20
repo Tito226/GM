@@ -31,7 +31,7 @@ int multiplies=0;
     private int energy=90;
     private int x;
     private int y;
-
+NormCellType normCellType=NormCellType.MOVABLE;
     public int getX() {
         return x;
     }
@@ -75,28 +75,6 @@ boolean isMyPart(PartCell partCell){
                 if (  y<height && cells[x][y].secCell==null && (cells[x][y].partCell==null || isMyPart(cells[x][y].partCell)) && myParts.size()==0){
                 cells[x][y].setSecCell(cells[x][y-1].secCell);
                 cells[x][y-1].setSecCell(null);
-                }else if(myParts.size()>0){
-                    boolean movable=true;
-                    Integer[] buba;
-                    for (int i = 0; i < myParts.size(); i++) {
-                        buba=myParts.get("protoplast"+i);
-                        if(buba[1]<height || cells[buba[0]][buba[1]+1].secCell!=null || cells[buba[0]][buba[1]+1].partCell!=null){
-                        movable=false;
-                        }
-                    }if(movable &&  y>0 && cells[x][y].secCell==null && cells[x][y].partCell==null){
-                        cells[x][y].setSecCell(cells[x][y-1].secCell);
-                        cells[x][y-1].setSecCell(null);
-                        for (int i = 0; i < myParts.size(); i++) {
-                            buba=myParts.get("protoplast"+i);
-                            cells[buba[0]][buba[1]+1].setPartCell(myPartsObj.get("protoplast"+i));
-                            cells[buba[0]][buba[1]].setPartCell(null);
-                            myPartsObj.get("protoplast"+i).setX(buba[0]);
-                            myPartsObj.get("protoplast"+i).setY(buba[1]+1);
-                            myParts.put("protoplast"+i,new Integer[]{buba[0],buba[1]+1});
-
-                        }
-                    }
-
                 }
                 else {
                     y--;
@@ -106,25 +84,7 @@ boolean isMyPart(PartCell partCell){
                 y--;
                 if (y>-1 &&  y<height-1 && cells[x][y].secCell==null && (cells[x][y].partCell==null || isMyPart(cells[x][y].partCell)) && myParts.size()==0){
                 cells[x][y].setSecCell(cells[x][y+1].secCell);
-                cells[x][y+1].setSecCell(null);}else if(myParts.size()>0){
-                    boolean movable=true;
-                    Integer[] buba;
-                    for (int i = 0; i < myParts.size(); i++) {
-                        buba=myParts.get("protoplast"+i);
-                        if(buba[1]<1 || cells[buba[0]][buba[1]-1].secCell!=null || cells[buba[0]][buba[1]-1].partCell!=null){
-                            movable=false;
-                        }
-                    }if(movable && y>-1 &&  y<height-1 && cells[x][y].secCell==null && cells[x][y].partCell==null){
-                        cells[x][y].setSecCell(cells[x][y+1].secCell);
-                        cells[x][y+1].setSecCell(null);
-                        for (int i = 0; i < myParts.size(); i++) {
-                            buba=myParts.get("protoplast"+i);
-                            cells[buba[0]][buba[1]-1].setPartCell(myPartsObj.get("protoplast"+i));
-                            cells[buba[0]][buba[1]].setPartCell(null);
-                        }
-                    }
-
-                }
+                cells[x][y+1].setSecCell(null);}
                 else{y++;
                 stepN++;}
 
@@ -134,24 +94,6 @@ boolean isMyPart(PartCell partCell){
                 if (x>-1 && cells[x][y].secCell==null && (cells[x][y].partCell==null || isMyPart(cells[x][y].partCell)) && myParts.size()==0){
                 cells[x][y].setSecCell(cells[x+1][y].secCell);
                 cells[x+1][y].setSecCell(null);
-                } else if(myParts.size()>0){
-                    boolean movable=true;
-                    Integer[] buba;
-                    for (int i = 0; i < myParts.size(); i++) {
-                        buba=myParts.get("protoplast"+i);
-                        if(buba[0]<1 || cells[buba[0]-1][buba[1]].secCell!=null || cells[buba[0]-1][buba[1]].partCell!=null){
-                            movable=false;
-                        }
-                    }if(movable && x>-1  && cells[x][y].secCell==null && cells[x][y].partCell==null){
-                        cells[x][y].setSecCell(cells[x+1][y].secCell);
-                        cells[x+1][y].setSecCell(null);
-                        for (int i = 0; i < myParts.size(); i++) {
-                            buba=myParts.get("protoplast"+i);
-                            cells[buba[0]-1][buba[1]].setPartCell(myPartsObj.get("protoplast"+i));
-                            cells[buba[0]][buba[1]].setPartCell(null);
-                        }
-                    }
-
                 }
                 else {x++;}
             }
@@ -159,24 +101,6 @@ boolean isMyPart(PartCell partCell){
                 if(x<width && cells[x][y].secCell==null && (cells[x][y].partCell==null || isMyPart(cells[x][y].partCell)) && myParts.size()==0){
                 cells[x][y].setSecCell(cells[x-1][y].secCell);
                 cells[x-1][y].setSecCell(null);
-                } else if(myParts.size()>0){
-                    boolean movable=true;
-                    Integer[] buba;
-                    for (int i = 0; i < myParts.size(); i++) {
-                        buba=myParts.get("protoplast"+i);
-                        if(buba[0]>width-1 || cells[buba[0]+1][buba[1]].secCell!=null || cells[buba[0]+1][buba[1]].partCell!=null){
-                            movable=false;
-                        }
-                    }if(movable  &&  x<width-1 && cells[x][y].secCell==null && cells[x][y].partCell==null){
-                        cells[x][y].setSecCell(cells[x-1][y].secCell);
-                        cells[x][y+1].setSecCell(null);
-                        for (int i = 0; i < myParts.size(); i++) {
-                            buba=myParts.get("protoplast"+i);
-                            cells[buba[0]+1][buba[1]].setPartCell(myPartsObj.get("protoplast"+i));
-                            cells[buba[0]][buba[1]].setPartCell(null);
-                        }
-                    }
-
                 }
                 else {x--;}
              }
@@ -222,38 +146,21 @@ public float getLeftCell(){
     }
 
     void step1(){
-       int step= random.nextInt(4); //2 не включительно(от 0 до 1)
-       int inStep;
-       if(step == 0 ) {
-           inStep=random.nextInt(4);
-           switch(inStep){
-               case 0 ->{
-                   move(Directions.UP);
-
-               }
-               case 1 ->{
-                   move(Directions.DOWN);
-               }
-               case 2 ->{
-                   move(Directions.LEFT);
-               }
-               case 3 ->{
-                   move(Directions.RIGHT);
-               }
-
-
-           }
-
-       }else if(step ==2 || step==1){
-           eatOrganic();
-       } else if(step ==3){
-           multiply();
-       }
-
-        System.out.println(step);
+        for (int i = 0; i < myPartsObj.size(); i++) {
+            myPartsObj.get("protoplast"+i).step();
+            System.out.println(energy);
+        }
        }
     Protoplast protoplast;
     void step(){
+        if (normCellType==NormCellType.CONTROLLER){
+            step1();
+
+        }
+        if(normCellType!=NormCellType.CONTROLLER){
+        if(myParts.size()>0){
+            normCellType=NormCellType.CONTROLLER;
+        }
 
        if(isSpaceAvailable()==0){
            energy-=2;
@@ -298,7 +205,8 @@ public float getLeftCell(){
     counter=0;
     }
 counter++;
-}
+        }
+    }
     public Color getColor(){
         return Color.GREEN;    //TODO set Changeable cell color
     }
@@ -533,7 +441,7 @@ multiplies++;
 
         void transferEnergy(){
         if(energy1>1){
-        cells[x][y].energy+=energy1/2;
+        cells[x][y].secCell.energy+=energy1/2;
         energy1-=energy1/2;
     }
 }
@@ -617,7 +525,7 @@ multiplies++;
 
         void eatSunE(){
             energy1=energy1+ World.sunny;
-            //System.out.println("Cell:"+x+" "+y+" have:"+energy1+" energy" );
+            System.out.println("Cell:"+x+" "+y+" have:"+energy1+" energy" );
         }
 
 

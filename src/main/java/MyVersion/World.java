@@ -15,7 +15,7 @@ Pool pooll;
     public static int cellSize=4;
    public static int width;
    public static int height;
-   public static int sunny=1;
+   public static int sunny=21;
     static Cell[][] cells;
     public static boolean pause=true;
     Paint paint=new Paint();
@@ -181,7 +181,7 @@ if(cells[i][j].partCell!=null){
 
 if (NULL_CELLS==width*height){
    Random r =new Random();
-    for (int i = 0; i < 1090; i++) {
+    for (int i = 0; i < 109; i++) {
         cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll));
         cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll));
         cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll));
