@@ -9,16 +9,16 @@ import java.util.Random;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 
-public class World extends JPanel implements Runnable {
+public class World extends JPanel  {
 Pool pooll;
  public static int cellls=0;
     public static int cellSize=4;
    public static int width;
    public static int height;
-   public static int sunny=21;
+   public static int sunny=1;
     static Cell[][] cells;
     public static boolean pause=true;
-    Paint paint=new Paint();
+
     public World(int width,int height){
         this.height=height;
         this.width=width;
@@ -28,12 +28,7 @@ Pool pooll;
         }
     }
 
-class Paint extends Thread{
-    @Override
-    public void run() {
-       paint(getGraphics());
-    }
-}
+
 
 public void sleep(int n) throws InterruptedException {
 
@@ -61,52 +56,75 @@ public static Cell[][] getCells(){
         frame.setSize(1600, 1000);
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         frame.setVisible(true);
-        Thread thread=new Thread(world);
-        thread.run();
+        world.run();
     }
 
 class inPaintThread extends Thread{
-
+        int type;
+        Graphics g;
+        int i;
+        int j;
+public inPaintThread(Graphics g,int type){
+  this.g=g;
+  this.i=i;
+  this.j=j;
+  this.type=type;
 }
-byte c=0;
-    public void paint(Graphics g) {
-        if(c==0){
-            for (int i = 0; i <width ; i++) {
+
+    @Override
+    public void run() {
+       switch(type){
+        case 1 ->{
+            for (int i = 0; i <width/2 ; i++) {
                 for (int j = 0; j < height; j++) {
                     if(cells[i][j]!=null){
+                        if(cells[i][j].secCell==null && cells[i][j].partCell==null ){
                             g.setColor(cells[i][j].getColor());
                             g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-                            cells[i][j].isChanged=true;
+                        }
+                        else
+                        if(cells[i][j].secCell!=null && cells[i][j].partCell==null ){
+                            g.setColor(cells[i][j].secCell.getColor());
+                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+                        }
+                        if (cells[i][j]!=null && cells[i][j].partCell!=null){
+                            g.setColor(cells[i][j].partCell.getColor());
+                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+                        }
                     }
                 }
             }
-            c++;
         }
-
-        for (int i = 0; i <width ; i++) {
-            for (int j = 0; j < height; j++) {
-                if(cells[i][j]!=null){
-                    if(cells[i][j].secCell==null && cells[i][j].partCell==null && cells[i][j].isChanged){
-                        g.setColor(cells[i][j].getColor());
-                        g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-                        cells[i][j].isChanged=true;
-                    }else
-                    if(cells[i][j].secCell!=null && cells[i][j].partCell==null ){
-                    g.setColor(cells[i][j].secCell.getColor());
-                    g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-                        cells[i][j].isChanged=true;
+        case 2 ->{
+            for (int i = width/2; i <width ; i++) {
+                for (int j = 0; j < height; j++) {
+                    if(cells[i][j]!=null){
+                        if(cells[i][j].secCell==null && cells[i][j].partCell==null ){
+                            g.setColor(cells[i][j].getColor());
+                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+                        }
+                        else
+                        if(cells[i][j].secCell!=null && cells[i][j].partCell==null ){
+                            g.setColor(cells[i][j].secCell.getColor());
+                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+                        }
+                        if (cells[i][j]!=null && cells[i][j].partCell!=null){
+                            g.setColor(cells[i][j].partCell.getColor());
+                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+                        }
                     }
-
-                  if (cells[i][j]!=null && cells[i][j].partCell!=null){
-                    g.setColor(cells[i][j].partCell.getColor());
-                    g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-                    cells[i][j].isChanged=true;}
-                 }
+                }
             }
         }
 
+       }
+    }
+}
 
-        }
+    public void paint(Graphics g) {
+        new inPaintThread(g,1).run();
+        new inPaintThread(g,2).run();
+    }
 
        /* try {
             sleep(1);
@@ -116,7 +134,7 @@ byte c=0;
 
 
 
-    @Override
+
     public void run() {
 
         long cellsNum=0;
@@ -137,10 +155,8 @@ byte c=0;
        cells[399][199].setSecCell(new NormCell());
 
 while(true) {
-    System.out.println("Step: "+gen);
     System.gc();
-  //System.out.println(NULL_CELLS);
-    paint.run();
+    paint(getGraphics());
         if(pause==true){
             int NULL_CELLS=0;
         for (int i = 0; i < width; i++) {
@@ -150,7 +166,7 @@ while(true) {
             }
              cells[i][j].testCell();
                 if(cells[i][j].secCell!=null){pooll=new Pool();
-                    pooll.initializePool(cells[i][j].secCell.pool);
+                    pooll.initializePool(cells[i][j].secCell.movablePool);
                     cells[i][j].secCell.stepN++;
                 }
 if(cells[i][j].partCell!=null){

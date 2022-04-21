@@ -37,22 +37,23 @@ NormCellType normCellType=NormCellType.MOVABLE;
     }
     Random random=new Random();
    // int[][] comands = new int[64][2];//[commands][parameters]
-public Pool pool=new Pool();
-
-
+public Pool movablePool =new Pool();
+Pool controllerPool=new Pool();
+Color myColor=Color.GREEN;
     public NormCell(Pool dadPool){
         myNum=num;
         num++;
-        pool.initializePool(dadPool);
+        movablePool.initializePool(dadPool);
         cellls++;
         energy=39;
+        controllerPool.initializePool();
     }
 
     public NormCell(){
-
+controllerPool.initializePool();
         myNum=num;
         num++;
-pool.initializePool();
+movablePool.initializePool();
 cellls++;
 
     }
@@ -119,6 +120,10 @@ energy-=1;
         this.y = y;
     }
 
+   float isController(){
+        if(normCellType==NormCellType.CONTROLLER){return 1.00f;}
+        else{return 0f;}
+   }
 
 public float getLeftCell(){
        if(  x>1 && cells[x-1][y].secCell!=null ){
@@ -145,15 +150,20 @@ public float getLeftCell(){
         return 0.00f;
     }
 
+
+
     void step1(){
+
         for (int i = 0; i < myPartsObj.size(); i++) {
             myPartsObj.get("protoplast"+i).step();
-            System.out.println(energy);
+           controllerPool.evaluateFitness(this);
         }
+        energy-=3;
        }
     Protoplast protoplast;
     void step(){
         if (normCellType==NormCellType.CONTROLLER){
+            setMyColor(Color.darkGray);
             step1();
 
         }
@@ -165,12 +175,12 @@ public float getLeftCell(){
        if(isSpaceAvailable()==0){
            energy-=2;
        }
-    pool.evaluateFitness(this);
+    movablePool.evaluateFitness(this);
     for (int i = 0; i < myPartsObj.size(); i++) {
         myPartsObj.get("protoplast"+i).step();
     }
-     if (output>0.2 && output<0.3){eatOrganic();}else
-    if(output>0.3f && output<0.35 ){
+     if (output>0.2 && output<0.3){eatOrganic();}
+     else if(output>0.3f && output<0.35 ){
         multiply();
     }else if(output>0.5f && output<0.52f){
         move(Directions.UP);
@@ -201,14 +211,19 @@ public float getLeftCell(){
     energy--;
     lifeTime++;
     if(counter%2==0){
-    pool.breedNewGeneration();
+    movablePool.breedNewGeneration();
     counter=0;
     }
 counter++;
         }
     }
+
+    public void setMyColor(Color myColor) {
+        this.myColor = myColor;
+    }
+
     public Color getColor(){
-        return Color.GREEN;    //TODO set Changeable cell color
+        return  myColor;    //TODO set Changeable cell color
     }
     void eatSunE(){
         energy=energy+ World.sunny;
@@ -304,27 +319,27 @@ counter++;
        if(xxx==0){
         if(x<width-1 && cells[x+1][y].secCell ==null  ){
 
-    cells[x+1][y].setSecCell(new NormCell(pool));
+    cells[x+1][y].setSecCell(new NormCell(movablePool));
 energy-=10;
 multiplies++;
         }
        }else if(xxx==1){
            if(x>0 && cells[x-1][y].secCell ==null  ){
 
-               cells[x-1][y].setSecCell(new NormCell(pool));
+               cells[x-1][y].setSecCell(new NormCell(movablePool));
                energy-=10;
                multiplies++;
            }
        } else if (xxx==2){
            if(y>0 && cells[x][y-1].secCell ==null  ){
 
-               cells[x][y-1].setSecCell(new NormCell(pool));
+               cells[x][y-1].setSecCell(new NormCell(movablePool));
                energy-=10;
                multiplies++;
            } else if(xxx==3){
                if(y<height-1 && cells[x][y+1].secCell ==null  ){
 
-                   cells[x][y+1].setSecCell(new NormCell(pool));
+                   cells[x][y+1].setSecCell(new NormCell(movablePool));
                    energy-=40;
                    multiplies++;
                }else{
@@ -339,72 +354,189 @@ multiplies++;
 }
 
     public void evaluateFitness(ArrayList<Genome> population) {
-        int successfully;
-       if(multiplies!=0){
-            successfully=energy+multiplies*2+lifeTime;
-       }else{
-        successfully=energy+lifeTime;}
-        float outputBuffer=0f;
-       int gSuccess=0;
-        for (Genome gene : population) {
-        Random r=new Random();
-        byte b= (byte) r.nextInt(101);
-        if ( b==45){gene.Mutate();
-       // System.out.println("Mutate");
+        if (normCellType == NormCellType.MOVABLE){
+            int successfully;
+        if (multiplies != 0) {
+            successfully = energy + multiplies * 2 + lifeTime;
+        } else {
+            successfully = energy + lifeTime;
         }
-        int gSuccessfully=successfully;
-        int gEnergy=energy;
-        gene.setFitness(0);
-        float[] inputs={getX(),getY(),getEnergy(),getUptCell(),getDownCell(),getLeftCell(),getRightCell(),isSpaceAvailable()};
-        float output[] = gene.evaluateNetwork(inputs);
-        if(output[0]>0.7f || output[0]==0.5f || output[0]==0.0f){gSuccessfully-=10;}
-            if(energy<=3){
-                gSuccessfully-=4;
+        float outputBuffer = 0f;
+        int gSuccess = 0;
+        for (Genome gene : population) {
+            Random r = new Random();
+            byte b = (byte) r.nextInt(101);
+            if (b == 45) {
+                gene.Mutate();
+                // System.out.println("Mutate");
             }
-            if(energy>=98){
+            int gSuccessfully = successfully;
+            int gEnergy = energy;
+            gene.setFitness(0);
+            float[] inputs = {getX(), getY(), getEnergy(), getUptCell(), getDownCell(), getLeftCell(), getRightCell(), isSpaceAvailable(), isController()};
+            float output[] = gene.evaluateNetwork(inputs);
+            if (output[0] > 0.7f || output[0] == 0.5f || output[0] == 0.0f) {
+                gSuccessfully -= 10;
+            }
+            if (energy <= 3) {
+                gSuccessfully -= 4;
+            }
+            if (energy >= 98) {
                 gSuccessfully--;
             }
-            if(output[0]>0.3f && output[0]<0.35 ){
-              //  multiply();
-                if(isSpaceAvailable()==1.0f && gEnergy>=40){
-                    gSuccessfully+=4;
-                }else{gEnergy--;}
-            }else if(output[0]>0.5f && output[0]<0.52f){
-               gEnergy++;
-             //   move(Directions.UP);
-            }else if (output[0]>0.52f && output[0]<0.54f){
-             //   move(Directions.DOWN);
+            if (output[0] > 0.3f && output[0] < 0.35) {
+                //  multiply();
+                if (isSpaceAvailable() == 1.0f && gEnergy >= 40) {
+                    gSuccessfully += 4;
+                } else {
+                    gEnergy--;
+                }
+            } else if (output[0] > 0.5f && output[0] < 0.52f) {
                 gEnergy++;
-            }else if (output[0]>0.54f && output[0]<0.58f){
-              //  move(Directions.LEFT);
+                //   move(Directions.UP);
+            } else if (output[0] > 0.52f && output[0] < 0.54f) {
+                //   move(Directions.DOWN);
                 gEnergy++;
-            } else if (output[0]>0.58f && output[0]<0.6f){
-               // move(Directions.RIGHT);
+            } else if (output[0] > 0.54f && output[0] < 0.58f) {
+                //  move(Directions.LEFT);
                 gEnergy++;
-            }else if(output[0]>0.6f && output[0]<0.61f){
-                if(eatCellT(Directions.RIGHT)){gEnergy+=enValue;}else{gEnergy--;}
-              //  eatCell(Directions.RIGHT);
+            } else if (output[0] > 0.58f && output[0] < 0.6f) {
+                // move(Directions.RIGHT);
+                gEnergy++;
+            } else if (output[0] > 0.6f && output[0] < 0.61f) {
+                if (eatCellT(Directions.RIGHT)) {
+                    gEnergy += enValue;
+                } else {
+                    gEnergy--;
+                }
+                //  eatCell(Directions.RIGHT);
 
-            }else if(output[0]>0.61f && output[0]<0.62f){
-               // eatCell(Directions.LEFT);
-                if(eatCellT(Directions.LEFT)){gEnergy+=enValue;}else{gEnergy--;}
-            }else if(output[0]>0.62f && output[0]<0.63f){
-              //  eatCell(Directions.UP);
-                if(eatCellT(Directions.UP)){gEnergy+=enValue;}else{gEnergy--;}
-            }else if(output[0]>0.63f && output[0]<0.64f){
-               // eatCell(Directions.DOWN);
-                if(eatCellT(Directions.DOWN)){gEnergy+=enValue;}else{gEnergy--;}
+            } else if (output[0] > 0.61f && output[0] < 0.62f) {
+                // eatCell(Directions.LEFT);
+                if (eatCellT(Directions.LEFT)) {
+                    gEnergy += enValue;
+                } else {
+                    gEnergy--;
+                }
+            } else if (output[0] > 0.62f && output[0] < 0.63f) {
+                //  eatCell(Directions.UP);
+                if (eatCellT(Directions.UP)) {
+                    gEnergy += enValue;
+                } else {
+                    gEnergy--;
+                }
+            } else if (output[0] > 0.63f && output[0] < 0.64f) {
+                // eatCell(Directions.DOWN);
+                if (eatCellT(Directions.DOWN)) {
+                    gEnergy += enValue;
+                } else {
+                    gEnergy--;
+                }
             }
 
 
-         gSuccessfully=gSuccessfully-energy+gEnergy;
-            if(gSuccessfully>gSuccess){
-            gSuccess=gSuccessfully;
-           outputBuffer= output[0];
+            gSuccessfully = gSuccessfully - energy + gEnergy;
+            if (gSuccessfully > gSuccess) {
+                gSuccess = gSuccessfully;
+                outputBuffer = output[0];
             }
-        gene.setFitness(gSuccessfully);
+            gene.setFitness(gSuccessfully);
         }
-        this.output=outputBuffer;
+        this.output = outputBuffer;
+
+
+    }else if(normCellType==NormCellType.CONTROLLER){
+
+
+            int successfully;
+            if (multiplies != 0) {
+                successfully = energy + multiplies * 2 + lifeTime;
+            } else {
+                successfully = energy + lifeTime;
+            }
+            float outputBuffer = 0f;
+            int gSuccess = 0;
+            for (Genome gene : population) {
+                gene.setOutputs(5);
+                Random r = new Random();
+                byte b = (byte) r.nextInt(101);
+                if (b == 45) {
+                    gene.Mutate();
+                    // System.out.println("Mutate");
+                }
+                int gSuccessfully = successfully;
+                int gEnergy = energy;
+                gene.setFitness(0);
+                float[] inputs = {getX(), getY(), getEnergy(), getUptCell(), getDownCell(), getLeftCell(), getRightCell(), isSpaceAvailable(), isController()};
+                float output[] = gene.evaluateNetwork(inputs);
+
+                if (energy <= 3) {
+                    gSuccessfully -= 4;
+                }
+                if (energy >= 98) {
+                    gSuccessfully--;
+                }
+                if (output[0] > 0.3f && output[0] < 0.35) {
+                    //  multiply();
+                    if (isSpaceAvailable() == 1.0f && gEnergy >= 40) {
+                        gSuccessfully += 4;
+                    } else {
+                        gEnergy--;
+                    }
+                } else if (output[0] > 0.5f && output[0] < 0.52f) {
+
+
+                } else if (output[0] > 0.52f && output[0] < 0.54f) {
+
+
+                } else if (output[0] > 0.54f && output[0] < 0.58f) {
+
+
+                } else if (output[0] > 0.58f && output[0] < 0.6f) {
+
+
+                } else if (output[0] > 0.6f && output[0] < 0.61f) {
+                    if (eatCellT(Directions.RIGHT)) {
+                        gEnergy += enValue;
+                    } else {
+                        gEnergy--;
+                    }
+                    //  eatCell(Directions.RIGHT);
+
+                } else if (output[0] > 0.61f && output[0] < 0.62f) {
+                    // eatCell(Directions.LEFT);
+                    if (eatCellT(Directions.LEFT)) {
+                        gEnergy += enValue;
+                    } else {
+                        gEnergy--;
+                    }
+                } else if (output[0] > 0.62f && output[0] < 0.63f) {
+                    //  eatCell(Directions.UP);
+                    if (eatCellT(Directions.UP)) {
+                        gEnergy += enValue;
+                    } else {
+                        gEnergy--;
+                    }
+                } else if (output[0] > 0.63f && output[0] < 0.64f) {
+                    // eatCell(Directions.DOWN);
+                    if (eatCellT(Directions.DOWN)) {
+                        gEnergy += enValue;
+                    } else {
+                        gEnergy--;
+                    }
+                }
+
+
+                gSuccessfully = gSuccessfully - energy + gEnergy;
+                if (gSuccessfully > gSuccess) {
+                    gSuccess = gSuccessfully;
+                    outputBuffer = output[0];
+                }
+                gene.setFitness(gSuccessfully);
+            }
+            this.output = outputBuffer;
+
+        }
     }
 
      public boolean eatCellT(Directions dirs){
@@ -467,8 +599,8 @@ multiplies++;
             }
             }catch (Exception e){
                 e.printStackTrace();
-                System.out.println("proto: "+getXx()+" "+getYy());
-                System.out.println("nomCell: "+getX()+" "+getY());
+              //  System.out.println("proto: "+getXx()+" "+getYy());
+             //   System.out.println("nomCell: "+getX()+" "+getY());
             }
         }
 
@@ -525,7 +657,7 @@ multiplies++;
 
         void eatSunE(){
             energy1=energy1+ World.sunny;
-            System.out.println("Cell:"+x+" "+y+" have:"+energy1+" energy" );
+         //   System.out.println("Cell:"+x+" "+y+" have:"+energy1+" energy" );
         }
 
 

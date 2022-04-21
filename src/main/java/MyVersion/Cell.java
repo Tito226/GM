@@ -5,7 +5,7 @@ import java.awt.*;
 import static MyVersion.World.cellls;
 
 public  class Cell {
-    boolean isChanged=false;
+    boolean isChanged=true;
 
     Color myColor = new Color(255, 255, 255);
     int energy=1;

@@ -234,7 +234,7 @@ public class Genome implements Comparable, Serializable {
         nodes.put(NEAT_Config.INPUTS, new NodeGene(1));        // Bias
 
         //output layer
-        for (int i = NEAT_Config.INPUTS + NEAT_Config.HIDDEN_NODES; i < NEAT_Config.INPUTS + NEAT_Config.HIDDEN_NODES + NEAT_Config.OUTPUTS; i++) {
+        for (int i = NEAT_Config.INPUTS + NEAT_Config.HIDDEN_NODES; i < NEAT_Config.INPUTS + NEAT_Config.HIDDEN_NODES + Outputs; i++) {
             nodes.put(i, new NodeGene(0));
         }
 
@@ -250,8 +250,13 @@ public class Genome implements Comparable, Serializable {
 
     }
 
+    public void setOutputs(int outputs) {
+        Outputs = outputs;
+    }
+
+    private int Outputs=NEAT_Config.OUTPUTS;
     public float[] evaluateNetwork(float[] inputs) {
-        float output[] = new float[NEAT_Config.OUTPUTS];
+        float output[] = new float[Outputs];
         generateNetwork();
 
         for (int i = 0; i < NEAT_Config.INPUTS; i++) {
@@ -273,7 +278,7 @@ public class Genome implements Comparable, Serializable {
             }
         }
 
-        for (int i = 0; i < NEAT_Config.OUTPUTS; i++) {
+        for (int i = 0; i <Outputs; i++) {
             output[i] = nodes.get(NEAT_Config.INPUTS + NEAT_Config.HIDDEN_NODES + i).getValue();
         }
         return output;
@@ -376,7 +381,7 @@ public class Genome implements Comparable, Serializable {
                 if (timeoutCount > NEAT_Config.HIDDEN_NODES)
                     return;
             }
-            int nextNode = nodes.size() - NEAT_Config.OUTPUTS;
+            int nextNode = nodes.size() - Outputs;
             randomCon.setEnabled(false);
             connectionGeneList.add(new ConnectionGene(randomCon.getInto(), nextNode, InnovationCounter.newInnovation(), 1, true));        // Add innovation and weight
             connectionGeneList.add(new ConnectionGene(nextNode, randomCon.getOut(), InnovationCounter.newInnovation(), randomCon.getWeight(), true));
