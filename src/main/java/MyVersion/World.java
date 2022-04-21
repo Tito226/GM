@@ -12,7 +12,7 @@ import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 public class World extends JPanel  {
 Pool pooll;
  public static int cellls=0;
-    public static int cellSize=4;
+    public static int cellSize=2;
    public static int width;
    public static int height;
    public static int sunny=1;
@@ -49,7 +49,7 @@ public static Cell[][] getCells(){
         controls.setLayout(new GridLayout(2, 1));
         controls.add(pauseButton);
         controls.add(dePauseButton);
-        World world=new World(400,200);
+        World world=new World(1000,600);
         frame.add(controls, BorderLayout.EAST); // справа будет панель с управлением
         frame.add(world, BorderLayout.CENTER);
 
@@ -66,11 +66,8 @@ class inPaintThread extends Thread{
         int j;
 public inPaintThread(Graphics g,int type){
   this.g=g;
-  this.i=i;
-  this.j=j;
   this.type=type;
 }
-
     @Override
     public void run() {
        switch(type){
@@ -138,7 +135,6 @@ public inPaintThread(Graphics g,int type){
     public void run() {
 
         long cellsNum=0;
-        int gen=0;
         for (int j = 0; j < height; j++) {
             for (int i = 0; i < width ; i++) {
                 cells[i][j]=new Cell();
@@ -154,8 +150,10 @@ public inPaintThread(Graphics g,int type){
         cells[397][179].setSecCell(new NormCell());
        cells[399][199].setSecCell(new NormCell());
 
+
 while(true) {
-    System.gc();
+    long startTime = System.currentTimeMillis();
+    //System.gc();
     paint(getGraphics());
         if(pause==true){
             int NULL_CELLS=0;
@@ -197,21 +195,20 @@ if(cells[i][j].partCell!=null){
 
 if (NULL_CELLS==width*height){
    Random r =new Random();
-    for (int i = 0; i < 109; i++) {
+    for (int i = 0; i < 1009; i++) {
         cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll));
         cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll));
         cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll));
         cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll));
     }
 
-
-
 pooll=new Pool();
 
     System.out.println("Restarted");}
             //   paint(getGraphics());
         }
-gen++;
+    long endTime = System.currentTimeMillis();
+    System.out.println("That took " + (endTime - startTime) + " milliseconds");
 }
 
     }
