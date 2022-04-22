@@ -12,7 +12,7 @@ import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 public class World extends JPanel  {
 Pool pooll;
  public static int cellls=0;
-    public static int cellSize=3;
+    public static int cellSize=4;
    public static int width;
    public static int height;
    public static int sunny=1;
@@ -182,7 +182,7 @@ case 4->{
     }
 }
 
-    public void repaint(Graphics g) {
+    public void paint(Graphics g) {
         long startTime = System.currentTimeMillis();
         new inPaintThread(g,1).run();
         new inPaintThread(g,2).run();
@@ -190,14 +190,10 @@ case 4->{
         new inPaintThread(g,5).run();
         new inPaintThread(g,4).run();
         long endTime = System.currentTimeMillis();
-        System.out.println("Paint took " + (endTime - startTime) + " milliseconds");
+       // System.out.println("Paint took " + (endTime - startTime) + " milliseconds");
     }
 
-       /* try {
-            sleep(1);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
+
 
 
 
@@ -217,15 +213,18 @@ case 4->{
         }
         cells[0][1].setSecCell(new NormCell());
         cells[100][9].setSecCell(new NormCell());
-        cells[397][179].setSecCell(new NormCell());
-       cells[399][199].setSecCell(new NormCell());
-byte countt=0;
+        cells[394][179].setSecCell(new NormCell());
+       cells[374][199].setSecCell(new NormCell());
+        byte countt=0;
+        byte countt2=0;
 
 while(true) {
     long startTime = System.currentTimeMillis();
-
-
-    repaint(getGraphics());
+countt2++;
+if(countt2%2==0){
+    paint(getGraphics());
+    countt2=0;
+}
         if(pause==true){
             int NULL_CELLS=0;
         for (int i = 0; i < width; i++) {
@@ -266,25 +265,25 @@ if(cells[i][j].partCell!=null){
 
 if (NULL_CELLS==width*height){
    Random r =new Random();
-    for (int i = 0; i < 10; i++) {
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll));
+    for (int i = 0; i < 100; i++) {
+        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell());
+        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell());
         cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll));
         cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll));
     }
-
+ //  System.out.println(pooll.getTopFitness());
 pooll=new Pool();
 
     System.out.println("Restarted");}
             //   paint(getGraphics());
         }
-if (countt%5==0){
+if (countt%3==0){
     System.gc();
 countt=0;
 }
         countt++;
     long endTime = System.currentTimeMillis();
-    System.out.println("Main took " + (endTime - startTime) + " milliseconds");
+   // System.out.println("Main took " + (endTime - startTime) + " milliseconds");
 }
 
     }
