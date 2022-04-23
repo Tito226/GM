@@ -183,19 +183,30 @@ case 4->{
 }
 
     public void paint(Graphics g) {
-        long startTime = System.currentTimeMillis();
+
         new inPaintThread(g,1).run();
         new inPaintThread(g,2).run();
         new inPaintThread(g,3).run();
         new inPaintThread(g,5).run();
         new inPaintThread(g,4).run();
-        long endTime = System.currentTimeMillis();
-       // System.out.println("Paint took " + (endTime - startTime) + " milliseconds");
+
     }
 
 
 
-
+public class poolInitThread extends Thread{
+        int j;
+        int i;
+        public poolInitThread(int i,int j){
+            this.j=j;
+            this.i=i;
+            run();
+        }
+    @Override
+    public void run() {
+        pooll.initializePool(cells[i][j].secCell.movablePool);
+    }
+}
 
 
     public void run() {
@@ -217,13 +228,16 @@ case 4->{
        cells[374][199].setSecCell(new NormCell());
         byte countt=0;
         byte countt2=0;
-
+        byte countt3=0;
 while(true) {
     long startTime = System.currentTimeMillis();
 countt2++;
 if(countt2%2==0){
+    long startTime1 = System.currentTimeMillis();
     paint(getGraphics());
     countt2=0;
+    long endTime1 = System.currentTimeMillis();
+    System.out.println("Paint took " + (endTime1 - startTime1) + " milliseconds");
 }
         if(pause==true){
             int NULL_CELLS=0;
@@ -233,8 +247,11 @@ if(countt2%2==0){
 
             }
              cells[i][j].testCell();
-                if(cells[i][j].secCell!=null){pooll=new Pool();
-                    pooll.initializePool(cells[i][j].secCell.movablePool);
+                if(cells[i][j].secCell!=null){
+                    if (countt3%11==0){
+                    pooll=new Pool();
+                    new poolInitThread(i,j);}
+                    countt3++;
                     cells[i][j].secCell.stepN++;
                 }
 if(cells[i][j].partCell!=null){
@@ -264,12 +281,9 @@ if(cells[i][j].partCell!=null){
 
 
 if (NULL_CELLS==width*height){
-   Random r =new Random();
-    for (int i = 0; i < 100; i++) {
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell());
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell());
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll));
+
+    for (int i = 0; i < 1; i++) {
+       new normCellInit(pooll);
     }
  //  System.out.println(pooll.getTopFitness());
 pooll=new Pool();
@@ -283,12 +297,26 @@ countt=0;
 }
         countt++;
     long endTime = System.currentTimeMillis();
-   // System.out.println("Main took " + (endTime - startTime) + " milliseconds");
+    System.out.println("Main took " + (endTime - startTime) + " milliseconds");
 }
 
     }
 
 
+class normCellInit extends Thread{
+        Pool pool;
+        public normCellInit(Pool pool){
+            this.pool=pool;
+            run();
+        }
 
+    @Override
+    public void run() {
+        Random r =new Random();
+        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll));
+        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
+
+    }
+}
 
 }

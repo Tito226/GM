@@ -28,7 +28,7 @@ public class Pool implements Serializable {
         ArrayList<Species> sp =pool.species;
         ArrayList<Genome> gen=sp.get(0).getGenomes();
         //System.out.println(sp.size()+"  ghgrthrthrtfhrtjhtyh");
-        for (int i = 0; i < NEAT_Config.POPULATION-1; i++) {
+        for (int i = 0; i < NEAT_Config.POPULATION; i++) {
          addToSpecies(getRanGen(pool));
         }
 

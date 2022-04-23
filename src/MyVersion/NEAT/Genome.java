@@ -111,15 +111,9 @@ public class Genome implements Comparable, Serializable {
         TreeMap<Integer, ConnectionGene> geneMap1 = new TreeMap<>();
         TreeMap<Integer, ConnectionGene> geneMap2 = new TreeMap<>();
 
-        for(ConnectionGene con: parent1.connectionGeneList){
-            assert  !geneMap1.containsKey(con.getInnovation());             //TODO Remove for better performance
-            geneMap1.put(con.getInnovation(), con);
-        }
 
-        for(ConnectionGene con: parent2.connectionGeneList){
-            assert  !geneMap2.containsKey(con.getInnovation());             //TODO Remove for better performance
-            geneMap2.put(con.getInnovation(), con);
-        }
+
+
 
         Set<Integer> innovationP1 = geneMap1.keySet();
         Set<Integer> innovationP2 = geneMap2.keySet();
@@ -178,15 +172,6 @@ public class Genome implements Comparable, Serializable {
         int lowMaxInnovation;
         float delta = 0;
 
-        for(ConnectionGene con: g1.connectionGeneList) {
-            assert  !geneMap1.containsKey(con.getInnovation());             //TODO Remove for better performance
-            geneMap1.put(con.getInnovation(), con);
-        }
-
-        for(ConnectionGene con: g2.connectionGeneList) {
-            assert  !geneMap2.containsKey(con.getInnovation());             //TODO Remove for better performance
-            geneMap2.put(con.getInnovation(), con);
-        }
         if(geneMap1.isEmpty() || geneMap2.isEmpty())
             lowMaxInnovation = 0;
         else
