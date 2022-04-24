@@ -13,7 +13,7 @@ NormCell secCell;
 PartCell partCell;
    private int x;
     private int y;
-    private int organic=3;
+    private int organic=30;
 private boolean nothing=true;
     public int getX() {
         return x;

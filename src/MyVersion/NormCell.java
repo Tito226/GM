@@ -53,7 +53,7 @@ Color myColor=Color.GREEN;
         num++;
         movablePool.initializePool(dadPool.getTopGenome());
         cellls++;
-        energy=39;
+        energy=30;
     }
 
     public NormCell(){
@@ -402,24 +402,55 @@ float isController(){
                     gSuccessfully += 10;
                 } else {
                     gEnergy-=2;
+                    gSuccessfully-=3;
                 }
             } else if (output[0] > 0.5f && output[0] < 0.52f) {
-                gEnergy++;
+                if(gEnergy>=4){
+           gSuccessfully +=3;
+                gEnergy--;
+                }else {
+                    gSuccessfully-=3;
+                    gEnergy--;
+                }
                 //   move(Directions.UP);
             } else if (output[0] > 0.52f && output[0] < 0.54f) {
                 //   move(Directions.DOWN);
-                gEnergy++;
+                if(gEnergy>=4){
+                    gSuccessfully +=3;
+                    gEnergy--;
+                }else {
+                    gSuccessfully-=3;
+                    gEnergy--;
+                }
             } else if (output[0] > 0.54f && output[0] < 0.58f) {
                 //  move(Directions.LEFT);
-                gEnergy++;
+                if(gEnergy>=4){
+                    gSuccessfully +=3;
+                    gEnergy--;
+                }else {
+                    gSuccessfully-=3;
+                    gEnergy--;
+                }
             } else if (output[0] > 0.58f && output[0] < 0.6f) {
                 // move(Directions.RIGHT);
-                gEnergy++;
+                if(gEnergy>=4){
+                    gSuccessfully +=3;
+                    gEnergy--;
+                }else {
+                    gSuccessfully-=3;
+                    gEnergy--;
+                }
             } else if (output[0] > 0.6f && output[0] < 0.61f) {
                 if (eatCellT(Directions.RIGHT)) {
                     gEnergy += enValue;
                 } else {
-                    gEnergy--;
+                    if(gEnergy>=4){
+                        gSuccessfully +=3;
+                        gEnergy--;
+                    }else {
+                        gSuccessfully-=3;
+                        gEnergy--;
+                    }
                 }
                 //  eatCell(Directions.RIGHT);
 
@@ -428,6 +459,7 @@ float isController(){
                 if (eatCellT(Directions.LEFT)) {
                     gEnergy += enValue;
                 } else {
+                    gSuccessfully-=2;
                     gEnergy--;
                 }
             } else if (output[0] > 0.62f && output[0] < 0.63f) {
@@ -435,6 +467,7 @@ float isController(){
                 if (eatCellT(Directions.UP)) {
                     gEnergy += enValue;
                 } else {
+                    gSuccessfully-=2;
                     gEnergy--;
                 }
             } else if (output[0] > 0.63f && output[0] < 0.64f) {
@@ -442,6 +475,7 @@ float isController(){
                 if (eatCellT(Directions.DOWN)) {
                     gEnergy += enValue;
                 } else {
+                    gSuccessfully-=2;
                     gEnergy--;
                 }
             }else if(output[0]>0.64 && output[0]<0.7){
@@ -456,7 +490,6 @@ gEnergy-=10;
                 gSuccessfully--;
             }
 
-            gSuccessfully = gSuccessfully - energy + gEnergy;
             if (gSuccessfully > gSuccess) {
                 gSuccess = gSuccessfully;
                 outputBuffer = output[0];
@@ -505,7 +538,7 @@ gEnergy-=10;
                 }
 
                 if (gEnergy <= 3) {
-                    gSuccessfully -= 20;
+                    gSuccessfully -= 200;
                 }
                 if (gEnergy >= 98) {
                     gSuccessfully-=2;
