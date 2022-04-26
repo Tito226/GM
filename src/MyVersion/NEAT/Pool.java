@@ -6,6 +6,7 @@ package MyVersion.NEAT;
 
 import MyVersion.NEAT.com.evo.NEAT.config.NEAT_Config;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,7 +14,8 @@ import java.util.Random;
 
 public class Pool implements Serializable {
 
-
+    @Serial
+    private static final long serialVersionUID = 1L;
     private ArrayList<Species> species = new ArrayList<>();
     private int generations = 0;
     private float topFitness ;

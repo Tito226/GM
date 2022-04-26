@@ -45,7 +45,7 @@ Color myColor=Color.GREEN;
         num++;
         movablePool.initializePool(dadPool);
         cellls++;
-        energy=39;
+        energy=30;
     }
 
     public NormCell(Pool dadPool,int anyNum){
@@ -220,7 +220,7 @@ boolean isMyPart(PartCell partCell){
 
     energy--;
     lifeTime++;
-    if(counter%2==0){
+    if(counter%1==0){
     movablePool.breedNewGeneration();
     counter=0;
     }
@@ -383,11 +383,11 @@ float isController(){
             int gSuccessfully = successfully;
             int gEnergy = energy;
             gene.setFitness(0);
-            float[] inputs = { getEnergy(), getUptCell(), getDownCell(), getLeftCell(), getRightCell(), isSpaceAvailable(), isController()};
+            float[] inputs = { getEnergy(), getUptCell(), getDownCell(), getLeftCell(), getRightCell(), isSpaceAvailable(), isController(),cells[x][y].getOrganic()};
             float[] output = gene.evaluateNetwork(inputs);
-            if (output[0] > 0.7f || output[0] == 0.5f || output[0] == 0.0f) {
-                gSuccessfully -= 10;
-            }
+           // if (output[0] > 0.7f || output[0] == 0.5f || output[0] == 0.0f) {
+          //     gSuccessfully -= 10;
+          //  }
             if (output[0]>0.2 && output[0]<0.3){
                 if(cells[x][y].getOrganic()>=3){
                 gEnergy+=3;
@@ -482,9 +482,11 @@ float isController(){
               //  protoplast=new Protoplast(output[0],x,y);
 gEnergy-=10;
             }
-
+if(gEnergy>energy){
+    gSuccessfully+=5;
+}
             if (gEnergy <= 3) {
-                gSuccessfully -= 4;
+                gSuccessfully -= 400;
             }
             if (gEnergy >= 98) {
                 gSuccessfully--;
@@ -497,6 +499,7 @@ gEnergy-=10;
             gene.setFitness(gSuccessfully);
 
         }
+
         this.output = outputBuffer;
 
 
@@ -523,7 +526,7 @@ gEnergy-=10;
                 int gSuccessfully = successfully;
                 int gEnergy = energy;
                 gene.setFitness(0);
-                float[] inputs = { getEnergy(), getUptCell(), getDownCell(), getLeftCell(), getRightCell(), isSpaceAvailable(), isController()};
+                float[] inputs = { getEnergy(), getUptCell(), getDownCell(), getLeftCell(), getRightCell(), isSpaceAvailable(), isController(),cells[x][y].getOrganic()};
                  float[]  myOutput= gene.evaluateNetwork(inputs);
 
                 for (int i = 1; i < outputBuffer.length; i++) {
@@ -535,6 +538,9 @@ gEnergy-=10;
                         }
                         else {gSuccessfully-=10;}
                     }
+                }
+                if(gEnergy>energy){
+                    gSuccessfully+=5;
                 }
 
                 if (gEnergy <= 3) {
