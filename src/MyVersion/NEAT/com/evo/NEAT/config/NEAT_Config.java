@@ -7,7 +7,7 @@ import java.io.Serializable;
  */
 public class NEAT_Config implements Serializable {
 
-    public static final int INPUTS = 8;
+    public static final int INPUTS = 14;
     public static final int OUTPUTS = 1;
     public static final int HIDDEN_NODES = 6;//20
     public static final int POPULATION =5; //3

@@ -4,14 +4,49 @@ package MyVersion;
 import MyVersion.NEAT.Pool;
 import javax.swing.*;
 import java.awt.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.Random;
 
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 
 public class World extends JPanel  {
-static Pool pooll=new Pool();
- public static int cellls=0;
+  static   FileInputStream fileInputStream;
+
+    static {
+        try {
+            fileInputStream = new FileInputStream("D:\\save.txt");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static    ObjectInputStream objectInputStream;
+
+    static {
+        try {
+            objectInputStream = new ObjectInputStream(fileInputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static Pool pooll;
+
+    static {
+        try {
+            pooll = (Pool) objectInputStream.readObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static int cellls=0;
     public static int cellSize=4;
    public static int width;
    public static int height;
@@ -19,7 +54,7 @@ static Pool pooll=new Pool();
     static Cell[][] cells;
     public static boolean pause=true;
 
-    public World(int width,int height){
+    public World(int width,int height) throws IOException {
         this.height=height;
         this.width=width;
         cells=new Cell[width][height];
@@ -39,11 +74,10 @@ public static Cell[][] getCells(){
 }
 
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, IOException {
         int width=1600;
         int height=1000;
         JFrame frame = new JFrame("GM");
-
         JButton pauseButton = new JButton("Pause");
         JButton dePauseButton = new JButton("Continue");
         pauseButton.addActionListener(new PauseListener());
@@ -56,12 +90,12 @@ public static Cell[][] getCells(){
         JButton button = new JButton("save");
         button.addActionListener(new FileSaveListener());
         JButton button2 = new JButton("load");
-        button.addActionListener(new FileOpenListener());
+        button2.addActionListener(new FileOpenListener());
         controls2.add(button);
         controls2.add(button2);
 
 
-        World world=new World(width/cellSize-5,height/cellSize-10);
+        World world=new World(width/cellSize-5,height/cellSize-20);
         frame.add(controls2,BorderLayout.NORTH);
         frame.add(controls, BorderLayout.EAST); // справа будет панель с управлением
         frame.add(world, BorderLayout.CENTER);
@@ -74,8 +108,6 @@ public static Cell[][] getCells(){
 class inPaintThread extends Thread{
         int type;
         Graphics g;
-        int i;
-        int j;
 public inPaintThread(Graphics g,int type){
   this.g=g;
   this.type=type;
@@ -239,7 +271,7 @@ public class poolInitThread extends Thread{
         byte countt2=0;
         byte countt3=0;
 while(true) {
-   // long startTime = System.currentTimeMillis();
+    long startTime = System.currentTimeMillis();
         if(pause==true){
             countt2++;
             if(countt2%2==0){
@@ -257,7 +289,7 @@ while(true) {
             }
              cells[i][j].testCell();
                 if(cells[i][j].secCell!=null){
-                    if ( NULL_CELLS<width*height-3){
+                    if ( NULL_CELLS<width*height-7){
 
                     new poolInitThread(i,j).join();}
                     countt3++;
@@ -307,8 +339,8 @@ if (countt%3==0){
 countt=0;
 }
         countt++;
-  //  long endTime = System.currentTimeMillis();
- //   System.out.println("Main took " + (endTime - startTime) + " milliseconds");
+   long endTime = System.currentTimeMillis();
+   System.out.println("Main took " + (endTime - startTime) + " milliseconds");
 }
 
     }
