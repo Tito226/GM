@@ -8,12 +8,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
+import static MyVersion.World.lastPooll;
 import static MyVersion.World.pooll;
 
 public class FileSaveListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
-        Pool pool=pooll;
+        Pool pool=lastPooll;
         FileOutputStream outputStream ;
         ObjectOutputStream objectOutputStream;
         try {

@@ -6,14 +6,14 @@ import static MyVersion.World.cellls;
 
 public  class Cell {
     boolean isChanged=true;
-
+public static int startEnergy=20;
     Color myColor = new Color(255, 255, 255);
     int energy=1;
 NormCell secCell;
 PartCell partCell;
    private int x;
     private int y;
-    private int organic=30;
+    public int organic=30;
 private boolean nothing=true;
     public int getX() {
         return x;
@@ -38,9 +38,6 @@ public void setSecCell(NormCell secCell){
         this.y = y;
     }
 
-    public boolean isNothing() {
-        return nothing;
-    }
     void step(){
 if( secCell!=null){
     secCell.step();
@@ -50,13 +47,18 @@ else{} //System.out.println(" ");
 
   void testCell(){
         if(secCell!=null  && secCell.getEnergy()<=0  ){
+            organic+=secCell.getEnergy();
+            secCell.myPartsObj=null;
+            secCell.myParts=null;
             secCell=null;
-            organic+=3;
+
             cellls--;
         }
       if(secCell!=null  && secCell.getEnergy()>=10000 ){
+          organic+=secCell.getEnergy();
+          secCell.myPartsObj=null;
+          secCell.myParts=null;
           secCell=null;
-          organic+=3;
           cellls--;
       }
       if(partCell!=null){

@@ -1,15 +1,21 @@
 package MyVersion;
 
 
+import MyVersion.NEAT.Genome;
 import MyVersion.NEAT.Pool;
+import MyVersion.NEAT.Species;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
+import static MyVersion.Cell.startEnergy;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 
@@ -26,25 +32,22 @@ public class World extends JPanel  {
 
     static    ObjectInputStream objectInputStream;
 
-    static {
+   /* static {
         try {
             objectInputStream = new ObjectInputStream(fileInputStream);
+            try {
+                pooll = (Pool) objectInputStream.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
-    static Pool pooll;
+    static Pool pooll=new Pool();
+static Pool lastPooll;
 
-    static {
-        try {
-            pooll = (Pool) objectInputStream.readObject();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
 
     public static int cellls=0;
     public static int cellSize=4;
@@ -87,6 +90,7 @@ public static Cell[][] getCells(){
         controls.add(pauseButton);
         controls.add(dePauseButton);
         JPanel controls2 = new JPanel();
+
         JButton button = new JButton("save");
         button.addActionListener(new FileSaveListener());
         JButton button2 = new JButton("load");
@@ -116,7 +120,7 @@ public inPaintThread(Graphics g,int type){
     public void run() {
        switch(type){
         case 1 ->{
-            for (int i = 0; i <width/5 ; i++) {
+            for (int i = 0; i <width/3 ; i++) {
                 for (int j = 0; j < height; j++) {
                     if(cells[i][j]!=null){
                         if(cells[i][j].secCell==null && cells[i][j].partCell==null ){
@@ -137,7 +141,7 @@ public inPaintThread(Graphics g,int type){
             }
         }
         case 2 ->{
-            for (int i = width/5; i <(width/5)*2 ; i++) {
+            for (int i = width/3; i <(width/3)*2 ; i++) {
                 for (int j = 0; j < height; j++) {
                     if(cells[i][j]!=null){
                         if(cells[i][j].secCell==null && cells[i][j].partCell==null ){
@@ -157,8 +161,9 @@ public inPaintThread(Graphics g,int type){
                 }
             }
         }
-case 3 ->{
-    for (int i = (width/5)*2; i <(width/5)*3 ; i++) {
+
+case 3->{
+    for (int i = (width/3)*2; i <width ; i++) {
         for (int j = 0; j < height; j++) {
             if(cells[i][j]!=null){
                 if(cells[i][j].secCell==null && cells[i][j].partCell==null ){
@@ -178,80 +183,27 @@ case 3 ->{
         }
     }
 }
-case 4->{
-    for (int i = (width/5)*3; i <(width/5)*4 ; i++) {
-        for (int j = 0; j < height; j++) {
-            if(cells[i][j]!=null){
-                if(cells[i][j].secCell==null && cells[i][j].partCell==null ){
-                    g.setColor(cells[i][j].getColor());
-                    g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-                }
-                else
-                if(cells[i][j].secCell!=null && cells[i][j].partCell==null ){
-                    g.setColor(cells[i][j].secCell.getColor());
-                    g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-                }
-                if (cells[i][j]!=null && cells[i][j].partCell!=null){
-                    g.setColor(cells[i][j].partCell.getColor());
-                    g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-                }
-            }
-        }
-    }
-}
-           case 5->{
-               for (int i = (width/5)*4; i <width ; i++) {
-                   for (int j = 0; j < height; j++) {
-                       if(cells[i][j]!=null){
-                           if(cells[i][j].secCell==null && cells[i][j].partCell==null ){
-                               g.setColor(cells[i][j].getColor());
-                               g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-                           }
-                           else
-                           if(cells[i][j].secCell!=null && cells[i][j].partCell==null ){
-                               g.setColor(cells[i][j].secCell.getColor());
-                               g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-                           }
-                           if (cells[i][j]!=null && cells[i][j].partCell!=null){
-                               g.setColor(cells[i][j].partCell.getColor());
-                               g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-                           }
-                       }
-                   }
-               }
-           }
+
        }
     }
 }
 
     public void paint(Graphics g) {
-if(Restarts>0){
+
         new inPaintThread(g,1).run();
         new inPaintThread(g,2).run();
         new inPaintThread(g,3).run();
-        new inPaintThread(g,4).run();
-        new inPaintThread(g,5).run();
-      }
-
+        g.setColor(Color.BLACK);
+        g.drawString("Restarts: " + Restarts, 7, 9);
     }
 
-public class poolInitThread extends Thread{
-        int j;
-        int i;
-        public poolInitThread(int i,int j){
-            this.j=j;
-            this.i=i;
-            run();
-        }
-    @Override
+   public static Genome topGene = null;
+ public static    Pool topPool=null;
+
+   public static int Restarts=0;
     public void run() {
-        pooll.initializePool(cells[i][j].secCell.movablePool.getTopGenome());
-    }
-}
-
-    int Restarts=0;
-    public void run() throws InterruptedException {
-
+        int bestLifeTime=0;
+        int thisBestLifeTime=0;
         long cellsNum=0;
         for (int j = 0; j < height; j++) {
             for (int i = 0; i < width ; i++) {
@@ -270,18 +222,24 @@ public class poolInitThread extends Thread{
         byte countt=0;
         byte countt2=0;
         byte countt3=0;
+
 while(true) {
+boolean isStep=false;
+    countt3++;
     long startTime = System.currentTimeMillis();
         if(pause==true){
             countt2++;
             if(countt2%2==0){
-                //   long startTime1 = System.currentTimeMillis();
                 paint(getGraphics());
                 countt2=0;
-                //  long endTime1 = System.currentTimeMillis();
-                // System.out.println("Paint took " + (endTime1 - startTime1) + " milliseconds");
             }
             int NULL_CELLS=0;
+            for (int i = 0; i < width; i++) {
+                for (int j = 0; j < height ; j++) {
+                    if( cells[i][j].secCell!=null){
+                    cells[i][j].secCell.stepN=0;}
+                }
+            }
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height ; j++) {
             if (cells[i][j].secCell==null){NULL_CELLS++;
@@ -289,11 +247,24 @@ while(true) {
             }
              cells[i][j].testCell();
                 if(cells[i][j].secCell!=null){
-                    if ( NULL_CELLS<width*height-7){
-
-                    new poolInitThread(i,j).join();}
+                    if ( NULL_CELLS>width*height-4){
+                        pooll.addToSpecies(cells[i][j].secCell.movablePool.getTopGenome());
+                        lastPooll=pooll;
+                    } if(cells[i][j].secCell.lifeTime>bestLifeTime){
+                        try{
+                        if(cells[i][j].secCell.movablePool.species.size()>0){
+                        pooll.addToSpecies(cells[i][j].secCell.movablePool.getTopGenome());}}catch (Exception e){
+                            e.printStackTrace();
+                            System.out.println("shit happened again movablePool size is 0");
+                        }
+                        bestLifeTime=cells[i][j].secCell.lifeTime;
+                        topPool=cells[i][j].secCell.movablePool;
+                        topGene=cells[i][j].secCell.movablePool.getTopGenome();
+                    }if(cells[i][j].secCell.lifeTime>thisBestLifeTime){
+                        thisBestLifeTime=cells[i][j].secCell.lifeTime;
+                    }
                     countt3++;
-                    cells[i][j].secCell.stepN++;
+
                 }
 if(cells[i][j].partCell!=null){
     cells[i][j].partCell.setX(i);
@@ -305,98 +276,90 @@ if(cells[i][j].partCell!=null){
                     cells[i][j].secCell.setY(j);
                     cellsNum=cells[i][j].secCell.getMyNum();
                     if(cells[i][j].secCell.stepN%2==0){
+                        cells[i][j].secCell.stepN++;
                         cells[i][j].secCell.step();
-                    }
-                    if(i+1<width && cells[i+1][j].secCell!=null && cells[i+1][j].secCell.getMyNum() == cellsNum) {
-                            cells[i+1][j].secCell.stepN++;
-                    }
-
-                  if(j+1<height &&  cells[i][j+1].secCell!=null && cells[i][j+1].secCell.getMyNum() == cellsNum){
-                        cells[i][j+1].secCell.stepN++;
-
+                       isStep=true;
                     }
 
                 }
+
             }
         }
 
+            if(!isStep){
+                System.out.println("shit");
+            }
+
 
 if (NULL_CELLS==width*height){
-
-    for (int i = 0; i < 10; i++) {
-       new normCellInit(pooll);
-    }
- //  System.out.println(pooll.getTopFitness());
-pooll=new Pool();
-Restarts++;
-    System.out.println("Restarted");}
-            //   paint(getGraphics());
-        }else {
-            paint(getGraphics());
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            cells[j][i].organic=startEnergy;
         }
-if (countt%3==0){
-    System.gc();
-countt=0;
+    }
+Pool pol=pooll;
+pol.removeStaleSpecies();
+pol.removeWeakGenomesFromSpecies(false);
+    ArrayList<Species> species = pol.getSpecies();
+
+  //  Collections.sort(species,Collections.reverseOrder());
+    pol.species=species;
+    pol.addToSpecies(topGene);
+    pol.addToSpecies(topGene);
+    lastPooll=pooll;
+    pooll=pol;
+    for (int i = 0; i < 3; i++) {
+        new normCellInit(pooll);
+    }
+    Restarts++;
+    System.out.println("Restarted");
+    System.out.println("best life time: "+ bestLifeTime);
+    System.out.println("this Best Life Time: " +thisBestLifeTime);
+    thisBestLifeTime=0;
 }
+
+
+          // long usedBytes = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
+           // usedBytes/1048576>500
+           if (countt%5000==0){
+               System.out.println("Garbage collector started");
+                System.gc();
+                countt=0;
+           }
+
+        }else {
+            if(countt3%10==0){
+            paint(getGraphics());
+            }
+        }
+
         countt++;
    long endTime = System.currentTimeMillis();
-   System.out.println("Main took " + (endTime - startTime) + " milliseconds");
+   if(endTime - startTime>100){
+   System.out.println("Main took " + (endTime - startTime) + " milliseconds");}
 }
 
     }
 
-
-class normCellInit extends Thread{
+    class normCellInit extends Thread{
         Pool pool;
         public normCellInit(Pool pool){
             this.pool=pool;
             run();
         }
 
-    @Override
-    public void run() {
-        Random r =new Random();
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,2));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,2));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,2));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,2));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,2));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,3));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,2));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,2));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,2));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,2));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,2));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,3));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
-        cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
+        @Override
+        public void run() {
+            System.gc();
+            Random r =new Random();
+
+            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,2));
+
+
+
+        }
     }
-}
+
+
 
 }

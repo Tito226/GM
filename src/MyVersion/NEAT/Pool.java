@@ -16,7 +16,7 @@ public class Pool implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
-    private ArrayList<Species> species = new ArrayList<>();
+    public ArrayList<Species> species = new ArrayList<>();
     private int generations = 0;
     private float topFitness ;
     private int poolStaleness = 0;
@@ -27,13 +27,9 @@ public class Pool implements Serializable {
     }
 
     public void initializePool(Pool pool) {
-        ArrayList<Species> sp =pool.species;
-        ArrayList<Genome> gen=sp.get(0).getGenomes();
-        //System.out.println(sp.size()+"  ghgrthrthrtfhrtjhtyh");
-        for (int i = 0; i < NEAT_Config.POPULATION; i++) {
-         addToSpecies(getRanGen(pool));
-        }
-
+        pool.removeWeakGenomesFromSpecies(false);
+       pool.removeStaleSpecies();
+       species= pool.getSpecies();
     }
     public void initializePool(Genome genome) {
 
@@ -42,15 +38,7 @@ public class Pool implements Serializable {
         }
 
     }
-Genome getRanGen(Pool pool){
-    Random r=new Random();
-  return   getRanGen1(pool.species.get(r.nextInt(pool.species.size())).getGenomes());
-}
 
-Genome getRanGen1(ArrayList<Genome> gen){
-    Random r=new Random();
-  return  gen.get(r.nextInt(gen.size()));
-}
 
     public void initializePool() {
 
@@ -136,7 +124,7 @@ Genome getRanGen1(ArrayList<Genome> gen){
   //      allGenome.get(allGenome.size()-1).writeTofile();
  //       System.out.println("TopFitness : "+ allGenome.get(allGenome.size()-1).getFitness());
         for (int i =0 ; i<allGenome.size(); i++) {
-            allGenome.get(i).setPoints(allGenome.get(i).getFitness());      //TODO use adjustedFitness and remove points
+            allGenome.get(i).setAdjustedFitness(allGenome.get(i).getFitness());      //TODO use adjustedFitness and remove points
             allGenome.get(i).setFitness(i);
         }
     }
