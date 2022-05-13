@@ -198,11 +198,13 @@ case 3->{
     }
 
    public static Genome topGene = null;
- public static    Pool topPool=null;
+ public static    Pool topLifeTimePool=null;
+ public static Pool topMultipliesPool=null;
 
    public static int Restarts=0;
     public void run() {
         int bestLifeTime=0;
+        int bestMultiplies=-1;
         int thisBestLifeTime=0;
         long cellsNum=0;
         for (int j = 0; j < height; j++) {
@@ -215,10 +217,17 @@ case 3->{
 
             }
         }
-        cells[0][1].setSecCell(new NormCell());
-        cells[100][9].setSecCell(new NormCell());
-        cells[394][179].setSecCell(new NormCell());
-       cells[374][199].setSecCell(new NormCell());
+
+
+        for (int i = 0; i < 100; i++) {
+            Random r =new Random();
+            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell());
+        }
+
+
+
+
+
         byte countt=0;
         byte countt2=0;
         byte countt3=0;
@@ -248,6 +257,8 @@ boolean isStep=false;
              cells[i][j].testCell();
                 if(cells[i][j].secCell!=null){
                     if ( NULL_CELLS>width*height-4){
+                        pooll.addToSpecies(topLifeTimePool.getTopGenome());
+                        pooll.addToSpecies(topMultipliesPool.getTopGenome());
                         pooll.addToSpecies(cells[i][j].secCell.movablePool.getTopGenome());
                         lastPooll=pooll;
                     } if(cells[i][j].secCell.lifeTime>bestLifeTime){
@@ -258,15 +269,19 @@ boolean isStep=false;
                             System.out.println("shit happened again movablePool size is 0");
                         }
                         bestLifeTime=cells[i][j].secCell.lifeTime;
-                        topPool=cells[i][j].secCell.movablePool;
+                        topLifeTimePool=cells[i][j].secCell.movablePool;
                         topGene=cells[i][j].secCell.movablePool.getTopGenome();
                     }if(cells[i][j].secCell.lifeTime>thisBestLifeTime){
                         thisBestLifeTime=cells[i][j].secCell.lifeTime;
+                    }if (cells[i][j].secCell.multiplies>bestMultiplies){
+                        bestMultiplies=cells[i][j].secCell.multiplies;
+                        topMultipliesPool=cells[i][j].secCell.movablePool;
                     }
                     countt3++;
 
                 }
 if(cells[i][j].partCell!=null){
+
     cells[i][j].partCell.setX(i);
     cells[i][j].partCell.setY(j);
 }
@@ -298,17 +313,16 @@ if (NULL_CELLS==width*height){
         }
     }
 Pool pol=pooll;
-pol.removeStaleSpecies();
-pol.removeWeakGenomesFromSpecies(false);
-    ArrayList<Species> species = pol.getSpecies();
+pol.breedNewGeneration();
 
   //  Collections.sort(species,Collections.reverseOrder());
-    pol.species=species;
+
     pol.addToSpecies(topGene);
-    pol.addToSpecies(topGene);
+    pol.addToSpecies(topLifeTimePool.getTopGenome());
+    pol.addToSpecies(topMultipliesPool.getTopGenome());
     lastPooll=pooll;
     pooll=pol;
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 20; i++) {
         new normCellInit(pooll);
     }
     Restarts++;
@@ -352,10 +366,11 @@ pol.removeWeakGenomesFromSpecies(false);
         public void run() {
             System.gc();
             Random r =new Random();
-
+            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,15));
             cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,2));
-
-
+            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
+            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll));
+            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll));
 
         }
     }
