@@ -27,8 +27,7 @@ public class Pool implements Serializable {
     }
 
     public void initializePool(Pool pool) {
-        pool.removeWeakGenomesFromSpecies(false);
-       pool.removeStaleSpecies();
+     pool.breedNewGeneration();
        species= pool.getSpecies();
     }
     public void initializePool(Genome genome) {

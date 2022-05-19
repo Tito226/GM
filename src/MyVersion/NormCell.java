@@ -22,9 +22,12 @@ public class NormCell implements Environment, Serializable {
     int partNum=0;
 HashMap<String, Integer[]> myParts=new HashMap<>();
     HashMap<String, PartCell> myPartsObj=new HashMap<>();
-float output=0;
-float[] outputs;
-int multiplies=0;
+    float output=0;
+    float[] outputs;
+    int multiplies=0;
+    Random r=new Random();
+    long myParentNum;
+    long myChildNum=r.nextLong();
     static long num = 0l;
     private long myNum;
  // public Cell[][] cells =getCells();
@@ -32,7 +35,7 @@ int multiplies=0;
     private int energy=30;
     private int x;
     private int y;
-    private int startEnergy=1;
+    private int startEnergy=10;
 NormCellType normCellType=NormCellType.MOVABLE;
     public String partName="part";
 
@@ -42,14 +45,15 @@ NormCellType normCellType=NormCellType.MOVABLE;
 public Pool movablePool =new Pool();
 
 Color myColor=Color.GREEN;
-    public NormCell(Pool dadPool){
+    public NormCell(Pool dadPool,long myParentNum){
         myNum=num;
         num++;
         movablePool=dadPool;
         cellls++;
         energy=startEnergy;
+       this.myParentNum=myParentNum;
         Random r=new Random();
-        if(r.nextInt(3)==1){
+        if(r.nextInt(20)==1){
             movablePool.breedNewGeneration();
         }
     }
@@ -60,20 +64,20 @@ Color myColor=Color.GREEN;
         if(anyNum==15){
             movablePool=topMultipliesPool;
             Random r=new Random();
-            if(r.nextInt(4)==1){
+            if(r.nextInt(20)==1){
                 movablePool.breedNewGeneration();
             }
         }else if(anyNum==1){
-            movablePool=topMultipliesPool;
+            movablePool=topLifeTimePool;
             Random r=new Random();
-            if(r.nextInt(4)==1){
+            if(r.nextInt(20)==1){
                 movablePool.breedNewGeneration();
             }
         }
         else{
         movablePool.initializePool(dadPool);
             Random r=new Random();
-            if(r.nextInt(4)==1){
+            if(r.nextInt(20)==1){
                 movablePool.breedNewGeneration();
             }}
         cellls++;
@@ -153,6 +157,7 @@ boolean isMyPart(PartCell partCell){
 
   public float getLeftCell(){
        if(  x>1 && cells[x-1][y].secCell!=null ){
+           if(isRelatives(  cells[x-1][y].secCell)){return 2.5f;}else
            return 1.00f;
        }else if(x>1 && cells[x-1][y].partCell!=null  && myPartsObj.containsValue(cells[x-1][y].partCell)){
            return 1.5f;
@@ -163,6 +168,7 @@ boolean isMyPart(PartCell partCell){
   }
     public float getRightCell(){
         if( x<width-1 &&  cells[x+1][y].secCell!=null  ){
+            if(isRelatives( cells[x+1][y].secCell)){return 2.5f;}else
             return 1.00f;
         }else if(x<width-1 &&  cells[x+1][y].partCell!=null  && myPartsObj.containsValue(cells[x+1][y].partCell)){
             return 1.5f;
@@ -174,6 +180,7 @@ boolean isMyPart(PartCell partCell){
     }
     public float getUptCell(){
         if( y>0  && cells[x][y-1].secCell!=null  ){
+            if(isRelatives( cells[x][y-1].secCell)){return 2.5f;}else
             return 1.00f;
         }else if(y>0  && cells[x][y-1].partCell!=null  && myPartsObj.containsValue(cells[x][y-1].partCell)){
             return 1.5f;
@@ -184,6 +191,7 @@ boolean isMyPart(PartCell partCell){
     }
     public float getDownCell(){
         if(  y<height-1&& cells[x][y+1].secCell!=null ){
+            if(isRelatives( cells[x][y+1].secCell)){return 2.5f;}else
             return 1.00f;
         }else if(y<height-1&& cells[x][y+1].partCell!=null && myPartsObj.containsValue(cells[x][y+1].partCell)){
             return 1.5f;
@@ -193,7 +201,8 @@ boolean isMyPart(PartCell partCell){
     }
     public float getRightDownCell(){
         if(  y<height-1&& x<width-1 && cells[x+1][y+1].secCell!=null ){
-            return 1.00f;
+            if(isRelatives( cells[x+1][y+1].secCell)){return 2.5f;}else
+                return 1.00f;
         }else if(y<height-1 && x<width-1&& cells[x+1][y+1].partCell!=null && myPartsObj.containsValue(cells[x+1][y+1].partCell)){
             return 1.5f;
         } else if( y<height-1 && x<width-1&& cells[x+1][y+1].partCell!=null){return 2.00f;}
@@ -202,6 +211,7 @@ boolean isMyPart(PartCell partCell){
     }
     public float getRightUpCell(){
         if(  y>0&& x<width-1 && cells[x+1][y-1].secCell!=null ){
+            if(isRelatives(cells[x+1][y-1].secCell)){return 2.5f;}else
             return 1.00f;
         }else if(y>0 && x<width-1&& cells[x+1][y-1].partCell!=null && myPartsObj.containsValue(cells[x+1][y-1].partCell)){
             return 1.5f;
@@ -212,6 +222,7 @@ boolean isMyPart(PartCell partCell){
     }
     public float getLeftUpCell(){
         if(  y>0&& x>0 && cells[x-1][y-1].secCell!=null ){
+            if(isRelatives( cells[x-1][y-1].secCell)){return 2.5f;}else
             return 1.00f;
         }else if(y>0 &&x>0&& cells[x-1][y-1].partCell!=null && myPartsObj.containsValue(cells[x-1][y-1].partCell)){
             return 1.5f;
@@ -221,6 +232,7 @@ boolean isMyPart(PartCell partCell){
     }
     public float getLeftDownCell(){
         if(  y<height-1&& x>0 && cells[x-1][y+1].secCell!=null ){
+            if(isRelatives( cells[x-1][y+1].secCell)){return 2.5f;}else
             return 1.00f;
         }else if(y<height-1 && x>0&& cells[x-1][y+1].partCell!=null && myPartsObj.containsValue(cells[x-1][y+1].partCell)){
             return 1.5f;
@@ -393,7 +405,7 @@ boolean isMyPart(PartCell partCell){
     }
 
     void eatOrganic(){
-        if(cells[x][y].getOrganic()!=0  && cells[x][y].getOrganic()>=3){
+        if(cells[x][y].getOrganic()!=0  && cells[x][y].getOrganic()>2){
            energy+= 3;
             cells[x][y].setOrganic(cells[x][y].getOrganic()-3);
         }
@@ -467,6 +479,17 @@ void transferEnergy(float output){
       //  System.out.println(done);
         return done;
     }
+
+   boolean isRelatives(NormCell normCell1){
+   if(normCell1.myParentNum ==myParentNum){
+       return true;
+   }else if (normCell1.myChildNum ==myParentNum){
+       return true;}
+   else {
+       return false;
+   }
+   }
+
     int   neededEnergy=30;
     void multiply(){
 
@@ -478,27 +501,27 @@ void transferEnergy(float output){
        if(xxx==0){
         if(x<width-1 && cells[x+1][y].secCell ==null && cells[x+1][y].partCell==null ){
 
-    cells[x+1][y].setSecCell(new NormCell(movablePool));
+    cells[x+1][y].setSecCell(new NormCell(movablePool,myChildNum));
 energy-=neededEnergy;
 multiplies++;
         }
        }else if(xxx==1){
            if(x>0 && cells[x-1][y].secCell ==null   && cells[x-1][y].partCell==null){
 
-               cells[x-1][y].setSecCell(new NormCell(movablePool));
+               cells[x-1][y].setSecCell(new NormCell(movablePool,myChildNum));
                energy-=neededEnergy;
                multiplies++;
            }
        } else if (xxx==2){
            if(y>0 && cells[x][y-1].secCell ==null && cells[x][y-1].partCell==null){
 
-               cells[x][y-1].setSecCell(new NormCell(movablePool));
+               cells[x][y-1].setSecCell(new NormCell(movablePool,myChildNum));
                energy-=neededEnergy;
                multiplies++;
            } else if(xxx==3){
                if(y<height-1 && cells[x][y+1].secCell ==null && cells[x][y+1].partCell==null ){
 
-                   cells[x][y+1].setSecCell(new NormCell(movablePool));
+                   cells[x][y+1].setSecCell(new NormCell(movablePool,myChildNum));
                    energy-=neededEnergy;
                    multiplies++;
                }else{
@@ -566,7 +589,7 @@ float isController(){
             int gSuccessfully = 20;
             int gEnergy = energy;
             gene.setFitness(0);
-            float[] inputs = { getEnergy()*0.1f, getUptCell(), getDownCell(), getLeftCell(), getRightCell(),getRightDownCell(),getRightUpCell(),getLeftUpCell(),getLeftDownCell(), isSpaceAvailable(), isController(),getRightDistance(),getLeftDistance(),getUpDistance(),getUpDistance(), cells[x][y].getOrganic(),lastEnergy*0.1f,lastUpCell,lastDownCell,lastLeftCell,lastRightCell,lastRightDownCell,lastRightUpCell,lastLeftDownCell,lastLeftUpCell,lastOrganic,sunny,myPartsObj.size(),lastSize,lastRightDistance,lastLeftDistace,lastUpDistance,lastDownDistance};
+            float[] inputs = { getEnergy()*0.1f, getUptCell(), getDownCell(), getLeftCell(), getRightCell(),getRightDownCell(),getRightUpCell(),getLeftUpCell(),getLeftDownCell(), isSpaceAvailable(), isController(),getRightDistance(),getLeftDistance(),getUpDistance(),getUpDistance(), cells[x][y].getOrganic()/100f,lastEnergy*0.1f,lastUpCell,lastDownCell,lastLeftCell,lastRightCell,lastRightDownCell,lastRightUpCell,lastLeftDownCell,lastLeftUpCell,lastOrganic/100f,sunny,myPartsObj.size(),lastSize,lastRightDistance,lastLeftDistace,lastUpDistance,lastDownDistance};
             float[] output = gene.evaluateNetwork(inputs);
             if (output[0] > 0.7f || output[0] == 0.5f || output[0] <= 0.0f) {
              gSuccessfully -= 100000;
@@ -576,6 +599,7 @@ float isController(){
                 gEnergy+=3;
             gSuccessfully+=10;
                 }else {
+                    gSuccessfully-=10;
                     gEnergy--;
                 }
             }
@@ -620,18 +644,20 @@ float isController(){
                 if(gEnergy>=4){
                     gSuccessfully +=2;
                     gEnergy--;
-                }else {
+                }
+                else {
                     gSuccessfully-=2;
                     gEnergy--;
                 }
             } else if (output[0] > 0.6f && output[0] < 0.61f) {
-                if (eatCellT(Directions.RIGHT)) {
+                if (eatCellT(Directions.RIGHT)==1) {
                     gEnergy += enValue;
                 } else {
                     if(gEnergy>=4){
                         gSuccessfully -=2;
                         gEnergy--;
-                    }else {
+                    }else if(eatCellT(Directions.RIGHT)==2){gSuccessfully-=3;}
+                    else {
                         gSuccessfully-=2;
                         gEnergy--;
                     }
@@ -640,25 +666,28 @@ float isController(){
 
             } else if (output[0] > 0.61f && output[0] < 0.62f) {
                 // eatCell(Directions.LEFT);
-                if (eatCellT(Directions.LEFT)) {
+                if (eatCellT(Directions.LEFT)==1) {
                     gEnergy += enValue;
-                } else {
+                } else if(eatCellT(Directions.LEFT)==2){gSuccessfully-=3;}
+                else {
                     gSuccessfully-=2;
                     gEnergy--;
                 }
             } else if (output[0] > 0.62f && output[0] < 0.63f) {
                 //  eatCell(Directions.UP);
-                if (eatCellT(Directions.UP)) {
+                if (eatCellT(Directions.UP)==1) {
                     gEnergy += enValue;
-                } else {
+                }else if(eatCellT(Directions.UP)==2){gSuccessfully-=3;}
+                else {
                     gSuccessfully-=2;
                     gEnergy--;
                 }
             } else if (output[0] > 0.63f && output[0] < 0.64f) {
                 // eatCell(Directions.DOWN);
-                if (eatCellT(Directions.DOWN)) {
+                if (eatCellT(Directions.DOWN)==1) {
                     gEnergy += enValue;
-                } else {
+                } else if(eatCellT(Directions.DOWN)==2){gSuccessfully-=3;}
+                else {
                     gSuccessfully-=2;
                     gEnergy--;
                 }
@@ -668,7 +697,7 @@ gEnergy-=10;
 
             }
 if(gEnergy>energy){
-    gSuccessfully+=2;
+    gSuccessfully+=1;
 }
             if (gEnergy <= 3) {
                 gSuccessfully -= 4;
@@ -681,8 +710,8 @@ if(gEnergy>energy){
                 gSuccess = gSuccessfully;
                 outputBuffer = output[0];
             }
-            gene.setFitness(gSuccessfully*0.1f);
-gene.setPoints(gSuccessfully*0.001f);
+            gene.setFitness(gSuccessfully);
+gene.setPoints(gSuccessfully*0.01f);
         }
 
         this.output = outputBuffer;
@@ -759,31 +788,35 @@ gene.setPoints(gSuccessfully*0.001f);
     }
 
 
-     public boolean eatCellT(Directions dirs){
-        boolean done = false;
+     public int eatCellT(Directions dirs){
+        int done = 0;
         switch (dirs){
             case UP -> {
                 if( y>0 && cells[x][y-1].secCell!=null ){
-                    done= true;
-                }else done= false;
+                    if (isRelatives(cells[x][y-1].secCell)){done=2;}else
+                    done= 1;
+                }else done= 0;
             }
             case DOWN -> {
                 if(y<height-1 && cells[x][y+1].secCell!=null){
-                    done= true;
-                }else done= false;
+                    if (isRelatives(cells[x][y+1].secCell)){done=2;}else
+                    done= 1;
+                }else done= 0;
             }
             case RIGHT -> {
                 if( x<width-1 &&  cells[x+1][y].secCell!=null ){
-                    done= true;
-                }else done = false;
+                    if (isRelatives(cells[x+1][y].secCell)){done=2;}else
+                    done= 1;
+                }else done = 0;
             }
             case LEFT -> {
                 if(  x>0 && cells[x-1][y].secCell!=null){
-                    done= true;
-                }else done= false;
+                    if (isRelatives(cells[x-1][y].secCell)){done=2;}else
+                    done= 1;
+                }else done= 0;
             }
         }
-        if(done){cellls--;}
+        if(done==1){cellls--;}
         return done;
     }
         public class Protoplast implements PartCell{

@@ -33,16 +33,7 @@ public class World extends JPanel  {
     static    ObjectInputStream objectInputStream;
 
    /* static {
-        try {
-            objectInputStream = new ObjectInputStream(fileInputStream);
-            try {
-                pooll = (Pool) objectInputStream.readObject();
-            } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
     }*/
 
     static Pool pooll=new Pool();
@@ -322,7 +313,7 @@ pol.breedNewGeneration();
     pol.addToSpecies(topMultipliesPool.getTopGenome());
     lastPooll=pooll;
     pooll=pol;
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 10; i++) {
         new normCellInit(pooll);
     }
     Restarts++;
@@ -366,11 +357,11 @@ pol.breedNewGeneration();
         public void run() {
             System.gc();
             Random r =new Random();
-            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,15));
-            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,2));
-            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll,1));
-            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll));
-            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pooll));
+            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pool,15));
+            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pool,2));
+            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pool,1));
+            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pool,r.nextLong()));
+            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pool,r.nextLong()));
 
         }
     }

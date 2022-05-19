@@ -7,7 +7,8 @@ import static MyVersion.World.cellls;
 public  class Cell {
     boolean isChanged=true;
 public static int startEnergy=20;
-    Color myColor = new Color(255, 255, 255);
+int[] color;
+    Color myColor ;
     int energy=1;
 NormCell secCell;
 PartCell partCell;
@@ -46,6 +47,20 @@ else{} //System.out.println(" ");
     }
 
   void testCell(){
+        try{
+        if(organic<255 && organic>0){
+        color=new int[3];
+
+          color[0]=255-organic;
+          color[1]=255-organic;
+            color[2]=255-organic;
+        myColor=new Color(color[0],color[1],color[2]);
+         }
+        }catch (IllegalArgumentException e){
+            System.out.println(color[0]);
+            System.out.println(color[1]);
+            System.out.println(color[2]);
+        }
         if(secCell!=null  && secCell.getEnergy()<=0  ){
             organic+=secCell.getEnergy();
             secCell.myPartsObj=null;
@@ -55,6 +70,7 @@ else{} //System.out.println(" ");
             cellls--;
         }
       if(secCell!=null  && secCell.getEnergy()>=10000 ){
+          System.out.println("Cell with 10000 died");
           organic+=secCell.getEnergy();
           secCell.myPartsObj=null;
           secCell.myParts=null;
