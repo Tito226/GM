@@ -7,7 +7,7 @@ public class NEAT_Config implements Serializable {
 
     public static final int INPUTS = 33;
     public static final int OUTPUTS = 1;
-    public static final int HIDDEN_NODES = 13;//20
+    public static final int HIDDEN_NODES = 20;//20
     public static final int POPULATION =58; //3
 
     public static final float COMPATIBILITY_THRESHOLD = 0;//5

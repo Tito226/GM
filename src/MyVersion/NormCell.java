@@ -31,7 +31,7 @@ HashMap<String, Integer[]> myParts=new HashMap<>();
     static long num = 0l;
     private long myNum;
  // public Cell[][] cells =getCells();
-    int stepN=0;
+    boolean stepN=false;
     private int energy=30;
     private int x;
     private int y;

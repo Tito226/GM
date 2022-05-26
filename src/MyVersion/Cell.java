@@ -45,8 +45,30 @@ if( secCell!=null){
 }
 else{} //System.out.println(" ");
     }
-
+   boolean getSecCell(){
+        if(secCell!=null){
+            return true;
+        }else return false;
+   }
+   boolean getPartCell(){
+        if(partCell!=null){
+            return true;
+        }else return false;
+    }
+   boolean lastNCell=false;
+    boolean lastPCell=false;
+    int lastOrganic=0;
+boolean isChanged(){
+        if (lastPCell!=getPartCell() || lastNCell!=getSecCell() || lastOrganic!=organic){
+            return true;
+        }
+        else
+            return false;
+}
   void testCell(){
+    lastNCell=getSecCell();
+    lastPCell=getPartCell();
+    lastOrganic=organic;
         try{
         if(organic<255 && organic>0){
         color=new int[3];
