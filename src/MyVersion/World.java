@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.Random;
 import static MyVersion.Cell.startEnergy;
+import static MyVersion.PaintThread.paintMode;
 import static MyVersion.World.*;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
@@ -19,6 +20,7 @@ class PaintThread extends Thread{
     inPaintThread paint1;
     inPaintThread paint2;
     inPaintThread paint3;
+   static byte paintMode=12;
   public   void rept(){
         pause=false;
         for (int i = 0; i <World.width ; i++) {
@@ -45,7 +47,7 @@ class PaintThread extends Thread{
         @Override
         public void run() {
             while (true) {
-                if (countt2 % 1 == 0){
+                if (0 == 0){
                     switch (type) {
                         case 1 -> {
                             for (int i = 0; i < width / 2; i++) {
@@ -92,6 +94,24 @@ class PaintThread extends Thread{
                             }
 
                         }
+                        case 3->{
+                            for (int i = 0; i < width; i++) {
+                            for (int j = 0; j < height; j++) {
+                                if (cells[i][j] != null) {
+                                    if (cells[i][j].secCell == null && cells[i][j].partCell == null) {
+                                            g.setColor(cells[i][j].getColor());
+                                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+                                    } else if (cells[i][j].secCell != null && cells[i][j].partCell == null) {
+                                            g.setColor(cells[i][j].secCell.getColor());
+                                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+                                    }
+                                    if (cells[i][j] != null && cells[i][j].partCell != null) {
+                                            g.setColor(cells[i][j].partCell.getColor());
+                                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+                                    }
+                                }
+                            }
+                        }}
                     }
                     g.setColor(Color.BLACK);
                     g.drawString("Restarts: " + Restarts, 7, 9);
@@ -108,13 +128,20 @@ class PaintThread extends Thread{
 
     public void paint(Graphics g) {
         long startTime = System.currentTimeMillis();
-        if(paint1!=null){
-        }else {paint1=new inPaintThread(g, 1);
-            paint2= new inPaintThread(g, 2);
-            paint1.start();
-            paint2.start();
+        if(paintMode==1) {
+            if (paint1 != null) {
+            } else {
+                paint1 = new inPaintThread(g, 1);
+                paint2 = new inPaintThread(g, 2);
+                paint1.start();
+                paint2.start();
             }
-
+        }else{
+            if (paint1 == null) {
+                paint1 = new inPaintThread(g, 3);
+                paint1.start();
+            }
+        }
         long endTime = System.currentTimeMillis();
         if (endTime - startTime > 100) {
             System.out.println("Paint took " + (endTime - startTime) + " milliseconds");
@@ -146,7 +173,7 @@ static Pool lastPooll;
 
 
     public static int cellls=0;
-    public static int cellSize=4;
+    public static int cellSize=3;
    public static int width;
    public static int height;
    public static int sunny=1;
@@ -171,8 +198,8 @@ public static Cell[][] getCells(){
 
 
     public static void main(String[] args) throws InterruptedException, IOException {
-        int width=1280;
-        int height=720;
+        int width=1600;
+        int height=1000;
         JFrame frame = new JFrame("GM");
         frame.getRootPane().addComponentListener(new ComponentAdapter() {
             public void componentResized(ComponentEvent e) {
@@ -352,17 +379,20 @@ pol.breedNewGeneration();
     pol.addToSpecies(topGene);
     pol.addToSpecies(topLifeTimePool.getTopGenome());
     pol.addToSpecies(topMultipliesPool.getTopGenome());
+    pol.addToSpecies(pooll.getTopGenome());
     lastPooll=pooll;
     pooll=pol;
     for (int i = 0; i < 10; i++) {
         new normCellInit(pooll);
     }
     Restarts++;
+    if(paintMode==1)
      paintThread.rept();
+
     try {
         Thread.yield();
-        Thread.sleep(1000);
-    } catch (InterruptedException e) {
+       //Thread.sleep(1000);
+    } catch (Exception e) {
         throw new RuntimeException(e);
     }
     lastRestarts++;

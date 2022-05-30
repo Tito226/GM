@@ -242,7 +242,7 @@ public class Genome implements Comparable, Serializable {
     private int Outputs=NEAT_Config.OUTPUTS;
     public float[] evaluateNetwork(float[] inputs) {
         float output[] = new float[Outputs];
-        generateNetwork();
+          generateNetwork();
 
         for (int i = 0; i < NEAT_Config.INPUTS; i++) {
             nodes.get(i).setValue(inputs[i]);
