@@ -5,6 +5,8 @@ import MyVersion.NEAT.Genome;
 import MyVersion.NEAT.Pool;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -17,6 +19,17 @@ class PaintThread extends Thread{
     inPaintThread paint1;
     inPaintThread paint2;
     inPaintThread paint3;
+  public   void rept(){
+        pause=false;
+        for (int i = 0; i <World.width ; i++) {
+            for (int j = 0; j < World.height; j++) {
+                if(cells[i][j]!=null)
+                    cells[i][j].change=true;
+            }
+        }
+
+        pause=true;
+    }
     public PaintThread(){
 
     }
@@ -80,6 +93,8 @@ class PaintThread extends Thread{
 
                         }
                     }
+                    g.setColor(Color.BLACK);
+                    g.drawString("Restarts: " + Restarts, 7, 9);
             }
          }
         }
@@ -99,8 +114,7 @@ class PaintThread extends Thread{
             paint1.start();
             paint2.start();
             }
-        g.setColor(Color.BLACK);
-        g.drawString("Restarts: " + Restarts, 7, 9);
+
         long endTime = System.currentTimeMillis();
         if (endTime - startTime > 100) {
             System.out.println("Paint took " + (endTime - startTime) + " milliseconds");
@@ -132,25 +146,22 @@ static Pool lastPooll;
 
 
     public static int cellls=0;
-    public static int cellSize=3;
+    public static int cellSize=4;
    public static int width;
    public static int height;
    public static int sunny=1;
     static Cell[][] cells;
     public static boolean pause=true;
-
+    static PaintThread paintThread;
     public World(int width,int height) throws IOException {
         this.height=height;
         this.width=width;
         cells=new Cell[width][height];
-        for (int i = 0; i < width; i++) {
-
-        }
     }
     static World world;
   static   Thread wor;
 
-public void sleep(int n) throws InterruptedException {
+public static void sleep(int n) throws InterruptedException {
 
         Thread.sleep(n);
 }
@@ -163,6 +174,23 @@ public static Cell[][] getCells(){
         int width=1280;
         int height=720;
         JFrame frame = new JFrame("GM");
+        frame.getRootPane().addComponentListener(new ComponentAdapter() {
+            public void componentResized(ComponentEvent e) {
+                pause=false;
+                for (int i = 0; i <World.width ; i++) {
+                    for (int j = 0; j < World.height; j++) {
+                        if(cells[i][j]!=null)
+                        cells[i][j].change=true;
+                    }
+                }
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
+                pause=true;
+            }
+        });
         JButton pauseButton = new JButton("Pause");
         JButton dePauseButton = new JButton("Continue");
         pauseButton.addActionListener(new PauseListener());
@@ -189,7 +217,7 @@ public static Cell[][] getCells(){
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         frame.setVisible(true);
          wor =new Thread(world);
-        PaintThread paintThread= new PaintThread();
+         paintThread= new PaintThread();
         paintThread.start();
         wor.setPriority(1);
         wor.start();
@@ -205,6 +233,7 @@ public static Cell[][] getCells(){
  public static Pool topMultipliesPool=null;
     static  byte countt2=0;
    public static int Restarts=0;
+   public  static int lastRestarts=0;
    @Override
     public void run() {
         int bestLifeTime=0;
@@ -301,6 +330,7 @@ if(cells[i][j].partCell!=null){
                 }
 
             }
+            //   Thread.yield();
         }
 
             if(!isStep){
@@ -328,6 +358,14 @@ pol.breedNewGeneration();
         new normCellInit(pooll);
     }
     Restarts++;
+     paintThread.rept();
+    try {
+        Thread.yield();
+        Thread.sleep(1000);
+    } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+    }
+    lastRestarts++;
     System.out.println("Restarted");
     System.out.println("best life time: "+ bestLifeTime);
     System.out.println("this Best Life Time: " +thisBestLifeTime);
@@ -343,20 +381,13 @@ pol.breedNewGeneration();
                 countt=0;
            }
            Thread.yield();
-           /* if (countt%2==0){
-                try {
-                    Thread.sleep(150);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }*/
         }
 
         countt++;
    long endTime = System.currentTimeMillis();
    if(endTime - startTime>100){
    System.out.println("Main took " + (endTime - startTime) + " milliseconds");}
-}
+    }
 
     }
 

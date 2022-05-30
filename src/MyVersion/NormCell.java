@@ -597,7 +597,7 @@ float isController(){
             if (output[0]>0.2 && output[0]<0.3){
                 if(cells[x][y].getOrganic()>=3){
                 gEnergy+=3;
-            gSuccessfully+=10;
+            gSuccessfully+=3;
                 }else {
                     gSuccessfully-=10;
                     gEnergy--;

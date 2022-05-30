@@ -2,7 +2,7 @@ package MyVersion;
 
 import java.awt.*;
 
-import static MyVersion.World.cellls;
+import static MyVersion.World.*;
 
 public  class Cell {
     boolean isChanged=true;
@@ -55,15 +55,20 @@ else{} //System.out.println(" ");
             return true;
         }else return false;
     }
+    boolean change=false;
    boolean lastNCell=false;
     boolean lastPCell=false;
     int lastOrganic=0;
 boolean isChanged(){
-        if (lastPCell!=getPartCell() || lastNCell!=getSecCell() || lastOrganic!=organic){
+        if (lastPCell!=getPartCell() || lastNCell!=getSecCell() || lastOrganic!=organic || lastRestarts!=Restarts){
             return true;
         }
-        else
-            return false;
+        if(change){
+            change=false;
+            return true;
+        }
+        else{
+            return false;}
 }
   void testCell(){
     lastNCell=getSecCell();
