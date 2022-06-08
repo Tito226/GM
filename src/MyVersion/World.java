@@ -20,7 +20,7 @@ class PaintThread extends Thread{
     inPaintThread paint1;
     inPaintThread paint2;
     inPaintThread paint3;
-   static byte paintMode=12;
+   static byte paintMode=1;
   public   void rept(){
         pause=false;
         for (int i = 0; i <World.width ; i++) {
@@ -198,8 +198,8 @@ public static Cell[][] getCells(){
 
 
     public static void main(String[] args) throws InterruptedException, IOException {
-        int width=1600;
-        int height=1000;
+        int width=1340;
+        int height=720;
         JFrame frame = new JFrame("GM");
         frame.getRootPane().addComponentListener(new ComponentAdapter() {
             public void componentResized(ComponentEvent e) {
