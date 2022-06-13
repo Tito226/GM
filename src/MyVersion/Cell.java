@@ -2,11 +2,12 @@ package MyVersion;
 
 import java.awt.*;
 
+import static MyVersion.GM2_CONFIG.CELL_START_ORGANIC;
 import static MyVersion.World.*;
 
 public  class Cell {
     boolean isChanged=true;
-public static int startEnergy=20;
+public static int startEnergy=CELL_START_ORGANIC;
 int[] color;
     Color myColor ;
     int energy=1;
@@ -90,7 +91,6 @@ boolean isChanged(){
         }
         if(secCell!=null  && secCell.getEnergy()<=0  ){
             organic+=secCell.getEnergy();
-            secCell.myPartsObj=null;
             secCell.myParts=null;
             secCell=null;
 
@@ -99,7 +99,6 @@ boolean isChanged(){
       if(secCell!=null  && secCell.getEnergy()>=10000 ){
           System.out.println("Cell with 10000 died");
           organic+=secCell.getEnergy();
-          secCell.myPartsObj=null;
           secCell.myParts=null;
           secCell=null;
           cellls--;

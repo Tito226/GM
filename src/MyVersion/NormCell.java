@@ -14,14 +14,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
+import static MyVersion.GM2_CONFIG.*;
 import static MyVersion.World.*;
 
 public class NormCell implements Environment, Serializable {
     byte counter=0;
     int lifeTime=0;
     int partNum=0;
-HashMap<String, Integer[]> myParts=new HashMap<>();
-    HashMap<String, PartCell> myPartsObj=new HashMap<>();
+ArrayList< Integer[]> myParts=new ArrayList<>();
     float output=0;
     float[] outputs;
     int multiplies=0;
@@ -30,12 +30,11 @@ HashMap<String, Integer[]> myParts=new HashMap<>();
     long myChildNum=r.nextLong();
     static long num = 0l;
     private long myNum;
- // public Cell[][] cells =getCells();
     boolean stepN=false;
     private int energy=30;
     private int x;
     private int y;
-    private int startEnergy=10;
+    private int startEnergy=NORM_CELL_START_ENERGY;
 NormCellType normCellType=NormCellType.MOVABLE;
     public String partName="part";
 
@@ -44,7 +43,7 @@ NormCellType normCellType=NormCellType.MOVABLE;
     }
 public Pool movablePool =new Pool();
 
-Color myColor=Color.GREEN;
+Color myColor=Color.green;
     public NormCell(Pool dadPool,long myParentNum){
         myNum=num;
         num++;
@@ -93,7 +92,9 @@ Color myColor=Color.GREEN;
     }
 
 boolean isMyPart(PartCell partCell){
-   if (myPartsObj.containsValue(partCell)){
+   if (myParts.contains(new Integer[]{partCell.getXx(),partCell.getYy()})){
+       System.out.println("WOOOOOOOOOOOOOOOOOOOOOOOOOOORK");
+
        return true;
    } else{
        return false;}
@@ -106,7 +107,7 @@ boolean isMyPart(PartCell partCell){
         switch (d){
             case DOWN ->{
                 y++;
-                if (  y<height && cells[x][y].secCell==null && (cells[x][y].partCell==null || isMyPart(cells[x][y].partCell)) && myParts.size()==0){
+                if (  y<height && cells[x][y].secCell==null && cells[x][y].partCell==null  && myParts.size()==0){
                 cells[x][y].setSecCell(cells[x][y-1].secCell);
                 cells[x][y-1].setSecCell(null);
                 }
@@ -116,7 +117,7 @@ boolean isMyPart(PartCell partCell){
             }
             case UP -> {
                 y--;
-                if (y>-1 &&  y<height-1 && cells[x][y].secCell==null && (cells[x][y].partCell==null || isMyPart(cells[x][y].partCell)) && myParts.size()==0){
+                if (y>-1 &&  y<height-1 && cells[x][y].secCell==null && cells[x][y].partCell==null  && myParts.size()==0){
                 cells[x][y].setSecCell(cells[x][y+1].secCell);
                 cells[x][y+1].setSecCell(null);}
                 else{y++;
@@ -125,14 +126,14 @@ boolean isMyPart(PartCell partCell){
             }
             case LEFT ->{
                 x--;
-                if (x>-1 && cells[x][y].secCell==null && (cells[x][y].partCell==null || isMyPart(cells[x][y].partCell)) && myParts.size()==0){
+                if (x>-1 && cells[x][y].secCell==null && cells[x][y].partCell==null && myParts.size()==0){
                 cells[x][y].setSecCell(cells[x+1][y].secCell);
                 cells[x+1][y].setSecCell(null);
                 }
                 else {x++;}
             }
             case RIGHT ->{ x++;
-                if(x<width && cells[x][y].secCell==null && (cells[x][y].partCell==null || isMyPart(cells[x][y].partCell)) && myParts.size()==0){
+                if(x<width && cells[x][y].secCell==null && cells[x][y].partCell==null  && myParts.size()==0){
                 cells[x][y].setSecCell(cells[x-1][y].secCell);
                 cells[x-1][y].setSecCell(null);
                 }
@@ -159,7 +160,7 @@ boolean isMyPart(PartCell partCell){
        if(  x>1 && cells[x-1][y].secCell!=null ){
            if(isRelatives(  cells[x-1][y].secCell)){return 2.5f;}else
            return 1.00f;
-       }else if(x>1 && cells[x-1][y].partCell!=null  && myPartsObj.containsValue(cells[x-1][y].partCell)){
+       }else if(x>1 && cells[x-1][y].partCell!=null  && isMyPart(cells[x-1][y].partCell)){
            return 1.5f;
        }
        else if(x>1 && cells[x-1][y].partCell!=null ){return 2.00f;}
@@ -170,7 +171,7 @@ boolean isMyPart(PartCell partCell){
         if( x<width-1 &&  cells[x+1][y].secCell!=null  ){
             if(isRelatives( cells[x+1][y].secCell)){return 2.5f;}else
             return 1.00f;
-        }else if(x<width-1 &&  cells[x+1][y].partCell!=null  && myPartsObj.containsValue(cells[x+1][y].partCell)){
+        }else if(x<width-1 &&  cells[x+1][y].partCell!=null  && isMyPart(cells[x+1][y].partCell)){
             return 1.5f;
         }
         else if(x<width-1 &&  cells[x+1][y].partCell!=null){return 2.00f;}
@@ -182,7 +183,7 @@ boolean isMyPart(PartCell partCell){
         if( y>0  && cells[x][y-1].secCell!=null  ){
             if(isRelatives( cells[x][y-1].secCell)){return 2.5f;}else
             return 1.00f;
-        }else if(y>0  && cells[x][y-1].partCell!=null  && myPartsObj.containsValue(cells[x][y-1].partCell)){
+        }else if(y>0  && cells[x][y-1].partCell!=null  && isMyPart(cells[x][y-1].partCell)){
             return 1.5f;
         }
         else if(y>0  && cells[x][y-1].partCell!=null){return 2.00f;}
@@ -193,7 +194,7 @@ boolean isMyPart(PartCell partCell){
         if(  y<height-1&& cells[x][y+1].secCell!=null ){
             if(isRelatives( cells[x][y+1].secCell)){return 2.5f;}else
             return 1.00f;
-        }else if(y<height-1&& cells[x][y+1].partCell!=null && myPartsObj.containsValue(cells[x][y+1].partCell)){
+        }else if(y<height-1&& cells[x][y+1].partCell!=null && isMyPart(cells[x][y+1].partCell)){
             return 1.5f;
         } else if( y<height-1&& cells[x][y+1].partCell!=null){return 2.00f;}
         else{
@@ -203,7 +204,7 @@ boolean isMyPart(PartCell partCell){
         if(  y<height-1&& x<width-1 && cells[x+1][y+1].secCell!=null ){
             if(isRelatives( cells[x+1][y+1].secCell)){return 2.5f;}else
                 return 1.00f;
-        }else if(y<height-1 && x<width-1&& cells[x+1][y+1].partCell!=null && myPartsObj.containsValue(cells[x+1][y+1].partCell)){
+        }else if(y<height-1 && x<width-1&& cells[x+1][y+1].partCell!=null && isMyPart(cells[x+1][y+1].partCell)){
             return 1.5f;
         } else if( y<height-1 && x<width-1&& cells[x+1][y+1].partCell!=null){return 2.00f;}
         else{
@@ -213,7 +214,7 @@ boolean isMyPart(PartCell partCell){
         if(  y>0&& x<width-1 && cells[x+1][y-1].secCell!=null ){
             if(isRelatives(cells[x+1][y-1].secCell)){return 2.5f;}else
             return 1.00f;
-        }else if(y>0 && x<width-1&& cells[x+1][y-1].partCell!=null && myPartsObj.containsValue(cells[x+1][y-1].partCell)){
+        }else if(y>0 && x<width-1&& cells[x+1][y-1].partCell!=null && isMyPart(cells[x+1][y-1].partCell)){
             return 1.5f;
         } else if( y>0 && x<width-1&& cells[x+1][y-1].partCell!=null){return 2.00f;}
         else{
@@ -224,7 +225,7 @@ boolean isMyPart(PartCell partCell){
         if(  y>0&& x>0 && cells[x-1][y-1].secCell!=null ){
             if(isRelatives( cells[x-1][y-1].secCell)){return 2.5f;}else
             return 1.00f;
-        }else if(y>0 &&x>0&& cells[x-1][y-1].partCell!=null && myPartsObj.containsValue(cells[x-1][y-1].partCell)){
+        }else if(y>0 &&x>0&& cells[x-1][y-1].partCell!=null && isMyPart(cells[x-1][y-1].partCell)){
             return 1.5f;
         } else if( y>0 && x>0&& cells[x-1][y-1].partCell!=null){return 2.00f;}
         else{
@@ -234,7 +235,7 @@ boolean isMyPart(PartCell partCell){
         if(  y<height-1&& x>0 && cells[x-1][y+1].secCell!=null ){
             if(isRelatives( cells[x-1][y+1].secCell)){return 2.5f;}else
             return 1.00f;
-        }else if(y<height-1 && x>0&& cells[x-1][y+1].partCell!=null && myPartsObj.containsValue(cells[x-1][y+1].partCell)){
+        }else if(y<height-1 && x>0&& cells[x-1][y+1].partCell!=null && isMyPart(cells[x-1][y+1].partCell)){
             return 1.5f;
         } else if( y<height-1 && x>0&& cells[x-1][y+1].partCell!=null){return 2.00f;}
         else{
@@ -302,9 +303,9 @@ boolean isMyPart(PartCell partCell){
 
     void step1(){
 
-        for (int i = 0; i < myPartsObj.size(); i++) {
+        for (int i = 0; i < myParts.size(); i++) {
             movablePool.evaluateFitness(this);
-            myPartsObj.get(partName +i).step(outputs[i+1]);
+            cells[myParts.get(i)[0]][myParts.get(i)[1]].partCell.step(outputs[i+1]);
 
         }
         if(outputs[0]>0.64 && outputs[0]<0.68){
@@ -326,7 +327,11 @@ boolean isMyPart(PartCell partCell){
         lifeTime++;
        }
     Protoplast protoplast;
-    void step(){           //TODO  Step
+    void step(){//TODO  Step
+        if(myParts.size()==0){
+            normCellType=NormCellType.MOVABLE;
+            setMyColor(Color.green);
+        }
         if (normCellType==NormCellType.CONTROLLER){
             setMyColor(Color.darkGray);
             step1();
@@ -490,7 +495,7 @@ void transferEnergy(float output){
    }
    }
 
-    int   neededEnergy=30;
+    int   neededEnergy=ENERGY_NEEDED_TO_MULTIPLY;
     void multiply(){
 
        if(isSpaceAvailable()==1.00f && energy>neededEnergy){
@@ -562,7 +567,7 @@ float isController(){
         lastLeftCell=getLeftCell();
         lastRightCell=getRightCell();
         lastOrganic=getEnergy();
-        lastSize=myPartsObj.size();
+        lastSize=myParts.size();
         lastRightDistance=getRightDistance();
         lastLeftDistace=getLeftDistance();
         lastUpDistance=getUpDistance();
@@ -588,8 +593,8 @@ float isController(){
             }
             int gSuccessfully = 20;
             int gEnergy = energy;
-            gene.setFitness(0);
-            float[] inputs = { getEnergy()*0.1f, getUptCell(), getDownCell(), getLeftCell(), getRightCell(),getRightDownCell(),getRightUpCell(),getLeftUpCell(),getLeftDownCell(), isSpaceAvailable(), isController(),getRightDistance(),getLeftDistance(),getUpDistance(),getUpDistance(), cells[x][y].getOrganic()/100f,lastEnergy*0.1f,lastUpCell,lastDownCell,lastLeftCell,lastRightCell,lastRightDownCell,lastRightUpCell,lastLeftDownCell,lastLeftUpCell,lastOrganic/100f,sunny,myPartsObj.size(),lastSize,lastRightDistance,lastLeftDistace,lastUpDistance,lastDownDistance};
+           // gene.setFitness(0);
+            float[] inputs = { getEnergy()*0.1f, getUptCell(), getDownCell(), getLeftCell(), getRightCell(),getRightDownCell(),getRightUpCell(),getLeftUpCell(),getLeftDownCell(), isSpaceAvailable(), isController(),getRightDistance(),getLeftDistance(),getUpDistance(),getUpDistance(), cells[x][y].getOrganic()/100f,lastEnergy*0.1f,lastUpCell,lastDownCell,lastLeftCell,lastRightCell,lastRightDownCell,lastRightUpCell,lastLeftDownCell,lastLeftUpCell,lastOrganic/100f,sunny,myParts.size(),lastSize,lastRightDistance,lastLeftDistace,lastUpDistance,lastDownDistance};
             float[] output = gene.evaluateNetwork(inputs);
             if (output[0] > 0.7f || output[0] == 0.5f || output[0] <= 0.0f) {
              gSuccessfully -= 100000;
@@ -693,17 +698,19 @@ float isController(){
                 }
             }else if(output[0]>0.64 && output[0]<0.7){
               //  protoplast=new Protoplast(output[0],x,y);
-gEnergy-=10;
-
+                if(gEnergy>20){
+            gEnergy-=ENERGY_NEEDED_TO_MULTIPLY_PROTOPLAST;
+            gSuccessfully+=PROTOPLAST_REWARD;
+                }
             }
-if(gEnergy>energy){
-    gSuccessfully+=1;
-}
+            if(gEnergy>energy){
+            gSuccessfully+=1;
+            }
             if (gEnergy <= 3) {
                 gSuccessfully -= 4;
             }
             if (gEnergy >= 98) {
-                gSuccessfully--;
+               // gSuccessfully--;
             }
 
             if (gSuccessfully > gSuccess) {
@@ -720,17 +727,13 @@ gene.setPoints(gSuccessfully*0.01f);
     }else if(normCellType==NormCellType.CONTROLLER){
          //  System.out.println(lifeTime);
 
-            int successfully;
-            if (multiplies != 0) {
-                successfully = energy + multiplies * 2 + lifeTime;
-            } else {
-                successfully = energy + lifeTime;
-            }
+            int successfully=20;
 
-            float[] outputBuffer = new float[myPartsObj.size()+1];
+
+            float[] outputBuffer = new float[myParts.size()+1];
             int gSuccess = 0;
             for (Genome gene : population) {
-                gene.setOutputs(myPartsObj.size()+1);
+                gene.setOutputs(myParts.size()+1);
                 Random r = new Random();
                 byte b = (byte) r.nextInt(101);
                 if (b == 45) {
@@ -739,8 +742,8 @@ gene.setPoints(gSuccessfully*0.01f);
                 }
                 int gSuccessfully = successfully;
                 int gEnergy = energy;
-                gene.setFitness(0);
-                float[] inputs = { getEnergy()*0.1f, getUptCell(), getDownCell(), getLeftCell(), getRightCell(),getRightDownCell(),getRightUpCell(),getLeftUpCell(),getLeftDownCell(), isSpaceAvailable(), isController(),getRightDistance(),getLeftDistance(),getUpDistance(),getUpDistance(), cells[x][y].getOrganic(),lastEnergy*0.1f,lastUpCell,lastDownCell,lastLeftCell,lastRightCell,lastRightDownCell,lastRightUpCell,lastLeftDownCell,lastLeftUpCell,lastOrganic,sunny,myPartsObj.size(),lastSize,lastRightDistance,lastLeftDistace,lastUpDistance,lastDownDistance};
+               // gene.setFitness(0);
+                float[] inputs = { getEnergy()*0.1f, getUptCell(), getDownCell(), getLeftCell(), getRightCell(),getRightDownCell(),getRightUpCell(),getLeftUpCell(),getLeftDownCell(), isSpaceAvailable(), isController(),getRightDistance(),getLeftDistance(),getUpDistance(),getUpDistance(), cells[x][y].getOrganic(),lastEnergy*0.1f,lastUpCell,lastDownCell,lastLeftCell,lastRightCell,lastRightDownCell,lastRightUpCell,lastLeftDownCell,lastLeftUpCell,lastOrganic,sunny,myParts.size(),lastSize,lastRightDistance,lastLeftDistace,lastUpDistance,lastDownDistance};
                  float[]  myOutput= gene.evaluateNetwork(inputs);
                 if ( myOutput[0]>0.64 && myOutput[0]<0.68 ){
                     gEnergy-=10;
@@ -752,15 +755,21 @@ gene.setPoints(gSuccessfully*0.01f);
                 for (int i = 1; i < outputBuffer.length; i++) {
                     if (myOutput[i]==0.5 || myOutput[i]==0){gSuccessfully-=50;}
                        // myPartsObj.get(partName+i).step(myOutput[i]);
-                        if (myPartsObj.get(partName+(i-1)) instanceof Protoplast){
+                    Integer[] coordinates = myParts.get(i-1);
+                        if (cells[coordinates[0]][coordinates[1]].partCell instanceof Protoplast){
                             if(myOutput[i]>0.5){
-                            gEnergy+=sunny;}else {gSuccessfully-=10;}
+                            gEnergy+=sunny;
+                                gSuccessfully+=1;
+                            }else {gSuccessfully-=10;}
 
                         }
 
                 }
                 if(gEnergy>energy){
-                    gSuccessfully+=3;
+                    gSuccessfully+=2;
+                }
+                else if (gEnergy <= 2) {
+                    gSuccessfully -= 200;
                 }
 
 
@@ -768,9 +777,7 @@ gene.setPoints(gSuccessfully*0.01f);
                     gSuccessfully -= 2;
                 }
 
-                if (gEnergy <= 2) {
-                    gSuccessfully -= 200;
-                }
+
                // if (gEnergy >= 98) {
                  //   gSuccessfully-=2;
               //  }
@@ -793,58 +800,69 @@ gene.setPoints(gSuccessfully*0.01f);
         switch (dirs){
             case UP -> {
                 if( y>0 && cells[x][y-1].secCell!=null ){
-                    if (isRelatives(cells[x][y-1].secCell)){done=2;}else
+                    if (isRelatives(cells[x][y-1].secCell)){
+                        done=2;
+                    }else
                     done= 1;
+                    enValue=cells[x][y-1].secCell.energy;
                 }else done= 0;
             }
             case DOWN -> {
                 if(y<height-1 && cells[x][y+1].secCell!=null){
-                    if (isRelatives(cells[x][y+1].secCell)){done=2;}else
+                    if (isRelatives(cells[x][y+1].secCell)){
+                        done=2;
+                    }else
                     done= 1;
+                    enValue=cells[x][y+1].secCell.energy;
                 }else done= 0;
             }
             case RIGHT -> {
                 if( x<width-1 &&  cells[x+1][y].secCell!=null ){
-                    if (isRelatives(cells[x+1][y].secCell)){done=2;}else
+                    if (isRelatives(cells[x+1][y].secCell)){
+                        done=2;
+                    }else
                     done= 1;
+                    enValue=cells[x+1][y].secCell.energy;
                 }else done = 0;
             }
             case LEFT -> {
                 if(  x>0 && cells[x-1][y].secCell!=null){
-                    if (isRelatives(cells[x-1][y].secCell)){done=2;}else
+                    if (isRelatives(cells[x-1][y].secCell)){
+                        done=2;
+                    }else
                     done= 1;
+                    enValue=cells[x-1][y].secCell.energy;
                 }else done= 0;
             }
         }
-        if(done==1){cellls--;}
         return done;
     }
         public class Protoplast implements PartCell{
         Color color=Color.CYAN;
         String myName;
-        int energy1 =1;
+        int energy1 =4;
 
         void transferEnergy(){
-        if(energy1>1){
+        if(energy1>=4){
         cells[x][y].secCell.energy+=energy1/2;
         energy1-=energy1/2;
     }
 }
 byte countb=0;
-        @Override
+
         public int getEnergy() {
             return energy1;
         }
 
         @Override
         public void step(float output) {
-            if(output>0.5){
             eatSunE();
+            if(output>0.5){
             transferEnergy();
                // System.out.println("WRYYYYY1");
                 if(countb%2==0){
             energy1--;
-                countb=0;}
+                }
                 countb++;
             }
         }
@@ -853,10 +871,12 @@ byte countb=0;
         public void test() {
 
             try {
-            if(getY()<0){
-                cells[xxx][yyy].partCell=null;}
-            else if( getX()<width && getY()<height && cells[getX()][getY()].secCell==null ){
+
+            if( cells[getX()][getY()].secCell==null ){
               cells[xxx][yyy].partCell=null;
+              if(myParts!=null){
+                  System.out.println(myParts.remove(new Integer[]{xxx,yyy}));
+              }
             }
             }catch (Exception e){
                 e.printStackTrace();
@@ -874,44 +894,36 @@ byte countb=0;
               if (y>0 && cells[x][y-1].secCell==null && cells[x][y-1].partCell==null) {
                   myName = partName + partNum;
                   partNum++;
-                  Protoplast protoplast = new Protoplast();
-                  cells[x][y - 1].partCell = protoplast;
-                  myParts.put(myName, new Integer[]{x, y - 1});
-                  myPartsObj.put(myName, protoplast);
+                  cells[x][y - 1].partCell = this;
+                  myParts.add(new Integer[]{x, y - 1});
                   done=true;
               }
           }  if(f>0.65 && f<0.66){
                   if (y<height-1 && cells[x][y+1].secCell==null && cells[x][y+1].partCell==null) {
                       myName=partName+partNum;
                       partNum++;
-                      Protoplast protoplast=new Protoplast();
-                      cells[x][y+1].partCell=protoplast;
-                      myParts.put(myName,new Integer[]{x,y+1});
-                      myPartsObj.put(myName,protoplast);
+                      cells[x][y+1].partCell=this;
+                      myParts.add(new Integer[]{x,y+1});
                       done=true;
                   }
               } if(f>0.66 && f<0.67){
                   if (x<width-1 && cells[x+1][y].secCell==null && cells[x+1][y].partCell==null) {
                       myName=partName+partNum;
                       partNum++;
-                      Protoplast protoplast=new Protoplast();
-                      cells[x+1][y].partCell=protoplast;
-                      myParts.put(myName,new Integer[]{x+1,y});
-                      myPartsObj.put(myName,protoplast);
+                      cells[x+1][y].partCell=this;
+                      myParts.add(new Integer[]{x+1,y});
                       done=true;
                   }
               }   if(f>0.67 && f<0.68){
                   if (x>0 && cells[x-1][y].secCell==null && cells[x-1][y].partCell==null) {
                       myName=partName+partNum;
                       partNum++;
-                      Protoplast protoplast=new Protoplast();
-                      cells[x-1][y].partCell=protoplast;
-                      myParts.put(myName,new Integer[]{x-1,y});
-                      myPartsObj.put(myName,protoplast);
+                      cells[x-1][y].partCell=this;
+                      myParts.add(new Integer[]{x-1,y});
                       done=true;
                   }
               }
-          if (done){energy-=10;
+          if (done){energy-=ENERGY_NEEDED_TO_MULTIPLY_PROTOPLAST;
           }
         }
      private    int xxx;
@@ -958,4 +970,6 @@ byte countb=0;
         Color getColor();
         void setY(int y);
         void setX(int x);
-    }
+            int getXx();
+            int getYy();
+        }

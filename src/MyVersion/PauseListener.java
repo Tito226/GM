@@ -13,7 +13,7 @@ public class PauseListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         System.out.println("It works1");
-        World.pause = false;
+        World.pause = true;
       //  if(y%2==0) {
       //      System.out.println("It works1");
       //      World.pause = false;

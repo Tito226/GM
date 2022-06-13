@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.Random;
 import static MyVersion.Cell.startEnergy;
+import static MyVersion.GM2_CONFIG.CELL_SIZE;
+import static MyVersion.GM2_CONFIG.PAINT_MODE;
 import static MyVersion.PaintThread.paintMode;
 import static MyVersion.World.*;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
@@ -20,17 +22,25 @@ class PaintThread extends Thread{
     inPaintThread paint1;
     inPaintThread paint2;
     inPaintThread paint3;
-   static byte paintMode=1;
+   static byte paintMode=PAINT_MODE;
   public   void rept(){
-        pause=false;
+      if(!pause){
+        pause=true;
         for (int i = 0; i <World.width ; i++) {
             for (int j = 0; j < World.height; j++) {
                 if(cells[i][j]!=null)
                     cells[i][j].change=true;
             }
         }
-
-        pause=true;
+        pause=false;
+  }else {
+        for (int i = 0; i <World.width ; i++) {
+            for (int j = 0; j < World.height; j++) {
+                if(cells[i][j]!=null)
+                    cells[i][j].change=true;
+            }
+        }
+    }
     }
     public PaintThread(){
 
@@ -111,7 +121,10 @@ class PaintThread extends Thread{
                                     }
                                 }
                             }
-                        }}
+                        }
+                            g.setColor(Color.BLACK);
+                            g.drawString("Restarts: " + Restarts, 7, 9);
+                        }
                     }
                     g.setColor(Color.BLACK);
                     g.drawString("Restarts: " + Restarts, 7, 9);
@@ -128,15 +141,15 @@ class PaintThread extends Thread{
 
     public void paint(Graphics g) {
         long startTime = System.currentTimeMillis();
-        if(paintMode==1) {
-            if (paint1 != null) {
-            } else {
+        if(paintMode==2) {
+            if (paint1 == null) {
+
                 paint1 = new inPaintThread(g, 1);
                 paint2 = new inPaintThread(g, 2);
                 paint1.start();
                 paint2.start();
             }
-        }else{
+        }else if (paintMode==1){
             if (paint1 == null) {
                 paint1 = new inPaintThread(g, 3);
                 paint1.start();
@@ -153,32 +166,20 @@ class PaintThread extends Thread{
 public class World extends JPanel implements Runnable  {
 
   static   FileInputStream fileInputStream;
-
-    //  static {
-     //   try {
-      //    fileInputStream = new FileInputStream("D:\\save.txt");
-       // } catch (FileNotFoundException e) {
-       //     e.printStackTrace();
-        //}
-    //}
-
     static    ObjectInputStream objectInputStream;
 
-   /* static {
-
-    }*/
 
     static Pool pooll=new Pool();
 static Pool lastPooll;
 
 
     public static int cellls=0;
-    public static int cellSize=3;
+    public static int cellSize=CELL_SIZE;
    public static int width;
    public static int height;
    public static int sunny=1;
     static Cell[][] cells;
-    public static boolean pause=true;
+    public static boolean pause=false;
     static PaintThread paintThread;
     public World(int width,int height) throws IOException {
         this.height=height;
@@ -197,13 +198,14 @@ public static Cell[][] getCells(){
 }
 
 
-    public static void main(String[] args) throws InterruptedException, IOException {
-        int width=1340;
-        int height=720;
+    public static void main(String[] args) throws  IOException {
+        int width=1600;
+        int height=1000;
         JFrame frame = new JFrame("GM");
         frame.getRootPane().addComponentListener(new ComponentAdapter() {
             public void componentResized(ComponentEvent e) {
-                pause=false;
+                if(!pause){
+                pause=true;
                 for (int i = 0; i <World.width ; i++) {
                     for (int j = 0; j < World.height; j++) {
                         if(cells[i][j]!=null)
@@ -215,7 +217,20 @@ public static Cell[][] getCells(){
                 } catch (InterruptedException ex) {
                     throw new RuntimeException(ex);
                 }
-                pause=true;
+                pause=false;
+                }else{
+                    for (int i = 0; i <World.width ; i++) {
+                        for (int j = 0; j < World.height; j++) {
+                            if(cells[i][j]!=null)
+                                cells[i][j].change=true;
+                        }
+                    }
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
             }
         });
         JButton pauseButton = new JButton("Pause");
@@ -246,7 +261,6 @@ public static Cell[][] getCells(){
          wor =new Thread(world);
          paintThread= new PaintThread();
         paintThread.start();
-        wor.setPriority(1);
         wor.start();
 
 
@@ -297,7 +311,7 @@ public static Cell[][] getCells(){
     Thread.yield();
     countt3++;
     long startTime = System.currentTimeMillis();
-        if(pause){
+        if(!pause){
             countt2++;
 
             int NULL_CELLS=0;
@@ -310,8 +324,8 @@ public static Cell[][] getCells(){
             }
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height ; j++) {
-            if (cells[i][j].secCell==null){NULL_CELLS++;
-
+            if (cells[i][j].secCell==null){
+                NULL_CELLS++;
             }
                 if(cells[i][j].secCell!=null){
                     if ( NULL_CELLS>width*height-4){
@@ -338,16 +352,15 @@ public static Cell[][] getCells(){
                     countt3++;
 
                 }
-if(cells[i][j].partCell!=null){
+                if(cells[i][j].partCell!=null){
 
-    cells[i][j].partCell.setX(i);
-    cells[i][j].partCell.setY(j);
-}
+                cells[i][j].partCell.setX(i);
+                cells[i][j].partCell.setY(j);
+                }
 
                 if(cells[i][j].secCell!=null){
                     cells[i][j].secCell.setX(i);
                     cells[i][j].secCell.setY(j);
-                    cellsNum=cells[i][j].secCell.getMyNum();
                     if(!cells[i][j].secCell.stepN){
                         cells[i][j].secCell.stepN=true;
                         cells[i][j].secCell.step();
@@ -386,15 +399,10 @@ pol.breedNewGeneration();
         new normCellInit(pooll);
     }
     Restarts++;
-    if(paintMode==1)
-     paintThread.rept();
 
-    try {
-        Thread.yield();
-       //Thread.sleep(1000);
-    } catch (Exception e) {
-        throw new RuntimeException(e);
-    }
+     paintThread.rept();
+Thread.yield();
+
     lastRestarts++;
     System.out.println("Restarted");
     System.out.println("best life time: "+ bestLifeTime);
@@ -410,7 +418,6 @@ pol.breedNewGeneration();
                 System.gc();
                 countt=0;
            }
-           Thread.yield();
         }
 
         countt++;
