@@ -22,6 +22,7 @@ public class NormCell implements Environment, Serializable {
     int lifeTime=0;
     int partNum=0;
 ArrayList< Integer[]> myParts=new ArrayList<>();
+ArrayList<PartCell> PartLinks=new ArrayList<>();
     float output=0;
     float[] outputs;
     int multiplies=0;
@@ -837,7 +838,13 @@ gene.setPoints(gSuccessfully*0.01f);
         }
         return done;
     }
+
+
+
+
+
         public class Protoplast implements PartCell{
+            Integer[] myCoords=new Integer[2];
         Color color=Color.CYAN;
         String myName;
         int energy1 =4;
@@ -875,7 +882,7 @@ byte countb=0;
             if( cells[getX()][getY()].secCell==null ){
               cells[xxx][yyy].partCell=null;
               if(myParts!=null){
-                  System.out.println(myParts.remove(new Integer[]{xxx,yyy}));
+                  System.out.println(myParts.remove(myCoords));
               }
             }
             }catch (Exception e){
@@ -885,17 +892,17 @@ byte countb=0;
             }
         }
 
-        public Protoplast(){
-
-        }
         public Protoplast(float f,int x,int y){
+
             boolean done=false;
           if(f>0.64 && f<0.65){
               if (y>0 && cells[x][y-1].secCell==null && cells[x][y-1].partCell==null) {
                   myName = partName + partNum;
                   partNum++;
                   cells[x][y - 1].partCell = this;
-                  myParts.add(new Integer[]{x, y - 1});
+                  myCoords[0]=x;
+                  myCoords[1]=y-1;
+                  myParts.add(myCoords);
                   done=true;
               }
           }  if(f>0.65 && f<0.66){
@@ -903,7 +910,9 @@ byte countb=0;
                       myName=partName+partNum;
                       partNum++;
                       cells[x][y+1].partCell=this;
-                      myParts.add(new Integer[]{x,y+1});
+                      myCoords[0]=x;
+                      myCoords[1]=y+1;
+                      myParts.add(myCoords);
                       done=true;
                   }
               } if(f>0.66 && f<0.67){
@@ -911,7 +920,9 @@ byte countb=0;
                       myName=partName+partNum;
                       partNum++;
                       cells[x+1][y].partCell=this;
-                      myParts.add(new Integer[]{x+1,y});
+                      myCoords[0]=x+1;
+                      myCoords[1]=y;
+                      myParts.add(myCoords);
                       done=true;
                   }
               }   if(f>0.67 && f<0.68){
@@ -919,11 +930,16 @@ byte countb=0;
                       myName=partName+partNum;
                       partNum++;
                       cells[x-1][y].partCell=this;
-                      myParts.add(new Integer[]{x-1,y});
+                      myCoords[0]=x-1;
+                      myCoords[1]=y;
+                      myParts.add(myCoords);
                       done=true;
                   }
               }
-          if (done){energy-=ENERGY_NEEDED_TO_MULTIPLY_PROTOPLAST;
+          if (done){
+              energy-=ENERGY_NEEDED_TO_MULTIPLY_PROTOPLAST;
+              xxx=myCoords[0];
+              yyy=myCoords[1];
           }
         }
      private    int xxx;
@@ -959,8 +975,7 @@ byte countb=0;
 
 
 
-
-    }
+}
 
 
         interface PartCell{
