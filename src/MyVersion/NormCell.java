@@ -609,10 +609,10 @@ float isController(){
                 }
             } else if (output[0] > 0.5f && output[0] < 0.52f) {
                 if(gEnergy>=4){
-           gSuccessfully +=2;
+           gSuccessfully +=1;
                 gEnergy--;
                 }else {
-                    gSuccessfully-=2;
+                    gSuccessfully-=1;
                     gEnergy--;
                 }
                 //   move(Directions.UP);
