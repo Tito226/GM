@@ -303,30 +303,31 @@ public static Cell[][] getCells(){
 
 
         byte countt=0;
-        byte countt3=0;
+
 
     while(true) {
     boolean isStep=false;
     countt2++;
     Thread.yield();
-    countt3++;
     long startTime = System.currentTimeMillis();
         if(!pause){
-            countt2++;
 
             int NULL_CELLS=0;
             for (int i = 0; i < width; i++) {
                 for (int j = 0; j < height ; j++) {
                     if( cells[i][j].secCell!=null){
-                    cells[i][j].secCell.stepN=false;}
+                    cells[i][j].secCell.stepN=false;
+                    }
                     cells[i][j].testCell();
                 }
             }
+
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height ; j++) {
             if (cells[i][j].secCell==null){
                 NULL_CELLS++;
             }
+            //BEST CELLS FINDER FROM HERE
                 if(cells[i][j].secCell!=null){
                     if ( NULL_CELLS>width*height-4){
                         pooll.addToSpecies(topLifeTimePool.getTopGenome());
@@ -349,14 +350,9 @@ public static Cell[][] getCells(){
                         bestMultiplies=cells[i][j].secCell.multiplies;
                         topMultipliesPool=cells[i][j].secCell.movablePool;
                     }
-                    countt3++;
 
                 }
-                if(cells[i][j].partCell!=null){
-
-                cells[i][j].partCell.setX(i);
-                cells[i][j].partCell.setY(j);
-                }
+                //TO HERE
 
                 if(cells[i][j].secCell!=null){
                     cells[i][j].secCell.setX(i);
@@ -378,14 +374,14 @@ public static Cell[][] getCells(){
             }
 
 
-if (NULL_CELLS==width*height){
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
+         if (NULL_CELLS==width*height){
+         for (int i = 0; i < height; i++) {
+         for (int j = 0; j < width; j++) {
             cells[j][i].organic=startEnergy;
-        }
-    }
-Pool pol=pooll;
-pol.breedNewGeneration();
+          }
+         }
+         Pool pol=pooll;
+         pol.breedNewGeneration();
 
   //  Collections.sort(species,Collections.reverseOrder());
 
@@ -401,21 +397,21 @@ pol.breedNewGeneration();
     Restarts++;
 
      paintThread.rept();
-Thread.yield();
+     Thread.yield();
 
     lastRestarts++;
     System.out.println("Restarted");
     System.out.println("best life time: "+ bestLifeTime);
     System.out.println("this Best Life Time: " +thisBestLifeTime);
     thisBestLifeTime=0;
-}
+         }
 
 
           // long usedBytes = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
            // usedBytes/1048576>500
            if (countt%5000==0){
-               System.out.println("Garbage collector started");
-                System.gc();
+             //  System.out.println("Garbage collector started");
+               // System.gc();
                 countt=0;
            }
         }
