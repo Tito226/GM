@@ -48,6 +48,9 @@ public void setSecCell(NormCell secCell){
                 }
             }
         }
+        secCell.myParts.clear();
+        secCell.lifeTime=0;
+        secCell.multiplies=0;
     }
     public void setPartCell(PartCell partCell) {
         this.partCell = partCell;
