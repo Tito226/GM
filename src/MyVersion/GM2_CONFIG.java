@@ -3,7 +3,7 @@ package MyVersion;
 public class GM2_CONFIG {
      //GENERAL
     public final static int CELL_SIZE=3;
-    public final static int PAINT_MODE=1; //1-1 Thread 2-2 Threads
+    public final static int PAINT_MODE=2; //1-1 Thread 2-2 Threads
      //NORMCELL SETTINGS
     public static final int ENERGY_NEEDED_TO_MULTIPLY=30;
     public final static int ENERGY_NEEDED_TO_MULTIPLY_PROTOPLAST=10;

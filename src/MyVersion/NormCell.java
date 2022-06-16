@@ -586,7 +586,7 @@ float isController(){
             if (output[0]>0.2 && output[0]<0.3){
                 if(cells[x][y].getOrganic()>=3){
                 gEnergy+=3;
-            gSuccessfully+=3;
+            gSuccessfully+=2;
                 }else {
                     gSuccessfully-=4;
                     gEnergy--;
@@ -601,7 +601,8 @@ float isController(){
                     gEnergy-=2;
                     gSuccessfully-=3;
                 }
-            } else if (output[0] > 0.5f && output[0] < 0.52f) {
+            } else if (output[0] > 0.5f && output[0] < 0.6f) {
+                //move
                 if(gEnergy>=4){
            gSuccessfully +=1;
                 gEnergy--;
@@ -609,35 +610,7 @@ float isController(){
                     gSuccessfully-=1;
                     gEnergy--;
                 }
-                //   move(Directions.UP);
-            } else if (output[0] > 0.52f && output[0] < 0.54f) {
-                //   move(Directions.DOWN);
-                if(gEnergy>=4){
-                    gSuccessfully +=1;
-                    gEnergy--;
-                }else {
-                    gSuccessfully-=1;
-                    gEnergy--;
-                }
-            } else if (output[0] > 0.54f && output[0] < 0.58f) {
-                //  move(Directions.LEFT);
-                if(gEnergy>=4){
-                    gSuccessfully +=1;
-                    gEnergy--;
-                }else {
-                    gSuccessfully-=1;
-                    gEnergy--;
-                }
-            } else if (output[0] > 0.58f && output[0] < 0.6f) {
-                // move(Directions.RIGHT);
-                if(gEnergy>=4){
-                    gSuccessfully +=1;
-                    gEnergy--;
-                }
-                else {
-                    gSuccessfully-=1;
-                    gEnergy--;
-                }
+
             } else if (output[0] > 0.6f && output[0] < 0.61f) {
                 if (eatCellT(Directions.RIGHT)==1) {
                     gEnergy += enValue;

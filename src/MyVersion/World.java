@@ -57,25 +57,33 @@ class PaintThread extends Thread{
         @Override
         public void run() {
             while (true) {
-                if (0 == 0){
+                if (0 == 0) {
+                    try{
                     switch (type) {
                         case 1 -> {
                             for (int i = 0; i < width / 2; i++) {
                                 for (int j = 0; j < height; j++) {
                                     if (cells[i][j] != null) {
                                         if (cells[i][j].secCell == null && cells[i][j].partCell == null) {
-                                            if(cells[i][j].isChanged()){
-                                            g.setColor(cells[i][j].getColor());
-                                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);}
+                                            if (cells[i][j].isChanged()) {
+                                                g.setColor(cells[i][j].getColor());
+                                                g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+                                            }
                                         } else if (cells[i][j].secCell != null && cells[i][j].partCell == null) {
-                                            if(cells[i][j].isChanged()){
-                                            g.setColor(cells[i][j].secCell.getColor());
-                                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);}
+                                            if (cells[i][j].isChanged()) {
+                                                g.setColor(cells[i][j].secCell.getColor());
+                                                g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+                                            }
                                         }
                                         if (cells[i][j] != null && cells[i][j].partCell != null) {
-                                            if(cells[i][j].isChanged()){
-                                            g.setColor(cells[i][j].partCell.getColor());
-                                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);}
+                                            try {
+                                                if (cells[i][j].isChanged()) {
+                                                    g.setColor(cells[i][j].partCell.getColor());
+                                                    g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+                                                }
+                                            } catch (Exception e) {
+
+                                            }
                                         }
                                     }
                                 }
@@ -86,49 +94,62 @@ class PaintThread extends Thread{
                                 for (int j = 0; j < height; j++) {
                                     if (cells[i][j] != null) {
                                         if (cells[i][j].secCell == null && cells[i][j].partCell == null) {
-                                            if(cells[i][j].isChanged()){
-                                            g.setColor(cells[i][j].getColor());
-                                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);}
+                                            if (cells[i][j].isChanged()) {
+                                                g.setColor(cells[i][j].getColor());
+                                                g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+                                            }
                                         } else if (cells[i][j].secCell != null && cells[i][j].partCell == null) {
-                                            if(cells[i][j].isChanged()){
-                                            g.setColor(cells[i][j].secCell.getColor());
-                                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);}
+                                            if (cells[i][j].isChanged()) {
+                                                g.setColor(cells[i][j].secCell.getColor());
+                                                g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+                                            }
                                         }
                                         if (cells[i][j] != null && cells[i][j].partCell != null) {
-                                            if(cells[i][j].isChanged()){
-                                            g.setColor(cells[i][j].partCell.getColor());
-                                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);}
+                                            try {
+                                                if (cells[i][j].isChanged()) {
+                                                    g.setColor(cells[i][j].partCell.getColor());
+                                                    g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+                                                }
+                                            } catch (Exception e) {
+
+                                            }
                                         }
                                     }
                                 }
                             }
 
                         }
-                        case 3->{
+                        case 3 -> {
                             for (int i = 0; i < width; i++) {
-                            for (int j = 0; j < height; j++) {
-                                if (cells[i][j] != null) {
-                                    if (cells[i][j].secCell == null && cells[i][j].partCell == null) {
+                                for (int j = 0; j < height; j++) {
+                                    if (cells[i][j] != null) {
+                                        if (cells[i][j].secCell == null && cells[i][j].partCell == null) {
                                             g.setColor(cells[i][j].getColor());
                                             g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-                                    } else if (cells[i][j].secCell != null && cells[i][j].partCell == null) {
+                                        } else if (cells[i][j].secCell != null && cells[i][j].partCell == null) {
                                             g.setColor(cells[i][j].secCell.getColor());
                                             g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-                                    }
-                                    if (cells[i][j] != null && cells[i][j].partCell != null) {
-                                            g.setColor(cells[i][j].partCell.getColor());
-                                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+                                        }
+                                        if (cells[i][j] != null && cells[i][j].partCell != null) {
+                                            try {
+                                                if (cells[i][j].isChanged()) {
+                                                    g.setColor(cells[i][j].partCell.getColor());
+                                                    g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+                                                }
+                                            } catch (Exception e) {
+
+                                            }
+                                        }
                                     }
                                 }
                             }
-                        }
                             g.setColor(Color.BLACK);
                             g.drawString("Restarts: " + Restarts, 7, 9);
                         }
                     }
                     g.setColor(Color.BLACK);
                     g.drawString("Restarts: " + Restarts, 7, 9);
-            }
+                } catch (Exception e){} }
          }
         }
 
@@ -199,8 +220,8 @@ public static Cell[][] getCells(){
 
 
     public static void main(String[] args) throws  IOException {
-        int width=1600;
-        int height=1000;
+        int width=1300;
+        int height=720;
         JFrame frame = new JFrame("GM");
         frame.getRootPane().addComponentListener(new ComponentAdapter() {
             public void componentResized(ComponentEvent e) {
@@ -306,6 +327,7 @@ public static Cell[][] getCells(){
 
 
     while(true) {
+        if(lastRestarts!=Restarts){Thread.yield();}
     boolean isStep=false;
     countt2++;
     Thread.yield();
@@ -396,10 +418,14 @@ public static Cell[][] getCells(){
     }
     Restarts++;
 
-     paintThread.rept();
-     Thread.yield();
+             paintThread.rept();
+             try {
+                 Thread.sleep(1000);
+             } catch (InterruptedException e) {
+                 throw new RuntimeException(e);
+             }
 
-    lastRestarts++;
+             lastRestarts++;
     System.out.println("Restarted");
     System.out.println("best life time: "+ bestLifeTime);
     System.out.println("this Best Life Time: " +thisBestLifeTime);
