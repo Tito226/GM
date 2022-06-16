@@ -38,7 +38,12 @@ NormCellType normCellType=NormCellType.MOVABLE;
     public int getX() {
         return x;
     }
-public Pool movablePool =new Pool();
+
+    public void setEnergy(int energy) {
+        this.energy = energy;
+    }
+
+    public Pool movablePool =new Pool();
 
 Color myColor=Color.green;
     public NormCell(Pool dadPool,long myParentNum){
@@ -57,25 +62,14 @@ Color myColor=Color.green;
     public NormCell(Pool dadPool,int anyNum){
         myNum=num;
         num++;
-        if(anyNum==15){
-            movablePool=topMultipliesPool;
-            Random r=new Random();
-            if(r.nextInt(20)==1){
-                movablePool.breedNewGeneration();
-            }
-        }else if(anyNum==1){
-            movablePool=topLifeTimePool;
-            Random r=new Random();
-            if(r.nextInt(20)==1){
-                movablePool.breedNewGeneration();
-            }
-        }
-        else{
+
+
+
         movablePool.initializePool(dadPool);
             Random r=new Random();
             if(r.nextInt(20)==1){
                 movablePool.breedNewGeneration();
-            }}
+            }
         cellls++;
         energy=startEnergy;
     }
@@ -884,7 +878,7 @@ gene.setPoints(gSuccessfully*0.01f);
               cells[xxx][yyy].partCell=null;
               cells[xxx][yyy].organic+=energy1;
               if(myParts!=null){
-                  System.out.println(myParts.remove(myCoords));
+                 myParts.remove(myCoords);
               }
             }
             }catch (Exception e){

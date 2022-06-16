@@ -270,8 +270,8 @@ public static Cell[][] getCells(){
 
 
    public static Genome topGene = null;
- public static    Pool topLifeTimePool=null;
- public static Pool topMultipliesPool=null;
+ public static  NormCell topLifeTimeCell=null;
+ public static NormCell topMultipliesCell=null;
     static  byte countt2=0;
    public static int Restarts=0;
    public  static int lastRestarts=0;
@@ -330,8 +330,8 @@ public static Cell[][] getCells(){
             //BEST CELLS FINDER FROM HERE
                 if(cells[i][j].secCell!=null){
                     if ( NULL_CELLS>width*height-4){
-                        pooll.addToSpecies(topLifeTimePool.getTopGenome());
-                        pooll.addToSpecies(topMultipliesPool.getTopGenome());
+                        pooll.addToSpecies(topLifeTimeCell.movablePool.getTopGenome());
+                        pooll.addToSpecies(topMultipliesCell.movablePool.getTopGenome());
                         pooll.addToSpecies(cells[i][j].secCell.movablePool.getTopGenome());
                         lastPooll=pooll;
                     } if(cells[i][j].secCell.lifeTime>bestLifeTime){
@@ -342,13 +342,13 @@ public static Cell[][] getCells(){
                             System.out.println("shit happened again movablePool size is 0");
                         }
                         bestLifeTime=cells[i][j].secCell.lifeTime;
-                        topLifeTimePool=cells[i][j].secCell.movablePool;
+                        topLifeTimeCell=cells[i][j].secCell;
                         topGene=cells[i][j].secCell.movablePool.getTopGenome();
                     }if(cells[i][j].secCell.lifeTime>thisBestLifeTime){
                         thisBestLifeTime=cells[i][j].secCell.lifeTime;
                     }if (cells[i][j].secCell.multiplies>bestMultiplies){
                         bestMultiplies=cells[i][j].secCell.multiplies;
-                        topMultipliesPool=cells[i][j].secCell.movablePool;
+                        topMultipliesCell=cells[i][j].secCell;
                     }
 
                 }
@@ -386,8 +386,8 @@ public static Cell[][] getCells(){
   //  Collections.sort(species,Collections.reverseOrder());
 
     pol.addToSpecies(topGene);
-    pol.addToSpecies(topLifeTimePool.getTopGenome());
-    pol.addToSpecies(topMultipliesPool.getTopGenome());
+    pol.addToSpecies(topLifeTimeCell.movablePool.getTopGenome());
+    pol.addToSpecies(topMultipliesCell.movablePool.getTopGenome());
     pol.addToSpecies(pooll.getTopGenome());
     lastPooll=pooll;
     pooll=pol;
@@ -436,8 +436,8 @@ public static Cell[][] getCells(){
             System.gc();
             Random r =new Random();
             cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pool,15));
-            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pool,2));
-            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pool,1));
+            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(2);
+            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(1);
             cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pool,r.nextLong()));
             cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pool,r.nextLong()));
 

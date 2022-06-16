@@ -1,8 +1,10 @@
 package MyVersion;
 
 import java.awt.*;
+import java.util.Random;
 
 import static MyVersion.GM2_CONFIG.CELL_START_ORGANIC;
+import static MyVersion.GM2_CONFIG.NORM_CELL_START_ENERGY;
 import static MyVersion.World.*;
 
 public  class Cell {
@@ -27,7 +29,26 @@ private boolean nothing=true;
 public void setSecCell(NormCell secCell){
       this.secCell=secCell;
 }
-
+    public void setSecCell(int i){
+        switch(i){
+            case 1->{
+        this.secCell=topLifeTimeCell;
+                secCell.setEnergy(NORM_CELL_START_ENERGY);
+                Random r=new Random();
+                if(r.nextInt(20)==1){
+                    secCell.movablePool.breedNewGeneration();
+                }
+            }
+            case 2 ->{
+                this.secCell=topMultipliesCell;
+                secCell.setEnergy(NORM_CELL_START_ENERGY);
+                Random r=new Random();
+                if(r.nextInt(20)==1){
+                    secCell.movablePool.breedNewGeneration();
+                }
+            }
+        }
+    }
     public void setPartCell(PartCell partCell) {
         this.partCell = partCell;
     }
@@ -91,15 +112,12 @@ boolean isChanged(){
         }
         if(secCell!=null  && secCell.getEnergy()<=0  ){
             organic+=secCell.getEnergy();
-            secCell.myParts=null;
             secCell=null;
-
             cellls--;
         }
       if(secCell!=null  && secCell.getEnergy()>=10000 ){
           System.out.println("Cell with 10000 died");
           organic+=secCell.getEnergy();
-          secCell.myParts=null;
           secCell=null;
           cellls--;
       }
