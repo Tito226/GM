@@ -46,10 +46,7 @@ public void setSecCell(NormCell secCell){
                 }
             }
         }
-        secCell.setEnergy(NORM_CELL_START_ENERGY);
-        secCell.myParts.clear();
-        secCell.lifeTime=0;
-        secCell.multiplies=0;
+       secCell.clear();
     }
     public void setPartCell(PartCell partCell) {
         this.partCell = partCell;
@@ -80,11 +77,11 @@ else{} //System.out.println(" ");
         }else return false;
     }
     boolean change=false;
-   boolean lastNCell=false;
-    boolean lastPCell=false;
+     boolean lastNCell=false;
+     boolean lastPCell=false;
     int lastOrganic=0;
-boolean isChanged(){
-        if (lastPCell!=getPartCell() || lastNCell!=getSecCell() || lastOrganic!=organic || lastRestarts!=Restarts){
+ boolean isChanged(){
+        if (lastPCell!=getPartCell() || lastNCell!=getSecCell() || lastOrganic!=organic || lastRestarts!=Restarts ){
             return true;
         }
         if(change){
@@ -95,8 +92,8 @@ boolean isChanged(){
             return false;}
 }
   void testCell(){
-    lastNCell=getSecCell();
-    lastPCell=getPartCell();
+ lastNCell=getSecCell();
+   lastPCell=getPartCell();
     lastOrganic=organic;
         try{
         if(organic<255 && organic>0){

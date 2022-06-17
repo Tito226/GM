@@ -54,11 +54,31 @@ Color myColor=Color.green;
         energy=startEnergy;
        this.myParentNum=myParentNum;
         Random r=new Random();
-        if(r.nextInt(20)==1){
+        if(r.nextInt(2)==1){
             movablePool.breedNewGeneration();
         }
     }
-
+void clear(){
+    myParts.clear();
+    lifeTime=0;
+    multiplies=0;
+    setEnergy(NORM_CELL_START_ENERGY);
+    lastEnergy=0;
+    lastUpCell=0;
+    lastDownCell=0;
+    lastLeftCell=0;
+    lastRightCell=0;
+    lastOrganic=0;
+    lastSize=0;
+    lastRightDistance=0;
+    lastLeftDistace=0;
+    lastUpDistance=0;
+    lastDownDistance=0;
+    lastRightUpCell=0;
+    lastRightDownCell=0;
+    lastLeftUpCell=0;
+    lastLeftDownCell=0;
+}
     public NormCell(Pool dadPool,int anyNum){
         myNum=num;
         num++;
@@ -67,7 +87,7 @@ Color myColor=Color.green;
 
         movablePool.initializePool(dadPool);
             Random r=new Random();
-            if(r.nextInt(20)==1){
+            if(r.nextInt(2)==1){
                 movablePool.breedNewGeneration();
             }
         cellls++;

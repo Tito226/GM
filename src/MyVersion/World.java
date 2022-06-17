@@ -58,7 +58,6 @@ class PaintThread extends Thread{
         public void run() {
             while (true) {
                 if (0 == 0) {
-                    try{
                     switch (type) {
                         case 1 -> {
                             for (int i = 0; i < width / 2; i++) {
@@ -76,14 +75,10 @@ class PaintThread extends Thread{
                                             }
                                         }
                                         if (cells[i][j] != null && cells[i][j].partCell != null) {
-                                            try {
                                                 if (cells[i][j].isChanged()) {
                                                     g.setColor(cells[i][j].partCell.getColor());
                                                     g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
                                                 }
-                                            } catch (Exception e) {
-
-                                            }
                                         }
                                     }
                                 }
@@ -105,14 +100,11 @@ class PaintThread extends Thread{
                                             }
                                         }
                                         if (cells[i][j] != null && cells[i][j].partCell != null) {
-                                            try {
+
                                                 if (cells[i][j].isChanged()) {
                                                     g.setColor(cells[i][j].partCell.getColor());
                                                     g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
                                                 }
-                                            } catch (Exception e) {
-
-                                            }
                                         }
                                     }
                                 }
@@ -131,14 +123,8 @@ class PaintThread extends Thread{
                                             g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
                                         }
                                         if (cells[i][j] != null && cells[i][j].partCell != null) {
-                                            try {
-                                                if (cells[i][j].isChanged()) {
                                                     g.setColor(cells[i][j].partCell.getColor());
                                                     g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-                                                }
-                                            } catch (Exception e) {
-
-                                            }
                                         }
                                     }
                                 }
@@ -149,7 +135,7 @@ class PaintThread extends Thread{
                     }
                     g.setColor(Color.BLACK);
                     g.drawString("Restarts: " + Restarts, 7, 9);
-                } catch (Exception e){} }
+                 }
          }
         }
 
@@ -413,7 +399,7 @@ public static Cell[][] getCells(){
     pol.addToSpecies(pooll.getTopGenome());
     lastPooll=pooll;
     pooll=pol;
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 1; i++) {
         new normCellInit(pooll);
     }
     Restarts++;
