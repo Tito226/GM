@@ -247,7 +247,7 @@ boolean isMyPart(PartCell partCell){
         float ii=i;
         return ii/dil;
     }
-    float dil=100f;
+    float dil=1000f;
  float getRightDistance(){
         int ix=x;
 
@@ -578,7 +578,7 @@ float isController(){
             int gSuccessfully = 20;
             int gEnergy = energy;
            // gene.setFitness(0);
-            float[] inputs = { getEnergy()*0.1f, getUptCell(), getDownCell(), getLeftCell(), getRightCell(),getRightDownCell(),getRightUpCell(),getLeftUpCell(),getLeftDownCell(), isSpaceAvailable(), isController(),getRightDistance(),getLeftDistance(),getUpDistance(),getDownDistance(), cells[x][y].getOrganic()/100f,lastEnergy*0.1f,lastUpCell,lastDownCell,lastLeftCell,lastRightCell,lastRightDownCell,lastRightUpCell,lastLeftDownCell,lastLeftUpCell,lastOrganic/100f,sunny,myParts.size(),lastSize,lastRightDistance,lastLeftDistace,lastUpDistance,lastDownDistance};
+            float[] inputs = { getEnergy()*0.01f, getUptCell(), getDownCell(), getLeftCell(), getRightCell(),getRightDownCell(),getRightUpCell(),getLeftUpCell(),getLeftDownCell(), isSpaceAvailable()*0.1f, isController(),getRightDistance(),getLeftDistance(),getUpDistance(),getDownDistance(), cells[x][y].getOrganic()/100f,lastEnergy*0.01f,lastUpCell,lastDownCell,lastLeftCell,lastRightCell,lastRightDownCell,lastRightUpCell,lastLeftDownCell,lastLeftUpCell,lastOrganic/100f,sunny*0.1f,myParts.size(),lastSize,lastRightDistance,lastLeftDistace,lastUpDistance,lastDownDistance};
             float[] output = gene.evaluateNetwork(inputs);
             if (output[0] > 0.7f || output[0] == 0.5f || output[0] <= 0.0f) {
              gSuccessfully -= 1000;
@@ -687,7 +687,7 @@ float isController(){
             }
 
             if(gEnergy>energy){
-                gSuccessfully+=2;
+                gSuccessfully+=1;
             }
             else if (gEnergy <= 4) {
                 gSuccessfully -= 20;
@@ -736,7 +736,7 @@ gene.setPoints(gSuccessfully*0.01f);
                 int gSuccessfully = successfully;
                 int gEnergy = energy;
                // gene.setFitness(0);
-                float[] inputs = { getEnergy()*0.1f, getUptCell(), getDownCell(), getLeftCell(), getRightCell(),getRightDownCell(),getRightUpCell(),getLeftUpCell(),getLeftDownCell(), isSpaceAvailable(), isController(),getRightDistance(),getLeftDistance(),getUpDistance(),getUpDistance(), cells[x][y].getOrganic(),lastEnergy*0.1f,lastUpCell,lastDownCell,lastLeftCell,lastRightCell,lastRightDownCell,lastRightUpCell,lastLeftDownCell,lastLeftUpCell,lastOrganic,sunny,myParts.size(),lastSize,lastRightDistance,lastLeftDistace,lastUpDistance,lastDownDistance};
+                float[] inputs = { getEnergy()*0.01f, getUptCell(), getDownCell(), getLeftCell(), getRightCell(),getRightDownCell(),getRightUpCell(),getLeftUpCell(),getLeftDownCell(), isSpaceAvailable()*0.1f, isController(),getRightDistance(),getLeftDistance(),getUpDistance(),getDownDistance(), cells[x][y].getOrganic()/100f,lastEnergy*0.01f,lastUpCell,lastDownCell,lastLeftCell,lastRightCell,lastRightDownCell,lastRightUpCell,lastLeftDownCell,lastLeftUpCell,lastOrganic/100f,sunny*0.1f,myParts.size(),lastSize,lastRightDistance,lastLeftDistace,lastUpDistance,lastDownDistance};
                  float[]  myOutput= gene.evaluateNetwork(inputs);
                 if ( myOutput[0]>0.64 && myOutput[0]<0.68 ){
                     gEnergy-=10;
@@ -836,10 +836,6 @@ gene.setPoints(gSuccessfully*0.01f);
          Color color=Color.CYAN;
          String myName;
          int energy1 =PROTOPLAST_START_ENERGY;
-
-         void multiply(){
-
-         }
 
          void transferEnergy(){
          if(energy1>=4){

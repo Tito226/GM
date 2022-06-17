@@ -266,9 +266,32 @@ public static Cell[][] getCells(){
 
     }
 
-
-
-
+    static boolean ready=false;
+public class StepThread extends Thread{
+   void setXYAndStart(int x,int y){
+       this.x=x;
+       this.y=y;
+       ready=false;
+       stop=false;
+    }
+    int x;
+    int y;
+    public StepThread(){
+        stop=false;
+    }
+boolean stop;
+    @Override
+    public void run() {
+        while (true){
+        while(!stop){
+        cells[x][y].secCell.step();
+        ready=true;
+        stop=true;
+        }
+        }
+    }
+}
+   StepThread stepThread=new StepThread();
    public static Genome topGene = null;
  public static  NormCell topLifeTimeCell=null;
  public static NormCell topMultipliesCell=null;
@@ -293,7 +316,7 @@ public static Cell[][] getCells(){
         }
 
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10; i++) {
             Random r =new Random();
             cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell());
         }
@@ -358,9 +381,20 @@ public static Cell[][] getCells(){
                     cells[i][j].secCell.setX(i);
                     cells[i][j].secCell.setY(j);
                     if(!cells[i][j].secCell.stepN){
+                        if(stepThread.isAlive()){
+                        while (!ready){
+                            try {
+                                Thread.sleep(1);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }}
                         cells[i][j].secCell.stepN=true;
-                        cells[i][j].secCell.step();
+                        stepThread.setXYAndStart(i,j);
+                        if(!stepThread.isAlive()){
+                        stepThread.start();}
                        isStep=true;
+
                     }
 
                 }
