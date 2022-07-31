@@ -189,10 +189,7 @@ static Pool lastPooll;
     static World world;
   static   Thread wor;
 
-public static void sleep(int n) throws InterruptedException {
 
-        Thread.sleep(n);
-}
 public static Cell[][] getCells(){
     return cells;
 }
@@ -266,29 +263,20 @@ public static Cell[][] getCells(){
 
     }
 
-    static boolean ready=false;
+
 public class StepThread extends Thread{
+
    void setXYAndStart(int x,int y){
        this.x=x;
        this.y=y;
-       ready=false;
-       stop=false;
     }
     int x;
     int y;
-    public StepThread(){
-        stop=false;
-    }
-boolean stop;
+
+
     @Override
     public void run() {
-        while (true){
-        while(!stop){
         cells[x][y].secCell.step();
-        ready=true;
-        stop=true;
-        }
-        }
     }
 }
    StepThread stepThread=new StepThread();
@@ -381,18 +369,16 @@ boolean stop;
                     cells[i][j].secCell.setX(i);
                     cells[i][j].secCell.setY(j);
                     if(!cells[i][j].secCell.stepN){
-                        if(stepThread.isAlive()){
-                        while (!ready){
+                        if (stepThread.isAlive()){
                             try {
-                                Thread.sleep(1);
+                                stepThread.join();
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
-                        }}
+                        }
                         cells[i][j].secCell.stepN=true;
                         stepThread.setXYAndStart(i,j);
-                        if(!stepThread.isAlive()){
-                        stepThread.start();}
+                        stepThread.run();
                        isStep=true;
 
                     }
@@ -472,8 +458,8 @@ boolean stop;
             cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pool,15));
             cells[r.nextInt(width)][r.nextInt(height)].setSecCell(2);
             cells[r.nextInt(width)][r.nextInt(height)].setSecCell(1);
-            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pool,r.nextLong()));
-            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pool,r.nextLong()));
+            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell());
+            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell());
 
         }
     }

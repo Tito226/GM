@@ -82,6 +82,8 @@ Color myColor=Color.green;
         cellls++;
     }
 
+
+
 boolean isMyPart(PartCell partCell){
    if (myParts.contains(partCell.myCoords)){
        System.out.println("WOOOOOOOOOOOOOOOOOOOOOOOOOOORK");
@@ -330,7 +332,7 @@ boolean isMyPart(PartCell partCell){
         }
 
        if(isSpaceAvailable()==0){
-           energy-=2;
+           energy-=1;
        }movablePool.evaluateFitness(this);
             //  System.out.println(output);
      if (output>0.2 && output<0.3){eatOrganic();}
@@ -562,161 +564,89 @@ float isController(){
          lastLeftDownCell=getLeftDownCell();
     }
 
+
+
+//*********************************************
+int gSuccess ;
+    public void setGSuccess(int gSuccess) {
+        synchronized (this){
+        this.gSuccess = gSuccess;
+        }
+    }
+
+    public int getGSuccess() {
+        synchronized (this){
+        return gSuccess;
+        }
+    }
+
+    public float getOutputBuffer() {
+        synchronized (this){
+        return outputBuffer;
+        }
+    }
+
+    public void setOutputBuffer(float outputBuffer) {
+        synchronized (this){
+        this.outputBuffer = outputBuffer;
+        }
+    }
+
+
+void bestOutputsAdd(Float f){
+        synchronized (NormCell.this){
+        bestOutputs.add(f);
+        }
+}
+void bestOuputsClear(){
+        synchronized (NormCell.this){
+            bestOutputs.clear();
+        }
+}
+
+    private float outputBuffer;
+    ArrayList<Float> bestOutputs;
+    int threadsFinished;
+
+    public void setThreadsFinished(int threadsFinished) {
+        synchronized (World.class){
+        this.threadsFinished = threadsFinished;
+        }
+    }
+
+    public int getThreadsFinished() {
+        synchronized (World.class){
+        return threadsFinished;
+        }
+    }
+
+    //************************************************
     public void evaluateFitness(ArrayList<Genome> population) {
+        threadsFinished=0;
+        outputBuffer = 0f;
         if (normCellType == NormCellType.MOVABLE){
-        ArrayList<Float> bestOutputs=new ArrayList<>();
+           bestOutputs=new ArrayList<>();
+            gSuccess = -99999;
 
-        float outputBuffer = 0f;
-        int gSuccess = 0;
-        for (Genome gene : population) {
-            Random r = new Random();
-            byte b = (byte) r.nextInt(101);
-            if (b == 45) {
-                gene.Mutate();
-                // System.out.println("Mutate");
+            for (Genome gene : population) {
+                try{
+                new evaluteFitnessT(gene).join();}catch (Exception e){}
+
             }
-            int gSuccessfully = 20;
-            int gEnergy = energy;
-           // gene.setFitness(0);
-            float[] inputs = { getEnergy()*0.01f, getUptCell(), getDownCell(), getLeftCell(), getRightCell(),getRightDownCell(),getRightUpCell(),getLeftUpCell(),getLeftDownCell(), isSpaceAvailable()*0.1f, isController(),getRightDistance(),getLeftDistance(),getUpDistance(),getDownDistance(), cells[x][y].getOrganic()/100f,lastEnergy*0.01f,lastUpCell,lastDownCell,lastLeftCell,lastRightCell,lastRightDownCell,lastRightUpCell,lastLeftDownCell,lastLeftUpCell,lastOrganic/100f,sunny*0.1f,myParts.size(),lastSize,lastRightDistance,lastLeftDistace,lastUpDistance,lastDownDistance};
-            float[] output = gene.evaluateNetwork(inputs);
-            if (output[0] > 0.7f || output[0] == 0.5f || output[0] <= 0.0f) {
-             gSuccessfully -= 1000;
+while(getThreadsFinished()!=population.size()){
+
+}
+            if(bestOutputs.size()>1){
+                Random rr=new Random();
+                output=bestOutputs.get(rr.nextInt(bestOutputs.size()));
+            }else{
+                output =bestOutputs.get(0);
             }
-            if (output[0]>0.2 && output[0]<0.3){
-                if(cells[x][y].getOrganic()>=3){
-                gEnergy+=3;
-            gSuccessfully+=3;
-                }else {
-                    gSuccessfully-=4;
-                    gEnergy--;
-                }
-            }
-            if (output[0] > 0.3f && output[0] < 0.35) {
-                //  multiply();
-                if (isSpaceAvailable() == 1.0f && gEnergy > neededEnergy) {
-                    gSuccessfully += 3;
-                    gEnergy-=neededEnergy;
-                } else {
-                    gEnergy-=2;
-                    gSuccessfully-=3;
-                }
-            } else if (output[0] > 0.5f && output[0] < 0.52f) {
-                if(gEnergy>=4){
-           gSuccessfully +=1;
-                gEnergy--;
-                }else {
-                    gSuccessfully-=1;
-                    gEnergy--;
-                }
-                //   move(Directions.UP);
-            } else if (output[0] > 0.52f && output[0] < 0.54f) {
-                //   move(Directions.DOWN);
-                if(gEnergy>=4){
-                    gSuccessfully +=1;
-                    gEnergy--;
-                }else {
-                    gSuccessfully-=1;
-                    gEnergy--;
-                }
-            } else if (output[0] > 0.54f && output[0] < 0.58f) {
-                //  move(Directions.LEFT);
-                if(gEnergy>=4){
-                    gSuccessfully +=1;
-                    gEnergy--;
-                }else {
-                    gSuccessfully-=1;
-                    gEnergy--;
-                }
-            } else if (output[0] > 0.58f && output[0] < 0.6f) {
-                // move(Directions.RIGHT);
-                if(gEnergy>=4){
-                    gSuccessfully +=1;
-                    gEnergy--;
-                }
-                else {
-                    gSuccessfully-=1;
-                    gEnergy--;
-                }
-            } else if (output[0] > 0.6f && output[0] < 0.61f) {
-                if (eatCellT(Directions.RIGHT)==1) {
-                    gEnergy += enValue;
-                } else {
-
-                    if(eatCellT(Directions.RIGHT)==2){gSuccessfully-=3;}
-                    else {
-                        gSuccessfully-=2;
-                        gEnergy--;
-                    }
-                }
-                //  eatCell(Directions.RIGHT);
-
-            } else if (output[0] > 0.61f && output[0] < 0.62f) {
-                // eatCell(Directions.LEFT);
-                if (eatCellT(Directions.LEFT)==1) {
-                    gEnergy += enValue;
-                } else if(eatCellT(Directions.LEFT)==2){gSuccessfully-=3;}
-                else {
-                    gSuccessfully-=2;
-                    gEnergy--;
-                }
-            } else if (output[0] > 0.62f && output[0] < 0.63f) {
-                //  eatCell(Directions.UP);
-                if (eatCellT(Directions.UP)==1) {
-                    gEnergy += enValue;
-                }else if(eatCellT(Directions.UP)==2){gSuccessfully-=3;}
-                else {
-                    gSuccessfully-=2;
-                    gEnergy--;
-                }
-            } else if (output[0] > 0.63f && output[0] < 0.64f) {
-                // eatCell(Directions.DOWN);
-                if (eatCellT(Directions.DOWN)==1) {
-                    gEnergy += enValue;
-                } else if(eatCellT(Directions.DOWN)==2){gSuccessfully-=3;}
-                else {
-                    gSuccessfully-=2;
-                    gEnergy--;
-                }
-            }else if(output[0]>0.64 && output[0]<0.68){
-              //  protoplast=new Protoplast(output[0],x,y);
-                if(gEnergy>ENERGY_NEEDED_TO_MULTIPLY_PROTOPLAST){
-            gEnergy-=ENERGY_NEEDED_TO_MULTIPLY_PROTOPLAST;
-            gSuccessfully+= PROTOPLAST_SPAWN_REWARD;
-                }
-            }
-
-            if(gEnergy>energy){
-                gSuccessfully+=1;
-            }
-            else if (gEnergy <= 4) {
-                gSuccessfully -= 20;
-            }
-
-
-
-
-            if (gSuccessfully > gSuccess) {
-                gSuccess = gSuccessfully;
-                outputBuffer = output[0];
-                bestOutputs.clear();
-                bestOutputs.add(output[0]);
-            }else if(gSuccessfully==gSuccess){
-                bestOutputs.add(output[0]);
-            }
-            gene.setFitness(gSuccessfully);
-gene.setPoints(gSuccessfully*0.01f);
-        }
-
-        if(bestOutputs.size()!=0){
-            Random rr=new Random();
-            this.output=bestOutputs.get(rr.nextInt(bestOutputs.size()));
-        }else{
-        this.output = outputBuffer;
-        }
-
-
     }else
+        //
+        //
+        //
+        //
         if(normCellType==NormCellType.CONTROLLER){
          //  System.out.println(lifeTime);
 
@@ -828,9 +758,164 @@ gene.setPoints(gSuccessfully*0.01f);
     }
 
 
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+    public class evaluteFitnessT extends Thread{
+        Genome gene;
+        public evaluteFitnessT( Genome gene){
+            this.gene=gene;
+            start();
+        }
+
+
+        @Override
+        public void run() {
+           
+                Random r = new Random();
+                byte b = (byte) r.nextInt(101);
+                if (b == 45) {
+                    gene.Mutate();
+                    // System.out.println("Mutate");
+                }
+                int gSuccessfully = 20;
+                int gEnergy = energy;
+                // gene.setFitness(0);
+                float[] inputs = { getEnergy()*0.01f, getUptCell(), getDownCell(), getLeftCell(), getRightCell(),getRightDownCell(),getRightUpCell(),getLeftUpCell(),getLeftDownCell(), isSpaceAvailable()*0.1f, isController(),getRightDistance(),getLeftDistance(),getUpDistance(),getDownDistance(), cells[x][y].getOrganic()/100f,lastEnergy*0.01f,lastUpCell,lastDownCell,lastLeftCell,lastRightCell,lastRightDownCell,lastRightUpCell,lastLeftDownCell,lastLeftUpCell,lastOrganic/100f,sunny*0.1f,myParts.size(),lastSize,lastRightDistance,lastLeftDistace,lastUpDistance,lastDownDistance};
+                float[] output = gene.evaluateNetwork(inputs);
+                if (output[0] > 0.7f || output[0] == 0.5f || output[0] <= 0.0f) {
+                    gSuccessfully -= 1000;
+                }
+                if (output[0]>0.2 && output[0]<0.3){
+                    if(cells[x][y].getOrganic()>=3){
+                        gEnergy+=3;
+                        gSuccessfully+=3;
+                    }else {
+                        gSuccessfully-=4;
+                        gEnergy--;
+                    }
+                }
+                if (output[0] > 0.3f && output[0] < 0.35) {
+                    //  multiply();
+                    if (isSpaceAvailable() == 1.0f && gEnergy > neededEnergy) {
+                        gSuccessfully += 3;
+                        gEnergy-=neededEnergy;
+                    } else {
+                        gEnergy-=2;
+                        gSuccessfully-=3;
+                    }
+                } else if (output[0] > 0.5f && output[0] < 0.52f) {
+                    if(gEnergy>=4){
+                        gSuccessfully +=1;
+                        gEnergy--;
+                    }else {
+                        gSuccessfully-=1;
+                        gEnergy--;
+                    }
+                    //   move(Directions.UP);
+                } else if (output[0] > 0.52f && output[0] < 0.54f) {
+                    //   move(Directions.DOWN);
+                    if(gEnergy>=4){
+                        gSuccessfully +=1;
+                        gEnergy--;
+                    }else {
+                        gSuccessfully-=1;
+                        gEnergy--;
+                    }
+                } else if (output[0] > 0.54f && output[0] < 0.58f) {
+                    //  move(Directions.LEFT);
+                    if(gEnergy>=4){
+                        gSuccessfully +=1;
+                        gEnergy--;
+                    }else {
+                        gSuccessfully-=1;
+                        gEnergy--;
+                    }
+                } else if (output[0] > 0.58f && output[0] < 0.6f) {
+                    // move(Directions.RIGHT);
+                    if(gEnergy>=4){
+                        gSuccessfully +=1;
+                        gEnergy--;
+                    }
+                    else {
+                        gSuccessfully-=1;
+                        gEnergy--;
+                    }
+                } else if (output[0] > 0.6f && output[0] < 0.61f) {
+                    if (eatCellT(Directions.RIGHT)==1) {
+                        gEnergy += enValue;
+                    } else {
+
+                        if(eatCellT(Directions.RIGHT)==2){gSuccessfully-=3;}
+                        else {
+                            gSuccessfully-=2;
+                            gEnergy--;
+                        }
+                    }
+                    //  eatCell(Directions.RIGHT);
+
+                } else if (output[0] > 0.61f && output[0] < 0.62f) {
+                    // eatCell(Directions.LEFT);
+                    if (eatCellT(Directions.LEFT)==1) {
+                        gEnergy += enValue;
+                    } else if(eatCellT(Directions.LEFT)==2){gSuccessfully-=3;}
+                    else {
+                        gSuccessfully-=2;
+                        gEnergy--;
+                    }
+                } else if (output[0] > 0.62f && output[0] < 0.63f) {
+                    //  eatCell(Directions.UP);
+                    if (eatCellT(Directions.UP)==1) {
+                        gEnergy += enValue;
+                    }else if(eatCellT(Directions.UP)==2){gSuccessfully-=3;}
+                    else {
+                        gSuccessfully-=2;
+                        gEnergy--;
+                    }
+                } else if (output[0] > 0.63f && output[0] < 0.64f) {
+                    // eatCell(Directions.DOWN);
+                    if (eatCellT(Directions.DOWN)==1) {
+                        gEnergy += enValue;
+                    } else if(eatCellT(Directions.DOWN)==2){gSuccessfully-=3;}
+                    else {
+                        gSuccessfully-=2;
+                        gEnergy--;
+                    }
+                }else if(output[0]>0.64 && output[0]<0.68){
+                    //  protoplast=new Protoplast(output[0],x,y);
+                    if(gEnergy>ENERGY_NEEDED_TO_MULTIPLY_PROTOPLAST){
+                        gEnergy-=ENERGY_NEEDED_TO_MULTIPLY_PROTOPLAST;
+                        gSuccessfully+= PROTOPLAST_SPAWN_REWARD;
+                    }
+                }
+
+                if(gEnergy>energy){
+                    gSuccessfully+=1;
+                }
+                else if (gEnergy <= 4) {
+                    gSuccessfully -= 20;
+                }
 
 
 
+
+                if (gSuccessfully > getGSuccess()) {
+                    setGSuccess(gSuccessfully);
+                    setOutputBuffer(output[0]);
+                    bestOuputsClear();
+                    bestOutputsAdd(output[0]);
+                }else if(gSuccessfully==getGSuccess()){
+                    //TODO MAKE PRIORITY
+                    bestOutputsAdd(output[0]);
+                }
+                gene.setFitness(gSuccessfully);
+                gene.setPoints(gSuccessfully*0.01f);
+
+               setThreadsFinished(getThreadsFinished()+1);
+
+        }
+    }
+///////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
         public class Protoplast implements PartCell{
             Integer[] myCoords=new Integer[2];
          Color color=Color.CYAN;

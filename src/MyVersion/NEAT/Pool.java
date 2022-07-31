@@ -87,7 +87,7 @@ public class Pool implements Serializable {
             rankGlobally();
     }
 
-    public void evaluateFitness(Environment environment){
+    public void evaluateFitness(Environment environment)  {
 
         ArrayList<Genome> allGenome = new ArrayList<>();
 
