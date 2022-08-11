@@ -38,10 +38,18 @@ public class Network {
     }
 
   public   void evaluteFitness(int[] inputs){
-        for (int i = 0; i < inputs.length-1; i++) {
+        for (int i = 0; i < inputs.length; i++) {
             dots.get(0).get(i).setValue(inputs[i]);
             dots.get(0).get(i).evalute();
         }
+      for (int i = 1; i <HIDDEN_DOTS / HIDDEN_DOTS_PER_ARRAY+1; i++) {
+          for (int j = 0; j <dots.get(i).size() ; j++) {
+           dots.get(i-1).get(j).evalute();
+          }
+      }
+      for (int i = 0; i < dots.get(dots.size()-1).size(); i++) {
+          dots.get(dots.size()-1).get(i).evalute();
+      }
 
    }
 
