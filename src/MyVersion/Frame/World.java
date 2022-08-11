@@ -1,8 +1,7 @@
 package MyVersion.Frame;
 
 
-import MyVersion.NEAT.Genome;
-import MyVersion.NEAT.Pool;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
@@ -168,11 +167,6 @@ public class World extends JPanel implements Runnable  {
   static   FileInputStream fileInputStream;
     static    ObjectInputStream objectInputStream;
 
-
-    static Pool pooll=new Pool();
-static Pool lastPooll;
-
-
     public static int cellls=0;
     public static int cellSize=CELL_SIZE;
    public static int width;
@@ -280,7 +274,6 @@ public class StepThread extends Thread{
     }
 }
    StepThread stepThread=new StepThread();
-   public static Genome topGene = null;
  public static  NormCell topLifeTimeCell=null;
  public static NormCell topMultipliesCell=null;
     static  byte countt2=0;
@@ -317,11 +310,17 @@ public class StepThread extends Thread{
 
 
     while(true) {
+
     boolean isStep=false;
     countt2++;
     Thread.yield();
     long startTime = System.currentTimeMillis();
         if(!pause){
+            try {
+                Thread.sleep(20);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
             int NULL_CELLS=0;
             for (int i = 0; i < width; i++) {
@@ -338,47 +337,16 @@ public class StepThread extends Thread{
             if (cells[i][j].secCell==null){
                 NULL_CELLS++;
             }
-            //BEST CELLS FINDER FROM HERE
-                if(cells[i][j].secCell!=null){
-                    if ( NULL_CELLS>width*height-4){
-                        pooll.addToSpecies(topLifeTimeCell.movablePool.getTopGenome());
-                        pooll.addToSpecies(topMultipliesCell.movablePool.getTopGenome());
-                        pooll.addToSpecies(cells[i][j].secCell.movablePool.getTopGenome());
-                        lastPooll=pooll;
-                    } if(cells[i][j].secCell.lifeTime>bestLifeTime){
-                        try{
-                        if(cells[i][j].secCell.movablePool.species.size()>0){
-                        pooll.addToSpecies(cells[i][j].secCell.movablePool.getTopGenome());}}catch (Exception e){
-                            e.printStackTrace();
-                            System.out.println("shit happened again movablePool size is 0");
-                        }
-                        bestLifeTime=cells[i][j].secCell.lifeTime;
-                        topLifeTimeCell=cells[i][j].secCell;
-                        topGene=cells[i][j].secCell.movablePool.getTopGenome();
-                    }if(cells[i][j].secCell.lifeTime>thisBestLifeTime){
-                        thisBestLifeTime=cells[i][j].secCell.lifeTime;
-                    }if (cells[i][j].secCell.multiplies>bestMultiplies){
-                        bestMultiplies=cells[i][j].secCell.multiplies;
-                        topMultipliesCell=cells[i][j].secCell;
-                    }
-
-                }
-                //TO HERE
 
                 if(cells[i][j].secCell!=null){
                     cells[i][j].secCell.setX(i);
                     cells[i][j].secCell.setY(j);
+                    if(cells[i][j].secCell.lifeTime>thisBestLifeTime){
+                        thisBestLifeTime=cells[i][j].secCell.lifeTime;
+                    }
                     if(!cells[i][j].secCell.stepN){
-                        if (stepThread.isAlive()){
-                            try {
-                                stepThread.join();
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
                         cells[i][j].secCell.stepN=true;
-                        stepThread.setXYAndStart(i,j);
-                        stepThread.run();
+                        cells[i][j].secCell.step();
                        isStep=true;
 
                     }
@@ -400,20 +368,13 @@ public class StepThread extends Thread{
             cells[j][i].organic=startEnergy;
           }
          }
-         Pool pol=pooll;
-         pol.breedNewGeneration();
 
-  //  Collections.sort(species,Collections.reverseOrder());
 
-    pol.addToSpecies(topGene);
-    pol.addToSpecies(topLifeTimeCell.movablePool.getTopGenome());
-    pol.addToSpecies(topMultipliesCell.movablePool.getTopGenome());
-    pol.addToSpecies(pooll.getTopGenome());
-    lastPooll=pooll;
-    pooll=pol;
-    for (int i = 0; i < 10; i++) {
-        new normCellInit(pooll);
-    }
+             for (int i = 0; i < 10; i++) {
+                 Random r =new Random();
+                 cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell());
+             }
+
     Restarts++;
 
      paintThread.rept();
@@ -444,25 +405,7 @@ public class StepThread extends Thread{
 
     }
 
-    class normCellInit extends Thread{
-        Pool pool;
-        public normCellInit(Pool pool){
-            this.pool=pool;
-            run();
-        }
 
-        @Override
-        public void run() {
-            System.gc();
-            Random r =new Random();
-            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(pool,15));
-            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(2);
-            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(1);
-            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell());
-            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell());
-
-        }
-    }
 
 
 

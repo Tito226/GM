@@ -6,15 +6,19 @@ public class Dot {
     public Dot( Dot_Type myType){
         this.myType=myType;
     }
+     void clear(){
+         value=0;
+     }
     void evalute(){
-        if(myType==Dot_Type.OUTPUT){
-            System.out.println(value);
-        }
     if(nodesFromMe.size()>0){
         for (int i = 0; i < nodesFromMe.size(); i++) {
            nodesFromMe.get(i).evalute();
         }
+       clear();
     }
+    }
+    float getOutpup(){
+      return value;
     }
     Dot_Type myType;
 public float value=0.0f;

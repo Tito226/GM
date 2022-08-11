@@ -30,27 +30,7 @@ public void setSecCell(NormCell secCell){
       this.secCell=secCell;
 }
     public void setSecCell(int i){
-        switch(i){
-            case 1->{
-        this.secCell=topLifeTimeCell;
-                secCell.setEnergy(NORM_CELL_START_ENERGY);
-                Random r=new Random();
-                if(r.nextInt(20)==1){
-                    secCell.movablePool.breedNewGeneration();
-                }
-            }
-            case 2 ->{
-                this.secCell=topMultipliesCell;
-                secCell.setEnergy(NORM_CELL_START_ENERGY);
-                Random r=new Random();
-                if(r.nextInt(20)==1){
-                    secCell.movablePool.breedNewGeneration();
-                }
-            }
-        }
-        secCell.myParts.clear();
-        secCell.lifeTime=0;
-        secCell.multiplies=0;
+
     }
     public void setPartCell(PartCell partCell) {
         this.partCell = partCell;
