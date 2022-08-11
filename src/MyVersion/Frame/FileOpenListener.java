@@ -1,4 +1,4 @@
-package MyVersion;
+package MyVersion.Frame;
 
 import MyVersion.NEAT.Pool;
 

@@ -1,4 +1,4 @@
-package MyVersion;
+package MyVersion.Frame;
 
 public enum Directions {
     UP,

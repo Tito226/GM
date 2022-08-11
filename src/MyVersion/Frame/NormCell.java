@@ -1,4 +1,4 @@
-package MyVersion;
+package MyVersion.Frame;
 
 
 import MyVersion.NEAT.Environment;
@@ -11,8 +11,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 
-import static MyVersion.GM2_CONFIG.*;
-import static MyVersion.World.*;
+import static MyVersion.Frame.GM2_CONFIG.*;
+import static MyVersion.Frame.World.*;
 
 public class NormCell implements Environment, Serializable {
     byte counter=0;

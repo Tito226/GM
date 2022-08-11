@@ -1,4 +1,4 @@
-package MyVersion;
+package MyVersion.Frame;
 
 
 import MyVersion.NEAT.Genome;
@@ -11,11 +11,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.Random;
-import static MyVersion.Cell.startEnergy;
-import static MyVersion.GM2_CONFIG.CELL_SIZE;
-import static MyVersion.GM2_CONFIG.PAINT_MODE;
-import static MyVersion.PaintThread.paintMode;
-import static MyVersion.World.*;
+import static MyVersion.Frame.Cell.startEnergy;
+import static MyVersion.Frame.GM2_CONFIG.CELL_SIZE;
+import static MyVersion.Frame.GM2_CONFIG.PAINT_MODE;
+import static MyVersion.Frame.PaintThread.paintMode;
+import static MyVersion.Frame.World.*;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 class PaintThread extends Thread{
@@ -26,7 +26,7 @@ class PaintThread extends Thread{
   public   void rept(){
       if(!pause){
         pause=true;
-        for (int i = 0; i <World.width ; i++) {
+        for (int i = 0; i < width ; i++) {
             for (int j = 0; j < World.height; j++) {
                 if(cells[i][j]!=null)
                     cells[i][j].change=true;
@@ -34,7 +34,7 @@ class PaintThread extends Thread{
         }
         pause=false;
   }else {
-        for (int i = 0; i <World.width ; i++) {
+        for (int i = 0; i < width ; i++) {
             for (int j = 0; j < World.height; j++) {
                 if(cells[i][j]!=null)
                     cells[i][j].change=true;
@@ -203,7 +203,7 @@ public static Cell[][] getCells(){
             public void componentResized(ComponentEvent e) {
                 if(!pause){
                 pause=true;
-                for (int i = 0; i <World.width ; i++) {
+                for (int i = 0; i < World.width; i++) {
                     for (int j = 0; j < World.height; j++) {
                         if(cells[i][j]!=null)
                         cells[i][j].change=true;
@@ -216,7 +216,7 @@ public static Cell[][] getCells(){
                 }
                 pause=false;
                 }else{
-                    for (int i = 0; i <World.width ; i++) {
+                    for (int i = 0; i < World.width; i++) {
                         for (int j = 0; j < World.height; j++) {
                             if(cells[i][j]!=null)
                                 cells[i][j].change=true;

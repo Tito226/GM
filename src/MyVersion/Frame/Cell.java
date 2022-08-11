@@ -1,11 +1,11 @@
-package MyVersion;
+package MyVersion.Frame;
 
 import java.awt.*;
 import java.util.Random;
 
-import static MyVersion.GM2_CONFIG.CELL_START_ORGANIC;
-import static MyVersion.GM2_CONFIG.NORM_CELL_START_ENERGY;
-import static MyVersion.World.*;
+import static MyVersion.Frame.GM2_CONFIG.CELL_START_ORGANIC;
+import static MyVersion.Frame.GM2_CONFIG.NORM_CELL_START_ENERGY;
+import static MyVersion.Frame.World.*;
 
 public  class Cell {
     boolean isChanged=true;

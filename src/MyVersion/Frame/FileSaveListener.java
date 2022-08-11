@@ -1,4 +1,4 @@
-package MyVersion;
+package MyVersion.Frame;
 
 import MyVersion.NEAT.Pool;
 
@@ -8,8 +8,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
-import static MyVersion.World.lastPooll;
-import static MyVersion.World.pooll;
+import static MyVersion.Frame.World.lastPooll;
+import static MyVersion.Frame.World.pooll;
 
 public class FileSaveListener implements ActionListener {
     @Override

@@ -1,9 +1,13 @@
 package MyVersion;
 
+import MyVersion.Core.Network;
+
 import java.util.HashMap;
 
 public class test {
     public static void main(String[] args) {
-        HashMap<String,Integer> b;
+        Network network=new Network();
+        int[] inputs=new int[]{1};
+        network.evaluteFitness(inputs);
     }
 }

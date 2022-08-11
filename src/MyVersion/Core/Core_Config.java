@@ -1,0 +1,12 @@
+package MyVersion.Core;
+
+public class Core_Config {
+    //Network
+public static final int INPUTS =1;
+public static final int HIDDEN_DOTS =1;// MUST DIVIDE ON HIDDEN_DOTS_PER_MASSIVE
+public static final int OUTPUTS=1;
+public static final float MAX_OUTPUT_VALUE=1.0F;
+//
+public static final int HIDDEN_DOTS_PER_ARRAY =1;
+}
+

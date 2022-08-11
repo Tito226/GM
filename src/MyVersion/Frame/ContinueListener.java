@@ -1,4 +1,4 @@
-package MyVersion;
+package MyVersion.Frame;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
