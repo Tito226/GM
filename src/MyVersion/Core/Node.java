@@ -23,4 +23,7 @@ public class Node {
 float value1=1.0f;
 Dot from;
 Dot to;
+
+
+
 }

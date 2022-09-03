@@ -21,7 +21,6 @@ public class NormCell implements  Serializable {
     int lifeTime=0;
     int partNum=0;
 ArrayList< Integer[]> myParts=new ArrayList<>();
-    float wrongStep=0.23f;
     float[] outputs;
     int multiplies=0;
     Random r=new Random();
@@ -114,11 +113,9 @@ boolean isMyPart(PartCell partCell){
                     y--;
                     switch (i5){
                         case 0->{
-                            wrongStep=0.3f;
                         }
                         case 1->{
-                            wrongStep=0.26f;
-                    }
+                        }
                     }
                 }
             }
@@ -131,10 +128,8 @@ boolean isMyPart(PartCell partCell){
                     y++;
                     switch (i5){
                         case 0->{
-                            wrongStep=0.3f;
                         }
                         case 1->{
-                            wrongStep=0.26f;
                         }
                     }
                 }
@@ -150,10 +145,8 @@ boolean isMyPart(PartCell partCell){
                     x++;
                     switch (i5){
                         case 0->{
-                            wrongStep=0.23f;
                         }
                         case 1->{
-                            wrongStep=0.2f;
                         }
                     }
                 }
@@ -167,10 +160,8 @@ boolean isMyPart(PartCell partCell){
                     x--;
                     switch (i5){
                         case 0->{
-                            wrongStep=0.23f;
                         }
                         case 1->{
-                            wrongStep=0.2f;
                         }
                     }
                 }
@@ -669,7 +660,7 @@ void bestOuputsClear(){
 
     //************************************************
     public float evaluateFitness() {
-        float[] inputs = {wrongStep,isRaedyToMultiply() ,getEnergy()*0.01f, getUptCell(), getDownCell(), getLeftCell(), getRightCell(),getRightDownCell(),getRightUpCell(),getLeftUpCell(),getLeftDownCell(), isSpaceAvailable()*0.1f, isController(),getRightDistance(),getLeftDistance(),getUpDistance(),getDownDistance(), cells[x][y].getOrganic()/100f,lastEnergy*0.01f,lastUpCell,lastDownCell,lastLeftCell,lastRightCell,lastRightDownCell,lastRightUpCell,lastLeftDownCell,lastLeftUpCell,lastOrganic/100f,sunny*0.1f,myParts.size(),lastSize,lastRightDistance,lastLeftDistace,lastUpDistance,lastDownDistance};
+        float[] inputs = {isRaedyToMultiply() ,getEnergy(),cells[x][y].getOrganic(), getUptCell(), getDownCell(), getLeftCell(), getRightCell(),getRightDownCell(),getRightUpCell(),getLeftUpCell(),getLeftDownCell(), isSpaceAvailable(), isController(),getRightDistance(),getLeftDistance(),getUpDistance(),getDownDistance(),lastEnergy,lastUpCell,lastDownCell,lastLeftCell,lastRightCell,lastRightDownCell,lastRightUpCell,lastLeftDownCell,lastLeftUpCell,lastOrganic,sunny,myParts.size(),lastSize,lastRightDistance,lastLeftDistace,lastUpDistance,lastDownDistance};
 
        return brain.evaluteFitness(inputs);
     }
