@@ -60,7 +60,7 @@ public class Network {
         return dots;
     }
     ArrayList< Float> outputs;
-  public float evaluteFitness(float[] inputs){
+  public float evaluteFitness(Float[] inputs){
      outputs=new ArrayList<>();
         for (int i = 0; i < inputs.length; i++) {
             dots.get(0).get(i).setValue(inputs[i]);

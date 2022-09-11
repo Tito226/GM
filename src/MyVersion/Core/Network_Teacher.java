@@ -4,20 +4,17 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class Network_Teacher {
-
+float error;
 
     public static void main(String[] args) {
         Network student=new Network();
-        Network_Teacher teacher=new Network_Teacher(student);
-        teacher.teach();
+        Data_Set data_set=new Data_Set();
+        Network_Teacher teacher=new Network_Teacher();
+       teacher.teach(student,data_set);
     }
 
 
-    Network student;
-    public Network_Teacher(Network student){
-        this.student=student;
-    }
-    void teach(){
+    void teach(Network student,Data_Set data_set){
         Random r=new Random();
 
         for (ArrayList<Dot> dotM:student.dots) {
@@ -27,8 +24,11 @@ public class Network_Teacher {
                }
            }
         }
+        int i=r.nextInt(data_set.inputs.size());
+        student.evaluteFitness( data_set.inputs.get(i));
 
-        float[] inputs=new float[]{1,1,100};
+
+        Float[] inputs=new Float[]{1F,1f,100f};
         System.out.println(student.evaluteFitness(inputs));
     }
 

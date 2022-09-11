@@ -13,13 +13,13 @@ public class Data_Set {
         }
         inputs.set(0,new Float[]{0f,rnd(6,ENERGY_NEEDED_TO_MULTIPLY),rnd(3,100),0f,0f,0f,0f});
         outputs.set(0,new Float[]{rndF(0.1001f,0.2f)});
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             inputs.set(0,new Float[]{0f,rnd(6,ENERGY_NEEDED_TO_MULTIPLY),rnd(3,100),0f,0f,0f,0f});
             outputs.set(0,new Float[]{rndF(0.1001f,0.2f)});
         }
     }
-    ArrayList<Float[]> inputs=new ArrayList<>();
-    ArrayList<Float[]> outputs=new ArrayList<>();
+   public ArrayList<Float[]> inputs=new ArrayList<>();
+   public ArrayList<Float[]> outputs=new ArrayList<>();
 
 
     public static float rnd(int min, int max){

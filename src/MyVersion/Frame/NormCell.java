@@ -111,12 +111,7 @@ boolean isMyPart(PartCell partCell){
                 }
                 else {
                     y--;
-                    switch (i5){
-                        case 0->{
-                        }
-                        case 1->{
-                        }
-                    }
+
                 }
             }
             case UP -> {
@@ -126,12 +121,7 @@ boolean isMyPart(PartCell partCell){
                 cells[x][y+1].setSecCell(null);}
                 else{
                     y++;
-                    switch (i5){
-                        case 0->{
-                        }
-                        case 1->{
-                        }
-                    }
+
                 }
 
             }
@@ -143,12 +133,7 @@ boolean isMyPart(PartCell partCell){
                 }
                 else {
                     x++;
-                    switch (i5){
-                        case 0->{
-                        }
-                        case 1->{
-                        }
-                    }
+
                 }
             }
             case RIGHT ->{ x++;
@@ -158,12 +143,7 @@ boolean isMyPart(PartCell partCell){
                 }
                 else {
                     x--;
-                    switch (i5){
-                        case 0->{
-                        }
-                        case 1->{
-                        }
-                    }
+
                 }
              }
         }
@@ -660,7 +640,7 @@ void bestOuputsClear(){
 
     //************************************************
     public float evaluateFitness() {
-        float[] inputs = {isRaedyToMultiply() ,getEnergy(),cells[x][y].getOrganic(), getUptCell(), getDownCell(), getLeftCell(), getRightCell(),getRightDownCell(),getRightUpCell(),getLeftUpCell(),getLeftDownCell(), isSpaceAvailable(), isController(),getRightDistance(),getLeftDistance(),getUpDistance(),getDownDistance(),lastEnergy,lastUpCell,lastDownCell,lastLeftCell,lastRightCell,lastRightDownCell,lastRightUpCell,lastLeftDownCell,lastLeftUpCell,lastOrganic,sunny,myParts.size(),lastSize,lastRightDistance,lastLeftDistace,lastUpDistance,lastDownDistance};
+        Float[] inputs = {isRaedyToMultiply() , (float) getEnergy(), (float) cells[x][y].getOrganic(), getUptCell(), getDownCell(), getLeftCell(), getRightCell(),getRightDownCell(),getRightUpCell(),getLeftUpCell(),getLeftDownCell(), isSpaceAvailable(), isController(),getRightDistance(),getLeftDistance(),getUpDistance(),getDownDistance(), (float) lastEnergy,lastUpCell,lastDownCell,lastLeftCell,lastRightCell,lastRightDownCell,lastRightUpCell,lastLeftDownCell,lastLeftUpCell, (float) lastOrganic, (float) sunny, (float) myParts.size(), (float) lastSize,lastRightDistance,lastLeftDistace,lastUpDistance,lastDownDistance};
 
        return brain.evaluteFitness(inputs);
     }
