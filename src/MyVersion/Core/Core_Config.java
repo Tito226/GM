@@ -7,6 +7,7 @@ public static final int HIDDEN_DOTS =10;// MUST DIVIDE ON HIDDEN_DOTS_PER_MASSIV
 public static final int OUTPUTS=1;
 public static final float MAX_OUTPUT_VALUE=1.0F;
 public static final int BIAS=1;//MUST BE 0 OR 1
+public static final float LEARNING_RATE =0.01F;
 //
 public static final int HIDDEN_DOTS_PER_ARRAY =5;
 }

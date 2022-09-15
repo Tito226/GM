@@ -3,6 +3,12 @@ package MyVersion.Core;
 import java.util.ArrayList;
 
 public class Dot {
+    float weightsDelta;
+    float error;
+    public float value=0.0f;
+    Dot_Type myType;
+    public ArrayList<Node> nodesFromMe=new ArrayList<>();
+    public ArrayList<Node> nodesToMe=new ArrayList<>();
     public Dot( Dot_Type myType){
         this.myType=myType;
         if (myType==Dot_Type.BIAS_TYPE){
@@ -11,22 +17,26 @@ public class Dot {
     }
      void clear(){
          value=0;
+         error=0f;
+         weightsDelta=0f;
      }
     void evalute(){
-    value= activaionFunction(value);
-    if(nodesFromMe.size()>0){
-        for (int i = 0; i < nodesFromMe.size(); i++) {
-           nodesFromMe.get(i).evalute();
+        if(myType==Dot_Type.OUTPUT){
+            value=activaionFunction(value);
+        }else {
+            value = activaionFunction(value);
+            if (nodesFromMe.size() > 0) {
+                for (int i = 0; i < nodesFromMe.size(); i++) {
+                    nodesFromMe.get(i).evalute();
+                }
+            }
         }
-       clear();
-    }
     }
     float getOutpup(){
       return value;
     }
-    Dot_Type myType;
-public float value=0.0f;
-public ArrayList<Node> nodesFromMe=new ArrayList<>();
+
+
 
     public void setValue(float value) {
         this.value = value;
@@ -36,12 +46,20 @@ public ArrayList<Node> nodesFromMe=new ArrayList<>();
         return value;
     }
     void addNode(Dot to){
-        nodesFromMe.add(new Node(this,to));
+        if(to.myType==Dot_Type.BIAS_TYPE){
+
+        }else {
+      Node node=  new Node(this,to);
+        nodesFromMe.add(node);
+        to.nodesToMe.add(node);}
     }
 
 
     float activaionFunction(float x){
         float e =2.71828f;
         return (float) (1/(1+ Math.pow(e,-x)));
+    }
+    float activationFunctionDX(float x){
+      return   activaionFunction(x)*(1-activaionFunction(x));
     }
 }

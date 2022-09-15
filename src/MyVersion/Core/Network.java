@@ -6,74 +6,143 @@ import java.util.Random;
 import static MyVersion.Core.Core_Config.*;
 
 public class Network {
-
-    ArrayList<ArrayList<Dot>> dots =new ArrayList<>();
-    public Network(){
-        dots.add(new ArrayList<>());//inputs (0)
+//сколько нейронов будет в скрытом слое - подбором. Если слишком много,  плохо - сеть начинает запоминать, зубрить примеры (нужно больше примеров чтобы этого избежать),
+// если мало нейронов, то она не достаточно гибкая, не сможет ухватить закономерность
+//Лучше мало нейронов но больше слоев чем больше нейронов но 1 слой
+    ArrayList<ArrayList<Dot>> dotsArr =new ArrayList<>();
+    public Network(int iii){
+        dotsArr.add(new ArrayList<>());//inputs (0)
 
         for (int i = 1; i <= HIDDEN_DOTS / HIDDEN_DOTS_PER_ARRAY; i++) {//hidden dots (1,2,3,...,HIDDEN_DOTS /HIDDEN_DOTS_PER_MASSIVE-1)
-          dots.add(new ArrayList<>());
+            dotsArr.add(new ArrayList<>());
 
         }
         for (int i = 0; i < INPUTS+BIAS; i++) {
-            dots.get(0).add(new Dot(Dot_Type.INPUT));
+            dotsArr.get(0).add(new Dot(Dot_Type.INPUT));
             if(BIAS==1){
-                dots.get(0).add(new Dot(Dot_Type.BIAS_TYPE));
-                for (int j = 0; j <dots.get(1).size() ; j++) {
-                    dots.get(0).get(dots.size()-1).addNode(dots.get(1).get(j));
+                dotsArr.get(0).add(new Dot(Dot_Type.BIAS_TYPE));
+                for (int j = 0; j < dotsArr.get(1).size() ; j++) {
+                    dotsArr.get(0).get(dotsArr.size()-1).addNode(dotsArr.get(1).get(j));
                 }
             }
         }
 
 
-        dots.add(new ArrayList<>());//outputs(HIDDEN_DOTS /HIDDEN_DOTS_PER_MASSIVE)
+        dotsArr.add(new ArrayList<>());//outputs(HIDDEN_DOTS /HIDDEN_DOTS_PER_MASSIVE)
 
 
         for (int i = 1; i < HIDDEN_DOTS / HIDDEN_DOTS_PER_ARRAY +1; i++) {
             for (int j = 0; j < HIDDEN_DOTS_PER_ARRAY; j++) {
-            dots.get(i).add(new Dot(Dot_Type.HIDDEN));
+                dotsArr.get(i).add(new Dot(Dot_Type.HIDDEN));
             }
-            dots.get(i).add(new Dot(Dot_Type.BIAS_TYPE));
+            dotsArr.get(i).add(new Dot(Dot_Type.BIAS_TYPE));
             if (BIAS==0) {
-                for (int j = 0; j < dots.get(j + 1).size(); j++) {
-                    dots.get(i).get(dots.size() - 1).addNode(dots.get(i+1).get(j));
+                for (int j = 0; j < dotsArr.get(j + 1).size(); j++) {
+                    dotsArr.get(i).get(dotsArr.size() - 1).addNode(dotsArr.get(i+1).get(j));
                 }
             }
 
         }
         for (int i = 0; i < OUTPUTS; i++) {
-          dots.get(dots.size()-1).add(new Dot(Dot_Type.OUTPUT));
+            dotsArr.get(dotsArr.size()-1).add(new Dot(Dot_Type.OUTPUT));
+        }
+        //
+
+
+        for (int i = 0; i < HIDDEN_DOTS/HIDDEN_DOTS_PER_ARRAY+1; i++) {
+            for (int j = 0; j < HIDDEN_DOTS_PER_ARRAY; j++) {
+                dotsArr.get(i).get(j).addNode(dotsArr.get(i+1).get(0));
+            }
+
+        }
+
+        //
+    }
+
+
+
+
+
+
+
+
+    public Network(){
+        dotsArr.add(new ArrayList<>());//inputs (0)
+
+        for (int i = 1; i <= HIDDEN_DOTS / HIDDEN_DOTS_PER_ARRAY; i++) {//hidden dots (1,2,3,...,HIDDEN_DOTS /HIDDEN_DOTS_PER_MASSIVE-1)
+          dotsArr.add(new ArrayList<>());
+
+        }
+        for (int i = 0; i < INPUTS+BIAS; i++) {
+            dotsArr.get(0).add(new Dot(Dot_Type.INPUT));
+            if(BIAS==1){
+                dotsArr.get(0).add(new Dot(Dot_Type.BIAS_TYPE));
+                for (int j = 0; j < dotsArr.get(1).size() ; j++) {
+                    dotsArr.get(0).get(dotsArr.size()-1).addNode(dotsArr.get(1).get(j));
+                }
+            }
+        }
+
+
+        dotsArr.add(new ArrayList<>());//outputs(HIDDEN_DOTS /HIDDEN_DOTS_PER_MASSIVE)
+
+
+        for (int i = 1; i < HIDDEN_DOTS / HIDDEN_DOTS_PER_ARRAY +1; i++) {
+            for (int j = 0; j < HIDDEN_DOTS_PER_ARRAY; j++) {
+            dotsArr.get(i).add(new Dot(Dot_Type.HIDDEN));
+            }
+            dotsArr.get(i).add(new Dot(Dot_Type.BIAS_TYPE));
+            if (BIAS==0) {
+                for (int j = 0; j < dotsArr.get(j + 1).size(); j++) {
+                    dotsArr.get(i).get(dotsArr.size() - 1).addNode(dotsArr.get(i+1).get(j));
+                }
+            }
+
+        }
+        for (int i = 0; i < OUTPUTS; i++) {
+          dotsArr.get(dotsArr.size()-1).add(new Dot(Dot_Type.OUTPUT));
         }
         //
         Random r=new Random();
-        dots.get(0).get(0).addNode( dots.get(1).get(0));
-        dots.get(0).get(0).nodesFromMe.get(0).value1=0.6f;
-        dots.get(0).get(1).addNode(dots.get(1).get(0));
-        dots.get(0).get(1).nodesFromMe.get(0).value1=0.8f;
+        dotsArr.get(0).get(0).addNode( dotsArr.get(1).get(0));
+        dotsArr.get(0).get(0).nodesFromMe.get(0).weight =0.6f;
+        dotsArr.get(0).get(1).addNode(dotsArr.get(1).get(0));
+        dotsArr.get(0).get(1).nodesFromMe.get(0).weight =0.8f;
         for (int i = 1; i < HIDDEN_DOTS/HIDDEN_DOTS_PER_ARRAY+1; i++) {
-            dots.get(i).get(0).addNode(dots.get(i+1).get(0));
+            dotsArr.get(i).get(0).addNode(dotsArr.get(i+1).get(0));
         }
         //
     }
 
-    public ArrayList<ArrayList<Dot>> getDots() {
-        return dots;
+    public ArrayList<ArrayList<Dot>> getDotsArr() {
+        return dotsArr;
     }
     ArrayList< Float> outputs;
   public float evaluteFitness(Float[] inputs){
-     outputs=new ArrayList<>();
-        for (int i = 0; i < inputs.length; i++) {
-            dots.get(0).get(i).setValue(inputs[i]);
-            dots.get(0).get(i).evalute();
-        }
-      for (int i = 1; i <HIDDEN_DOTS / HIDDEN_DOTS_PER_ARRAY+1; i++) {
-          for (int j = 0; j <dots.get(i).size() ; j++) {
-           dots.get(i).get(j).evalute();
+
+      //Dots value , error and weightsDelta clears in next method call
+      for(ArrayList<Dot> dotArr: dotsArr){
+          for(Dot dot:dotArr){
+              dot.clear();
           }
       }
-      for (int i = 0; i < dots.get(dots.size()-1).size(); i++) {
-         outputs.add( dots.get(dots.size()-1).get(i).getOutpup());
-          dots.get(dots.size()-1).get(i).clear();
+
+     outputs=new ArrayList<>();
+      //Set inputs
+        for (int i = 0; i < inputs.length; i++) {
+            dotsArr.get(0).get(i).setValue(inputs[i]);
+            dotsArr.get(0).get(i).evalute();
+        }
+        //evalute hidden layer
+      for (int i = 1; i <HIDDEN_DOTS / HIDDEN_DOTS_PER_ARRAY+1; i++) {
+          for (int j = 0; j < dotsArr.get(i).size() ; j++) {
+           dotsArr.get(i).get(j).evalute();
+          }
+      }
+      //Getting outputs
+      for (int i = 0; i < dotsArr.get(dotsArr.size()-1).size(); i++) {
+          dotsArr.get(dotsArr.size()-1).get(i).evalute();
+         outputs.add( dotsArr.get(dotsArr.size()-1).get(i).getOutpup());
       }
 return outputs.get(0);
    }

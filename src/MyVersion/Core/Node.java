@@ -13,14 +13,14 @@ public class Node {
 
 
        if(from.myType==Dot_Type.BIAS_TYPE){
-           value1=0.0f;
+           weight =0.0f;
        }
        this.to=to;
     }
    void evalute(){
-        to.value+= from.value*value1;
+        to.value+= from.value* weight;
    }
-float value1=1.0f;
+float weight =1.0f;
 Dot from;
 Dot to;
 
