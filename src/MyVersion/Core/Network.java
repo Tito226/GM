@@ -31,12 +31,13 @@ public class Network {
         dotsArr.add(new ArrayList<>());//outputs(HIDDEN_DOTS /HIDDEN_DOTS_PER_MASSIVE)
 
 
-        for (int i = 1; i < HIDDEN_DOTS / HIDDEN_DOTS_PER_ARRAY +1; i++) {
+        for (int i = 1; i <= HIDDEN_DOTS / HIDDEN_DOTS_PER_ARRAY ; i++) {
             for (int j = 0; j < HIDDEN_DOTS_PER_ARRAY; j++) {
                 dotsArr.get(i).add(new Dot(Dot_Type.HIDDEN));
             }
-            dotsArr.get(i).add(new Dot(Dot_Type.BIAS_TYPE));
-            if (BIAS==0) {
+
+            if (BIAS==1) {
+                dotsArr.get(i).add(new Dot(Dot_Type.BIAS_TYPE));
                 for (int j = 0; j < dotsArr.get(j + 1).size(); j++) {
                     dotsArr.get(i).get(dotsArr.size() - 1).addNode(dotsArr.get(i+1).get(j));
                 }
@@ -50,8 +51,10 @@ public class Network {
 
 
         for (int i = 0; i < HIDDEN_DOTS/HIDDEN_DOTS_PER_ARRAY+1; i++) {
-            for (int j = 0; j < HIDDEN_DOTS_PER_ARRAY; j++) {
-                dotsArr.get(i).get(j).addNode(dotsArr.get(i+1).get(0));
+            for (int j = 0; j < dotsArr.get(i).size(); j++) {
+                for (int k = 0; k < dotsArr.get(i+1).size(); k++) {
+                    dotsArr.get(i).get(j).addNode(dotsArr.get(i+1).get(k));
+                }
             }
 
         }
@@ -87,12 +90,13 @@ public class Network {
         dotsArr.add(new ArrayList<>());//outputs(HIDDEN_DOTS /HIDDEN_DOTS_PER_MASSIVE)
 
 
-        for (int i = 1; i < HIDDEN_DOTS / HIDDEN_DOTS_PER_ARRAY +1; i++) {
+        for (int i = 1; i < HIDDEN_DOTS / HIDDEN_DOTS_PER_ARRAY +BIAS; i++) {
             for (int j = 0; j < HIDDEN_DOTS_PER_ARRAY; j++) {
             dotsArr.get(i).add(new Dot(Dot_Type.HIDDEN));
             }
-            dotsArr.get(i).add(new Dot(Dot_Type.BIAS_TYPE));
-            if (BIAS==0) {
+
+            if (BIAS==1) {
+                dotsArr.get(i).add(new Dot(Dot_Type.BIAS_TYPE));
                 for (int j = 0; j < dotsArr.get(j + 1).size(); j++) {
                     dotsArr.get(i).get(dotsArr.size() - 1).addNode(dotsArr.get(i+1).get(j));
                 }

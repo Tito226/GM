@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Random;
 
 import static MyVersion.Core.Core_Config.LEARNING_RATE;
+import static MyVersion.Core.Data_Set.rnd;
+import static MyVersion.Frame.GM2_CONFIG.ENERGY_NEEDED_TO_MULTIPLY;
 
 public class Network_Teacher {
 
@@ -14,10 +16,11 @@ public class Network_Teacher {
         Data_Set data_set=new Data_Set();
         Network_Teacher teacher=new Network_Teacher();
         teacher.randomize(student);
-        for (int i = 0; i < 200000; i++) {
+        for (int i = 0; i < 20000; i++) {
             teacher.teach(student,data_set);
         }
-
+        System.out.println("ggggggggggggggggggggggggggggggggggggggggggggggggggg:"+ student.evaluteFitness(new Float[]{1f,rnd(ENERGY_NEEDED_TO_MULTIPLY,500),rnd(3,100),0f,0f,0f,0f}));
+        System.out.println("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy:"+student.evaluteFitness(new Float[]{0f,rnd(6,ENERGY_NEEDED_TO_MULTIPLY),rnd(3,100),0f,0f,0f,0f}));
     }
 
 
