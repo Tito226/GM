@@ -19,6 +19,7 @@ public class Network_Teacher {
         for (int i = 0; i < 20000; i++) {
             teacher.teach(student,data_set);
         }
+        //TODO вывод непраавильный ,проверить акриваионную функцию в обучении
         System.out.println("ggggggggggggggggggggggggggggggggggggggggggggggggggg:"+ student.evaluteFitness(new Float[]{1f,rnd(ENERGY_NEEDED_TO_MULTIPLY,500),rnd(3,100),0f,0f,0f,0f}));
         System.out.println("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy:"+student.evaluteFitness(new Float[]{0f,rnd(6,ENERGY_NEEDED_TO_MULTIPLY),rnd(3,100),0f,0f,0f,0f}));
     }
@@ -35,6 +36,12 @@ public class Network_Teacher {
         }
     }
     void teach(Network student,Data_Set data_set){
+
+        for(ArrayList<Dot> dotArr: student.dotsArr){
+            for(Dot dot:dotArr){
+                dot.clear();
+            }
+        }
 
         Random r=new Random();
 // КОМЕНТАТОРЫ{

@@ -125,11 +125,7 @@ public class Network {
   public float evaluteFitness(Float[] inputs){
 
       //Dots value , error and weightsDelta clears in next method call
-      for(ArrayList<Dot> dotArr: dotsArr){
-          for(Dot dot:dotArr){
-              dot.clear();
-          }
-      }
+
 
      outputs=new ArrayList<>();
       //Set inputs
