@@ -1,5 +1,8 @@
 package MyVersion.Core;
 
+import MyVersion.Frame.World;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -11,7 +14,7 @@ import static MyVersion.Frame.GM2_CONFIG.ENERGY_NEEDED_TO_MULTIPLY;
 public class Network_Teacher {
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         Network student=new Network(1);
         Data_Set data_set=new Data_Set();
         Network_Teacher teacher=new Network_Teacher();
@@ -19,11 +22,25 @@ public class Network_Teacher {
         for (int i = 0; i < 20000; i++) {
             teacher.teach(student,data_set);
         }
-        //TODO вывод непраавильный ,проверить акриваионную функцию в обучении
+        //TODO вывод непраавильный(уу...) ,проверить акриваионную функцию в обучении
         System.out.println("ggggggggggggggggggggggggggggggggggggggggggggggggggg:"+ student.evaluteFitness(new Float[]{1f,rnd(ENERGY_NEEDED_TO_MULTIPLY,500),rnd(3,100),0f,0f,0f,0f}));
         System.out.println("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy:"+student.evaluteFitness(new Float[]{0f,rnd(6,ENERGY_NEEDED_TO_MULTIPLY),rnd(3,100),0f,0f,0f,0f}));
+
     }
 
+    public  Network mainy() throws IOException {
+        Network student=new Network(1);
+        Data_Set data_set=new Data_Set();
+        Network_Teacher teacher=new Network_Teacher();
+        teacher.randomize(student);
+        for (int i = 0; i < 20000; i++) {
+            teacher.teach(student,data_set);
+        }
+        //TODO вывод непраавильный(уу...) ,проверить акриваионную функцию в обучении
+        System.out.println("ggggggggggggggggggggggggggggggggggggggggggggggggggg:"+ student.evaluteFitness(new Float[]{1f,rnd(ENERGY_NEEDED_TO_MULTIPLY,500),rnd(3,100),0f,0f,0f,0f}));
+        System.out.println("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy:"+student.evaluteFitness(new Float[]{0f,rnd(6,ENERGY_NEEDED_TO_MULTIPLY),rnd(3,100),0f,0f,0f,0f}));
+        return student;
+    }
 
     void randomize(Network student){
         Random r=new Random();
@@ -78,9 +95,12 @@ public class Network_Teacher {
 
         for (int j = 1; j < student.dotsArr.size(); j++) {//hidden layer correction
             for (Dot dot : student.dotsArr.get(student.dotsArr.size()-(j+1))) {
+                int counter=0;
                 for (Node node:dot.nodesFromMe) {
                   dot.error+=node.weight*node.to.weightsDelta;
+                  counter++;
                 }
+
                 dot.weightsDelta= dot.error*dot.activationFunctionDX(dot.value);
             }
 

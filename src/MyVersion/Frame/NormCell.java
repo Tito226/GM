@@ -14,7 +14,7 @@ import static MyVersion.Frame.World.*;
 
 public class NormCell implements  Serializable {
     //*****************************************
-    Network brain=new Network();
+    Network brain;
     //*****************************************
     byte counter=0;
     float readyToMultiply=0.0f;
@@ -72,7 +72,8 @@ Color myColor=Color.green;
         energy=startEnergy;
     }
 
-    public NormCell(){
+    public NormCell(Network brain){
+        this.brain=brain;
         myNum=num;
         num++;
         energy=startEnergy;

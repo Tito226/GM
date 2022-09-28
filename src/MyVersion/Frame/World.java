@@ -2,6 +2,9 @@ package MyVersion.Frame;
 
 
 
+import MyVersion.Core.Network;
+import MyVersion.Core.Network_Teacher;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
@@ -164,18 +167,20 @@ class PaintThread extends Thread{
 
 public class World extends JPanel implements Runnable  {
 
-  static   FileInputStream fileInputStream;
+    static   FileInputStream fileInputStream;
     static    ObjectInputStream objectInputStream;
-
+    public Network relative;
     public static int cellls=0;
     public static int cellSize=CELL_SIZE;
-   public static int width;
-   public static int height;
-   public static int sunny=1;
+    public static int width;
+    public static int height;
+    public static int sunny=1;
     static Cell[][] cells;
     public static boolean pause=false;
     static PaintThread paintThread;
     public World(int width,int height) throws IOException {
+        Network_Teacher network_teacher=new Network_Teacher();
+        relative=network_teacher.mainy();
         this.height=height;
         this.width=width;
         cells=new Cell[width][height];
@@ -299,7 +304,7 @@ public class StepThread extends Thread{
 
         for (int i = 0; i < 10; i++) {
             Random r =new Random();
-            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell());
+            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(relative));
         }
 
 
@@ -372,7 +377,7 @@ public class StepThread extends Thread{
 
              for (int i = 0; i < 10; i++) {
                  Random r =new Random();
-                 cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell());
+                 cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(relative));
              }
 
     Restarts++;

@@ -141,7 +141,9 @@ public class Network {
       }
       //Getting outputs
       for (int i = 0; i < dotsArr.get(dotsArr.size()-1).size(); i++) {
+          //вызов метода точки(возможно повторный)
           dotsArr.get(dotsArr.size()-1).get(i).evalute();
+          //
          outputs.add( dotsArr.get(dotsArr.size()-1).get(i).getOutpup());
       }
 return outputs.get(0);
