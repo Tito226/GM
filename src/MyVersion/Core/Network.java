@@ -17,7 +17,8 @@ public class Network {
             dotsArr.add(new ArrayList<>());
 
         }
-        for (int i = 0; i < INPUTS+BIAS; i++) {
+
+        for (int i = 0; i < INPUTS+BIAS; i++) {//adding input Dots to array,if bias,add dias Dot and add notes to it
             dotsArr.get(0).add(new Dot(Dot_Type.INPUT));
             if(BIAS==1){
                 dotsArr.get(0).add(new Dot(Dot_Type.BIAS_TYPE));
@@ -49,7 +50,7 @@ public class Network {
         }
         //
 
-
+        //ADDING NOTES TO DOTS
         for (int i = 0; i < HIDDEN_DOTS/HIDDEN_DOTS_PER_ARRAY+1; i++) {
             for (int j = 0; j < dotsArr.get(i).size(); j++) {
                 for (int k = 0; k < dotsArr.get(i+1).size(); k++) {
@@ -68,8 +69,8 @@ public class Network {
 
 
 
-
-    public Network(){
+    //it dont work now
+    public Network(){//it dont work now
         dotsArr.add(new ArrayList<>());//inputs (0)
 
         for (int i = 1; i <= HIDDEN_DOTS / HIDDEN_DOTS_PER_ARRAY; i++) {//hidden dots (1,2,3,...,HIDDEN_DOTS /HIDDEN_DOTS_PER_MASSIVE-1)
@@ -109,9 +110,9 @@ public class Network {
         //
         Random r=new Random();
         dotsArr.get(0).get(0).addNode( dotsArr.get(1).get(0));
-        dotsArr.get(0).get(0).nodesFromMe.get(0).weight =0.6f;
+      //  dotsArr.get(0).get(0).nodesFromMe.get(0).weight =0.6f;
         dotsArr.get(0).get(1).addNode(dotsArr.get(1).get(0));
-        dotsArr.get(0).get(1).nodesFromMe.get(0).weight =0.8f;
+      //  dotsArr.get(0).get(1).nodesFromMe.get(0).weight =0.8f;
         for (int i = 1; i < HIDDEN_DOTS/HIDDEN_DOTS_PER_ARRAY+1; i++) {
             dotsArr.get(i).get(0).addNode(dotsArr.get(i+1).get(0));
         }
@@ -122,13 +123,19 @@ public class Network {
         return dotsArr;
     }
     ArrayList< Float> outputs;
-  public float evaluteFitness(Float[] inputs){
+  public float evaluteFitness(Float[] inputs,boolean forTeaching){
 
       //Dots value , error and weightsDelta clears in next method call
+       if(!forTeaching){
+          for(ArrayList<Dot> dotArr: dotsArr){
+              for(Dot dot:dotArr){
+                  dot.clear();
+              }
+          }
+       }
 
-
-     outputs=new ArrayList<>();
-      //Set inputs
+        outputs=new ArrayList<>();
+        //Set inputs
         for (int i = 0; i < inputs.length; i++) {
             dotsArr.get(0).get(i).setValue(inputs[i]);
             dotsArr.get(0).get(i).evalute();
@@ -145,6 +152,14 @@ public class Network {
           dotsArr.get(dotsArr.size()-1).get(i).evalute();
           //
          outputs.add( dotsArr.get(dotsArr.size()-1).get(i).getOutpup());
+
+      }
+      if(!forTeaching){
+      for(ArrayList<Dot> dotArr: dotsArr){
+          for(Dot dot:dotArr){
+              dot.clear();
+          }
+      }
       }
 return outputs.get(0);
    }

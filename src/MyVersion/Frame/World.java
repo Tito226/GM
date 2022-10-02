@@ -322,11 +322,12 @@ public class StepThread extends Thread{
     long startTime = System.currentTimeMillis();
         if(!pause){
             try {
-                Thread.sleep(20);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
+            //step{*************************************************************************
+            //******************************************************************************
             int NULL_CELLS=0;
             for (int i = 0; i < width; i++) {
                 for (int j = 0; j < height ; j++) {
@@ -365,8 +366,10 @@ public class StepThread extends Thread{
             if(!isStep){
                 System.out.println("shit");
             }
+            //***************************************************************
+            //***************************************************************}step
 
-
+            //reset field organic
          if (NULL_CELLS==width*height){
          for (int i = 0; i < height; i++) {
          for (int j = 0; j < width; j++) {
@@ -374,16 +377,16 @@ public class StepThread extends Thread{
           }
          }
 
-
+            //Summon cells
              for (int i = 0; i < 10; i++) {
                  Random r =new Random();
                  cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(relative));
              }
 
     Restarts++;
-
-     paintThread.rept();
-     Thread.yield();
+    //+++++++++++++++++++
+    paintThread.rept();
+    Thread.yield();
 
     lastRestarts++;
     System.out.println("Restarted");

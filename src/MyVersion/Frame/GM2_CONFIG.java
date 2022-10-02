@@ -11,6 +11,6 @@ public class GM2_CONFIG {
     public static final int NORM_CELL_START_ENERGY=15;
     public static final int PROTOPLAST_START_ENERGY=4;
     //CELL SETTINGS
-    public static final int CELL_START_ORGANIC=20;
+    public static final int CELL_START_ORGANIC=6;
 
 }

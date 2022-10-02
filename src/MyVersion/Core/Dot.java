@@ -55,11 +55,11 @@ public class Dot {
     }
 
 
-    float activaionFunction(float x){
+  static   float activaionFunction(float x){
         float e =2.71828f;
         return (float) (1/(1+ Math.pow(e,-x)));
     }
-    float activationFunctionDX(float x){
+   static float activationFunctionDX(float x){
       return   activaionFunction(x)*(1-activaionFunction(x));
     }
 }

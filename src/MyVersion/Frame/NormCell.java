@@ -13,6 +13,7 @@ import static MyVersion.Frame.GM2_CONFIG.*;
 import static MyVersion.Frame.World.*;
 
 public class NormCell implements  Serializable {
+    //TODO ЕНЕРГИЯ СЧИТАЕТСЯ НЕПРАВИЛЬНО, КЛЕТКА МОЖЕТ РАЗМНОЖИТСЯ БЕЗ НУЖНОЙ ЕНЕРГИИ
     //*****************************************
     Network brain;
     //*****************************************
@@ -29,10 +30,9 @@ ArrayList< Integer[]> myParts=new ArrayList<>();
     static long num = 0L;
     private final long myNum;
     boolean stepN=false;
-    private int energy=30;
+    private int energy=20;
     private int x;
     private int y;
-    private final int startEnergy=NORM_CELL_START_ENERGY;
 NormCellType normCellType=NormCellType.MOVABLE;
     public String partName="part";
 
@@ -45,17 +45,17 @@ NormCellType normCellType=NormCellType.MOVABLE;
     }
 
 Color myColor=Color.green;
-    public NormCell(long myParentNum){
+   /* public NormCell(long myParentNum){
         myNum=num;
         num++;
         cellls++;
-        energy=startEnergy;
+        energy=NORM_CELL_START_ENERGY;
        this.myParentNum=myParentNum;
         Random r=new Random();
         if(r.nextInt(20)==1){
 
         }
-    }
+    }*/
 
     public NormCell(int anyNum){
         myNum=num;
@@ -69,14 +69,14 @@ Color myColor=Color.green;
 
             }
         cellls++;
-        energy=startEnergy;
+        energy=NORM_CELL_START_ENERGY;
     }
 
     public NormCell(Network brain){
         this.brain=brain;
         myNum=num;
         num++;
-        energy=startEnergy;
+        energy=15;
         cellls++;
     }
 
@@ -506,27 +506,27 @@ void transferEnergy(float output){
        if(xxx==0){
         if(x<width-1 && cells[x+1][y].secCell ==null && cells[x+1][y].partCell==null ){
 
-    cells[x+1][y].setSecCell(new NormCell(myChildNum));
+    cells[x+1][y].setSecCell(new NormCell(brain));
 energy-=ENERGY_NEEDED_TO_MULTIPLY;
 multiplies++;
         }
        }else if(xxx==1){
            if(x>0 && cells[x-1][y].secCell ==null   && cells[x-1][y].partCell==null){
 
-               cells[x-1][y].setSecCell(new NormCell(myChildNum));
+               cells[x-1][y].setSecCell(new NormCell(brain));
                energy-=ENERGY_NEEDED_TO_MULTIPLY;
                multiplies++;
            }
        } else if (xxx==2){
            if(y>0 && cells[x][y-1].secCell ==null && cells[x][y-1].partCell==null){
 
-               cells[x][y-1].setSecCell(new NormCell(myChildNum));
+               cells[x][y-1].setSecCell(new NormCell(brain));
                energy-=ENERGY_NEEDED_TO_MULTIPLY;
                multiplies++;
            } else if(xxx==3){
                if(y<height-1 && cells[x][y+1].secCell ==null && cells[x][y+1].partCell==null ){
 
-                   cells[x][y+1].setSecCell(new NormCell(myChildNum));
+                   cells[x][y+1].setSecCell(new NormCell(brain));
                    energy-=ENERGY_NEEDED_TO_MULTIPLY;
                    multiplies++;
                }else{
@@ -643,7 +643,7 @@ void bestOuputsClear(){
     public float evaluateFitness() {
         Float[] inputs = {isRaedyToMultiply() , (float) getEnergy(), (float) cells[x][y].getOrganic(), getUptCell(), getDownCell(), getLeftCell(), getRightCell(),getRightDownCell(),getRightUpCell(),getLeftUpCell(),getLeftDownCell(), isSpaceAvailable(), isController(),getRightDistance(),getLeftDistance(),getUpDistance(),getDownDistance(), (float) lastEnergy,lastUpCell,lastDownCell,lastLeftCell,lastRightCell,lastRightDownCell,lastRightUpCell,lastLeftDownCell,lastLeftUpCell, (float) lastOrganic, (float) sunny, (float) myParts.size(), (float) lastSize,lastRightDistance,lastLeftDistace,lastUpDistance,lastDownDistance};
 
-       return brain.evaluteFitness(inputs);
+       return brain.evaluteFitness(inputs,false);
     }
 
 

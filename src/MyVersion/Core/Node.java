@@ -1,6 +1,10 @@
 package MyVersion.Core;
 
 public class Node {
+    boolean changeble=true; //IF IT BECOME TRUE(IN RUNTIME) ,DONT CHANGE IT
+    private float weight =0.0f;
+    Dot from;
+    Dot to;
     public Node(Dot from,Dot to){
        this.from=from;
 
@@ -20,10 +24,12 @@ public class Node {
    void evalute(){
         to.value+= from.value* weight;
    }
-float weight =1.0f;
-Dot from;
-Dot to;
 
+    public void setWeight(float weight) {
+        this.weight = weight;
+    }
 
-
+    public float getWeight() {
+        return weight;
+    }
 }

@@ -14,12 +14,15 @@ public class Data_Set {
     public Data_Set(){
 
         for (int i = 0; i < inputsNum; i++) {
-                inputs.add(new Float[]{1f,rnd(ENERGY_NEEDED_TO_MULTIPLY,200),rnd(3,100),0f,0f,0f,0f});
-                outputs.add(new Float[]{rndF(0.9001f,1f)});
+                inputs.add(new Float[]{1f,rnd(ENERGY_NEEDED_TO_MULTIPLY,200),rnd(0,100),0f,0f,0f,0f});
+                outputs.add(new Float[]{0.94f});
 
 
-                inputs.add(new Float[]{0f,rnd(6,ENERGY_NEEDED_TO_MULTIPLY),rnd(3,100),0f,0f,0f,0f});
-                outputs.add(new Float[]{rndF(0.1001f,0.2f)});
+                inputs.add(new Float[]{0f,rnd(6,ENERGY_NEEDED_TO_MULTIPLY),rnd(0,3),0f,0f,0f,0f});
+                outputs.add(new Float[]{0.15f});
+
+                inputs.add(new Float[]{0f,rnd(1,6),rnd(3,100),0f,0f,0f,0f});
+                outputs.add(new Float[]{0.25f});
 
               //  inputs.add(new Float[]{1f,rnd(ENERGY_NEEDED_TO_MULTIPLY,500),rnd(3,100),0f,0f,0f,0f});
                // outputs.add(new Float[]{rndF(0.9001f,1f)});
