@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
+import static MyVersion.Core.Core_Config.BIAS;
 import static MyVersion.Core.Core_Config.LEARNING_RATE;
 import static MyVersion.Core.Data_Set.rnd;
 import static MyVersion.Frame.GM2_CONFIG.ENERGY_NEEDED_TO_MULTIPLY;
@@ -42,17 +43,20 @@ public class Network_Teacher {
     }
 
     void randomize(Network student){
+        //попробовать выставлять не случайные числа
         Random r=new Random();
         for (ArrayList<Dot> dotM:student.dotsArr) {
             for(Dot dot:dotM) {
                 for(Node node:dot.nodesFromMe){
-                    node.setWeight( r.nextFloat());
+                    node.setWeight(r.nextFloat());// node.setWeight( r.nextFloat());
                 }
             }
         }
+        //число точек на которые подается информация(не включая биос точки)
         int numberOfTeachDots=7;
         for (int i = student.dotsArr.get(0).size()-numberOfTeachDots; i >0; i--) {
-            for (int j = 0; j < student.dotsArr.get(1).size(); j++) {
+            //TODO Выяснить как -BIAS решает ошибку(IndexOutOfBoundsExeption(вызов елемента на 1 больше масива))
+            for (int j = 0; j < student.dotsArr.get(1).size()-BIAS; j++) {//"< student.dotsArr.get(1).size()-1" may be changed to "student.dotsArr.get(0).get(i).nodesFromMe.size()"
                 student.dotsArr.get(0).get(i).nodesFromMe.get(j).setWeight(0);
                 student.dotsArr.get(0).get(i).nodesFromMe.get(j).changeble=false;
             }
@@ -98,8 +102,10 @@ public class Network_Teacher {
            // System.out.println("error:"+dot.error);
            // System.out.println("output:"+dot.getOutpup());
         }
-
-        for (int j = 1; j < student.dotsArr.size(); j++) {//hidden layer correction
+//TODO  При более чем 2х слоях большая ошибка(3+) в первых слоях дот,изза чего данные превращаются в единицу,выяснить почему.
+//TODO  В слоях ближе к концу такой проблемы нет,можно попробовать увеличить количество итераций обучения.
+//TODO  Нужно оптимизировать обучение в многопоточность.
+        for (int j = 1; j < student.dotsArr.size(); j++) {//hidden layer calculation(error,weightsDelta)
             for (Dot dot : student.dotsArr.get(student.dotsArr.size()-(j+1))) {
                 int counter=0;
                 for (Node node:dot.nodesFromMe) {

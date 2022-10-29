@@ -1,5 +1,7 @@
 package MyVersion.Core;
 
+import MyVersion.Frame.Directions;
+
 import java.util.ArrayList;
 
 import static MyVersion.Frame.GM2_CONFIG.ENERGY_NEEDED_TO_MULTIPLY;
@@ -14,15 +16,15 @@ public class Data_Set {
     public Data_Set(){
 
         for (int i = 0; i < inputsNum; i++) {
-                inputs.add(new Float[]{1f,rnd(ENERGY_NEEDED_TO_MULTIPLY,200),rnd(0,100),0f,0f,0f,0f});
-                outputs.add(new Float[]{0.94f});
-
 
                 inputs.add(new Float[]{0f,rnd(6,ENERGY_NEEDED_TO_MULTIPLY),rnd(0,3),0f,0f,0f,0f});
-                outputs.add(new Float[]{0.15f});
+                outputs.add(new Float[]{0.12f});//(output>0.125f && output<0.15f){move(Directions.DOWN);}
+
+                inputs.add(new Float[]{1f,rnd(ENERGY_NEEDED_TO_MULTIPLY,200),rnd(0,100),0f,0f,0f,0f});
+                outputs.add(new Float[]{0.95f});
 
                 inputs.add(new Float[]{0f,rnd(1,6),rnd(3,100),0f,0f,0f,0f});
-                outputs.add(new Float[]{0.25f});
+                outputs.add(new Float[]{0.26f});//(output>0.2 && output<0.3){eatOrganic();}
 
               //  inputs.add(new Float[]{1f,rnd(ENERGY_NEEDED_TO_MULTIPLY,500),rnd(3,100),0f,0f,0f,0f});
                // outputs.add(new Float[]{rndF(0.9001f,1f)});

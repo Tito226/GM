@@ -39,8 +39,8 @@ public class Network {
 
             if (BIAS==1) {
                 dotsArr.get(i).add(new Dot(Dot_Type.BIAS_TYPE));
-                for (int j = 0; j < dotsArr.get(j + 1).size(); j++) {
-                    dotsArr.get(i).get(dotsArr.size() - 1).addNode(dotsArr.get(i+1).get(j));
+                for (int j = 0; j < dotsArr.get(i + 1).size(); j++) {
+                    dotsArr.get(i).get(dotsArr.get(i).size() - 1).addNode(dotsArr.get(i+1).get(j));
                 }
             }
 
