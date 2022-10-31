@@ -17,7 +17,7 @@ public class Network_Teacher {
         Data_Set data_set=new Data_Set();
         Network_Teacher teacher=new Network_Teacher();
         teacher.randomize(student);
-        for (int i = 0; i < 500000; i++) {
+        for (int i = 0; i < 99000; i++) {
             teacher.teach(student,data_set);
         }
     }
@@ -25,7 +25,6 @@ public class Network_Teacher {
     public static void main(String[] args) throws IOException {
         Network student=new Network(1);
         fullTeach(student);
-        //TODO исправить ноды от ненужных точек(на которых не обучались ,они влияют на выход)
         System.out.println("ggggggggggggggggggggggggggggggggggggggggggggggggggg:"+ student.evaluteFitness(new Float[]{1f,rnd(ENERGY_NEEDED_TO_MULTIPLY,500),rnd(3,100),0f,0f,0f,0f},false));
         System.out.println("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy:"+student.evaluteFitness(new Float[]{0f,rnd(6,ENERGY_NEEDED_TO_MULTIPLY),rnd(3,100),0f,0f,0f,0f},false));
         System.out.println("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy:"+student.evaluteFitness(new Float[]{0f,rnd(1,6),rnd(3,100),0f,0f,0f,0f},false));
@@ -35,7 +34,6 @@ public class Network_Teacher {
     public  Network mainy() throws IOException {
         Network student=new Network(1);
         fullTeach(student);
-        //TODO исправить ноды от ненужных точек(на которых не обучались ,они влияют на выход)
         System.out.println("ggggggggggggggggggggggggggggggggggggggggggggggggggg:"+ student.evaluteFitness(new Float[]{1f,rnd(ENERGY_NEEDED_TO_MULTIPLY,500),rnd(3,100),0f,0f,0f,0f},false));
         System.out.println("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy:"+student.evaluteFitness(new Float[]{0f,rnd(6,ENERGY_NEEDED_TO_MULTIPLY),rnd(3,100),0f,0f,0f,0f},false));
         System.out.println("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy:"+student.evaluteFitness(new Float[]{0f,rnd(1,6),rnd(3,100),0f,0f,0f,0f},false));
@@ -53,6 +51,11 @@ public class Network_Teacher {
             }
         }
         //число точек на которые подается информация(не включая биос точки)
+        //TODO проблема возникает в неправильно забракованых(false) нодах
+        //бракуются не те ноды ,которые необходимо менять ,если запретить происходит магия(работает дольше ,результат неверный
+        //и веса нод становятся огромными
+
+        //всю ето парашуу еще и удалить нельзя ,выдает результат неверный
         int numberOfTeachDots=7;
         for (int i = student.dotsArr.get(0).size()-numberOfTeachDots; i >0; i--) {
             //TODO Выяснить как -BIAS решает ошибку(IndexOutOfBoundsExeption(вызов елемента на 1 больше масива))
@@ -104,6 +107,7 @@ public class Network_Teacher {
         }
 //TODO  При более чем 2х слоях большая ошибка(3+) в первых слоях дот,изза чего данные превращаются в единицу,выяснить почему.
 //TODO  В слоях ближе к концу такой проблемы нет,можно попробовать увеличить количество итераций обучения.
+//TODO В нодах из первых дот огромные веса(10+),данные превращаются в еденицу
 //TODO  Нужно оптимизировать обучение в многопоточность.
         for (int j = 1; j < student.dotsArr.size(); j++) {//hidden layer calculation(error,weightsDelta)
             for (Dot dot : student.dotsArr.get(student.dotsArr.size()-(j+1))) {
@@ -117,12 +121,27 @@ public class Network_Teacher {
             }
 
         }
-
-        for (int j = 1; j < student.dotsArr.size(); j++) {//hidden layer correction
+//TODO  на входном слое ноды имеют бешеные веса
+        for (int j = 1; j < student.dotsArr.size()+1; j++) {//hidden layer correction
             for (Dot dot : student.dotsArr.get(student.dotsArr.size()-j)) {
                 for (Node node: dot.nodesToMe) {
                     //nodes to dot weight correction  :  weight=weight-node_fromDot_value*weightsDelta*learning_rate
-                    node.setWeight(node.getWeight()-node.from.value*dot.weightsDelta*LEARNING_RATE);
+                    float weight=
+
+                            //скорее всего дельта имеет отрицательное большое значение ,значит проблема с ней и ее расчетом
+                            // (насколько я заметил проблемы возникают в первом слое)
+                            node.getWeight()-node.from.value*dot.weightsDelta*LEARNING_RATE;
+
+                    /*
+                    if(weight>node.getWeight() &&weight>5&& node.getWeight()<5){
+                        System.out.println("вес был нормальным но почемуто вырос больше 5");
+                    }else if(node.getWeight()>10){
+                        System.out.println("вес ноды "+node.getWeight());
+                    }else if(!node.changeble && node.getWeight()!=0f){
+                        //System.out.println("гдето был изменен вес неизменяемой ноды");
+                    }
+                    */
+                    node.setWeight(weight);
                 }
             }
 

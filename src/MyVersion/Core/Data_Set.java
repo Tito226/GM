@@ -16,7 +16,7 @@ public class Data_Set {
     public Data_Set(){
 
         for (int i = 0; i < inputsNum; i++) {
-
+//TODO Попробовать уменьшить числа ,например поделить один на ето число,чтобы при суммировании на нейронах не получалась единица
                 inputs.add(new Float[]{0f,rnd(6,ENERGY_NEEDED_TO_MULTIPLY),rnd(0,3),0f,0f,0f,0f});
                 outputs.add(new Float[]{0.12f});//(output>0.125f && output<0.15f){move(Directions.DOWN);}
 

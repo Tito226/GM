@@ -25,8 +25,15 @@ public class Node {
         to.value+= from.value* weight;
    }
 
-    public void setWeight(float weight) {
+    public void setWeight(float weight)  {
+        this.weight=weight;
+        /* if(changeble){
         this.weight = weight;
+        }else try {
+            throw new UchengebleExeption("НЕЛЬЗЯ МЕНЯТЬ НЕИЗМЕНЯЕМЫЕ НОДЫ!!!!");
+        } catch (UchengebleExeption e) {
+         //   e.printStackTrace();
+        }*/
     }
 
     public float getWeight() {

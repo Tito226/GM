@@ -2,6 +2,8 @@ package MyVersion.Core;
 
 import java.util.ArrayList;
 
+import static MyVersion.Core.Core_Config.BIAS_VALUE;
+
 public class Dot {
     float weightsDelta;
     float error;
@@ -12,18 +14,19 @@ public class Dot {
     public Dot( Dot_Type myType){
         this.myType=myType;
         if (myType==Dot_Type.BIAS_TYPE){
-            value=1;
+            value=BIAS_VALUE;
         }
     }
      void clear(){
-         value=0;
+        if(myType!=Dot_Type.BIAS_TYPE){
+         value=0;}
          error=0f;
          weightsDelta=0f;
      }
     void evalute(){
         if(myType==Dot_Type.OUTPUT){
             value=activaionFunction(value);
-        }else {
+        }else if(myType!= Dot_Type.BIAS_TYPE){
             value = activaionFunction(value);
             if (nodesFromMe.size() > 0) {
                 for (int i = 0; i < nodesFromMe.size(); i++) {

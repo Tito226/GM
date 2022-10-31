@@ -17,17 +17,16 @@ public class Network {
             dotsArr.add(new ArrayList<>());
 
         }
-
-        for (int i = 0; i < INPUTS+BIAS; i++) {//adding input Dots to array,if bias,add dias Dot and add notes to it
+//TODO на входном слое появляется много лишних нейронов(биас в том числе)
+        for (int i = 0; i < INPUTS; i++) {//adding input Dots to array,if bias,add dias Dot and add notes to it
             dotsArr.get(0).add(new Dot(Dot_Type.INPUT));
-            if(BIAS==1){
-                dotsArr.get(0).add(new Dot(Dot_Type.BIAS_TYPE));
-                for (int j = 0; j < dotsArr.get(1).size() ; j++) {
-                    dotsArr.get(0).get(dotsArr.size()-1).addNode(dotsArr.get(1).get(j));
-                }
+        }
+        if(BIAS==1){
+            dotsArr.get(0).add(new Dot(Dot_Type.BIAS_TYPE));
+            for (int j = 0; j < dotsArr.get(1).size() ; j++) {
+                dotsArr.get(0).get(dotsArr.size()-1).addNode(dotsArr.get(1).get(j));
             }
         }
-
 
         dotsArr.add(new ArrayList<>());//outputs(HIDDEN_DOTS /HIDDEN_DOTS_PER_MASSIVE)
 
