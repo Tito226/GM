@@ -26,14 +26,13 @@ public class Node {
    }
 
     public void setWeight(float weight)  {
-        this.weight=weight;
-        /* if(changeble){
+         if(changeble){
         this.weight = weight;
         }else try {
             throw new UchengebleExeption("НЕЛЬЗЯ МЕНЯТЬ НЕИЗМЕНЯЕМЫЕ НОДЫ!!!!");
         } catch (UchengebleExeption e) {
-         //   e.printStackTrace();
-        }*/
+            e.printStackTrace();
+        }
     }
 
     public float getWeight() {

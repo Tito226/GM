@@ -7,8 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
-import static MyVersion.Core.Core_Config.BIAS;
-import static MyVersion.Core.Core_Config.LEARNING_RATE;
+import static MyVersion.Core.Core_Config.*;
 import static MyVersion.Core.Data_Set.rnd;
 import static MyVersion.Frame.GM2_CONFIG.ENERGY_NEEDED_TO_MULTIPLY;
 
@@ -17,7 +16,7 @@ public class Network_Teacher {
         Data_Set data_set=new Data_Set();
         Network_Teacher teacher=new Network_Teacher();
         teacher.randomize(student);
-        for (int i = 0; i < 99000; i++) {
+        for (int i = 0; i < 990000; i++) {
             teacher.teach(student,data_set);
         }
     }
@@ -56,13 +55,14 @@ public class Network_Teacher {
         //и веса нод становятся огромными
 
         //всю ето парашуу еще и удалить нельзя ,выдает результат неверный
-        int numberOfTeachDots=7;
-        for (int i = student.dotsArr.get(0).size()-numberOfTeachDots; i >0; i--) {
-            //TODO Выяснить как -BIAS решает ошибку(IndexOutOfBoundsExeption(вызов елемента на 1 больше масива))
+        if(BLOCK_USELESS_INPUTS){
+
+        for (int i = student.dotsArr.get(0).size()-BIAS-1; i >HOW_MUCH_INPUTS_MUST_BE_USED-BIAS-1; i--) {
             for (int j = 0; j < student.dotsArr.get(1).size()-BIAS; j++) {//"< student.dotsArr.get(1).size()-1" may be changed to "student.dotsArr.get(0).get(i).nodesFromMe.size()"
                 student.dotsArr.get(0).get(i).nodesFromMe.get(j).setWeight(0);
                 student.dotsArr.get(0).get(i).nodesFromMe.get(j).changeble=false;
             }
+        }
         }
     }
     // КОМЕНТАТОРЫ{
@@ -83,14 +83,13 @@ public class Network_Teacher {
     // НА https://robocraft.ru/algorithm/560 НАПИСАНО ЧТО ОШИБИ НУЖНО СУММИРОВАТЬ
     void teach(Network student,Data_Set data_set){
 
-        for(ArrayList<Dot> dotArr: student.dotsArr){
+        for(ArrayList<Dot> dotArr: student.dotsArr){//clear dots value
             for(Dot dot:dotArr){
                 dot.clear();
             }
         }
 
         Random r=new Random();
-
         int i=r.nextInt(data_set.inputs.size());
         //System.out.println("ee:"+ student.evaluteFitness( data_set.inputs.get(i),true));
         student.evaluteFitness( data_set.inputs.get(i),true);
@@ -125,6 +124,7 @@ public class Network_Teacher {
         for (int j = 1; j < student.dotsArr.size()+1; j++) {//hidden layer correction
             for (Dot dot : student.dotsArr.get(student.dotsArr.size()-j)) {
                 for (Node node: dot.nodesToMe) {
+                    if(node.changeble){
                     //nodes to dot weight correction  :  weight=weight-node_fromDot_value*weightsDelta*learning_rate
                     float weight=
 
@@ -132,16 +132,8 @@ public class Network_Teacher {
                             // (насколько я заметил проблемы возникают в первом слое)
                             node.getWeight()-node.from.value*dot.weightsDelta*LEARNING_RATE;
 
-                    /*
-                    if(weight>node.getWeight() &&weight>5&& node.getWeight()<5){
-                        System.out.println("вес был нормальным но почемуто вырос больше 5");
-                    }else if(node.getWeight()>10){
-                        System.out.println("вес ноды "+node.getWeight());
-                    }else if(!node.changeble && node.getWeight()!=0f){
-                        //System.out.println("гдето был изменен вес неизменяемой ноды");
-                    }
-                    */
                     node.setWeight(weight);
+                    }
                 }
             }
 
