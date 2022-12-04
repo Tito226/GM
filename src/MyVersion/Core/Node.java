@@ -10,7 +10,7 @@ public class Node {
 
         for (int i = 0; i < from.nodesFromMe.size(); i++) {
             if(from.nodesFromMe.get(i).to.equals(to)){
-                System.out.println("могло быть 2 ноды на одну точку");
+                System.out.println("могло быть 2 ноды на одну точку(node class)");
             return;
             }
         }
@@ -26,13 +26,7 @@ public class Node {
    }
 
     public void setWeight(float weight)  {
-         if(changeble){
-        this.weight = weight;
-        }else try {
-            throw new UchengebleExeption("НЕЛЬЗЯ МЕНЯТЬ НЕИЗМЕНЯЕМЫЕ НОДЫ!!!!");
-        } catch (UchengebleExeption e) {
-            e.printStackTrace();
-        }
+        this.weight=weight;
     }
 
     public float getWeight() {

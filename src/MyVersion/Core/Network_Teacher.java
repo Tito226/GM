@@ -21,21 +21,16 @@ public class Network_Teacher {
         }
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {//run this to test network teacher
         Network student=new Network(1);
         fullTeach(student);
-        System.out.println("ggggggggggggggggggggggggggggggggggggggggggggggggggg:"+ student.evaluteFitness(new Float[]{1f,rnd(ENERGY_NEEDED_TO_MULTIPLY,500),rnd(3,100),0f,0f,0f,0f},false));
-        System.out.println("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy:"+student.evaluteFitness(new Float[]{0f,rnd(6,ENERGY_NEEDED_TO_MULTIPLY),rnd(3,100),0f,0f,0f,0f},false));
-        System.out.println("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy:"+student.evaluteFitness(new Float[]{0f,rnd(1,6),rnd(3,100),0f,0f,0f,0f},false));
-
+        suitabilityTest(student);
     }
 
-    public  Network mainy() throws IOException {
+    public  Network mainy() throws IOException {//must create and tune network
         Network student=new Network(1);
         fullTeach(student);
-        System.out.println("ggggggggggggggggggggggggggggggggggggggggggggggggggg:"+ student.evaluteFitness(new Float[]{1f,rnd(ENERGY_NEEDED_TO_MULTIPLY,500),rnd(3,100),0f,0f,0f,0f},false));
-        System.out.println("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy:"+student.evaluteFitness(new Float[]{0f,rnd(6,ENERGY_NEEDED_TO_MULTIPLY),rnd(3,100),0f,0f,0f,0f},false));
-        System.out.println("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy:"+student.evaluteFitness(new Float[]{0f,rnd(1,6),rnd(3,100),0f,0f,0f,0f},false));
+        suitabilityTest(student);
         return student;
     }
 
@@ -55,15 +50,24 @@ public class Network_Teacher {
         //и веса нод становятся огромными
 
         //всю ето парашуу еще и удалить нельзя ,выдает результат неверный
-        if(BLOCK_USELESS_INPUTS){
+        if(SET_FIRST_LAYER_NODES_NON_RANDOM_VALUE) {
 
-        for (int i = student.dotsArr.get(0).size()-BIAS-1; i >HOW_MUCH_INPUTS_MUST_BE_USED-BIAS-1; i--) {
-            for (int j = 0; j < student.dotsArr.get(1).size()-BIAS; j++) {//"< student.dotsArr.get(1).size()-1" may be changed to "student.dotsArr.get(0).get(i).nodesFromMe.size()"
-                student.dotsArr.get(0).get(i).nodesFromMe.get(j).setWeight(0);
-                student.dotsArr.get(0).get(i).nodesFromMe.get(j).changeble=false;
+            for (int i = student.dotsArr.get(0).size() - 1 - BIAS; i > 0; i--) {
+                //TODO  -BIAS решает ошибку(IndexOutOfBoundsExeption(вызов елемента на 1 больше масива))
+                for (int j = 0; j < student.dotsArr.get(1).size() - BIAS; j++) {//"< student.dotsArr.get(1).size()-1" may be changed to "student.dotsArr.get(0).get(i).nodesFromMe.size()"
+                    student.dotsArr.get(0).get(i).nodesFromMe.get(j).setWeight(FIRST_LAYER_NODES_VALUE);
+                }
             }
-        }
-        }
+        }else if(BLOCK_USELESS_INPUTS){
+
+                for (int i = student.dotsArr.get(0).size()-BIAS-1; i >HOW_MUCH_INPUTS_MUST_BE_USED-BIAS-1; i--) {
+                    for (int j = 0; j < student.dotsArr.get(1).size()-BIAS; j++) {//"< student.dotsArr.get(1).size()-1" may be changed to "student.dotsArr.get(0).get(i).nodesFromMe.size()"
+                        student.dotsArr.get(0).get(i).nodesFromMe.get(j).setWeight(0f);
+                        student.dotsArr.get(0).get(i).nodesFromMe.get(j).changeble=false;
+                    }
+                }
+
+    }
     }
     // КОМЕНТАТОРЫ{
 //Если я правильно помню, тот же Ng постоянно говорит, что корректировка весов должна производится одновременно.
@@ -124,21 +128,48 @@ public class Network_Teacher {
         for (int j = 1; j < student.dotsArr.size()+1; j++) {//hidden layer correction
             for (Dot dot : student.dotsArr.get(student.dotsArr.size()-j)) {
                 for (Node node: dot.nodesToMe) {
-                    if(node.changeble){
-                    //nodes to dot weight correction  :  weight=weight-node_fromDot_value*weightsDelta*learning_rate
-                    float weight=
-
-                            //скорее всего дельта имеет отрицательное большое значение ,значит проблема с ней и ее расчетом
-                            // (насколько я заметил проблемы возникают в первом слое)
-                            node.getWeight()-node.from.value*dot.weightsDelta*LEARNING_RATE;
-
-                    node.setWeight(weight);
+                    float weight=node.getWeight()-node.from.value*dot.weightsDelta*LEARNING_RATE;
+                    if(weight>THRESHOLD_NODE_VALUE){
+                        weight=THRESHOLD_NODE_VALUE;
                     }
+                    //nodes to dot weight correction  :  weight=weight-node_fromDot_value*weightsDelta*learning_rate
+                    node.setWeight(weight);
+                    int yu=0;
+                    yu++;
+
                 }
             }
 
         }
 
     }
+
+    static void suitabilityTest(Network student) {//testі network
+        float weightBuffer=student.evaluteFitness(new Float[]{1f,rnd(ENERGY_NEEDED_TO_MULTIPLY,500),rnd(3,100),0f,0f,0f,0f},false);
+        String answer;
+        if(weightBuffer<1f && weightBuffer>0.9f){
+           answer=" passed";
+        }else{
+           answer=" failed";
+        }
+        System.out.println("Multiply:"+ weightBuffer+answer);
+        weightBuffer=student.evaluteFitness(new Float[]{0f,rnd(6,ENERGY_NEEDED_TO_MULTIPLY),rnd(3,100),0f,0f,0f,0f},false);
+        if(weightBuffer<0.15 && weightBuffer>0.125f){
+            answer=" passed";
+        }else{
+            answer=" failed";
+        }
+        System.out.println("Move down:"+weightBuffer+answer);
+        weightBuffer=student.evaluteFitness(new Float[]{0f,rnd(1,6),rnd(3,100),0f,0f,0f,0f},false);
+        if(weightBuffer<0.3f && weightBuffer>0.2f){
+            answer=" passed";
+        }else{
+            answer=" failed";
+        }
+        System.out.println("Eat organic:"+weightBuffer+answer);
+
+    }
+
+
 
 }
