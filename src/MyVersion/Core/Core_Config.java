@@ -10,6 +10,7 @@ public class Core_Config {
     public static final float LEARNING_RATE =0.02F;//0.08
     //
     public static final int HIDDEN_DOTS_PER_ARRAY =25;
+    public static final int TEACH_ITERATIONS=990000;
 
     //Realization parameters                                DON'T CHANGE IF YOU DON'T KNOW WHAT THEY DO
     public static final boolean BLOCK_USELESS_INPUTS=true;//TRUE

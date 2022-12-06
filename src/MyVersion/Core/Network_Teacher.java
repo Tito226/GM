@@ -1,6 +1,7 @@
 package MyVersion.Core;
 
 import MyVersion.Frame.World;
+import MyVersion.Graphic_Builder.Graphic_Builder;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ public class Network_Teacher {
         Data_Set data_set=new Data_Set();
         Network_Teacher teacher=new Network_Teacher();
         teacher.randomize(student);
-        for (int i = 0; i < 990000; i++) {
+        for (int i = 0; i < TEACH_ITERATIONS; i++) {
             teacher.teach(student,data_set);
         }
     }
@@ -170,6 +171,8 @@ public class Network_Teacher {
 
     }
 
-
+        void showResult(float[] errors){
+            Graphic_Builder.createGraphic(errors);
+        }
 
 }
