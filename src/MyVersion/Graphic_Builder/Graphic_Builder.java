@@ -1,6 +1,7 @@
 package MyVersion.Graphic_Builder;
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 import static MyVersion.Core.Core_Config.TEACH_ITERATIONS;
 import static MyVersion.Graphic_Builder.Graphic_Builder_Config.*;
@@ -34,7 +35,7 @@ public class Graphic_Builder {
             frame.setVisible(true);
             Graphics g= frame.getGraphics();
             while(true){
-                paint(errors,1,g);
+                paintTest(1,g);
                 try {
                     sleep(90);
                 } catch (InterruptedException e) {
@@ -42,6 +43,7 @@ public class Graphic_Builder {
                 }
             }
         }
+
     static float testFunc(float x){
         return x*x;
    }
@@ -58,19 +60,26 @@ public class Graphic_Builder {
            i+=step;
        }
    }
-    private static void paint(float[] errors,int step, Graphics g){
-        float i=-25f;
-        int y1=heigh/2;
-        int x1=0;
+    private static void paint(float[] errors, Graphics g){
 
-        for (int j = 0; j < errors.length; j++) {
-
+        ArrayList<Integer> realValue=new ArrayList<>();
+        int di = errors.length/weight;
+        for (int i = 0; i < weight; i++) {
+            int[] buffer=new int[di];
+            for (int j = 0; j < di; j++) {
+                buffer[j]=((int)errors[j+i]*100);
+            }
+            int sum = 0;
+            for(int bb:buffer){
+                sum+=bb;
+            }
+            realValue.add(sum/di);
         }
-        while(x1<weight && testFunc(i)<heigh){
-            g.drawLine(x1,y1,x1+INDENT_BETWEEN_GRAPHIC_COORDS,(int)testFunc(i)+ INDENT_Y);
-            y1=(int)testFunc(i)+INDENT_Y;
-            x1+=INDENT_BETWEEN_GRAPHIC_COORDS;
-            i+=step;
+        int iter=0;
+        int x1=0;
+        while(x1<weight && realValue.get(iter)<heigh){
+            g.drawRect(x1,realValue.get(iter),1,1);
+            x1+=1;
         }
     }
 
