@@ -13,19 +13,23 @@ import static MyVersion.Core.Data_Set.rnd;
 import static MyVersion.Frame.GM2_CONFIG.ENERGY_NEEDED_TO_MULTIPLY;
 
 public class Network_Teacher {
-    public static void fullTeach(Network student){
+
+    public static float[] fullTeach(Network student){
+        float[] errors=new float[TEACH_ITERATIONS];//TODO may change to long
         Data_Set data_set=new Data_Set();
         Network_Teacher teacher=new Network_Teacher();
         teacher.randomize(student);
         for (int i = 0; i < TEACH_ITERATIONS; i++) {
-            teacher.teach(student,data_set);
+            errors[i]=teacher.teach(student,data_set);//teaches network and save error
         }
+        return errors;
     }
 
     public static void main(String[] args) throws IOException {//run this to test network teacher
         Network student=new Network(1);
-        fullTeach(student);
+        float[] errors= fullTeach(student);
         suitabilityTest(student);
+        Graphic_Builder.createGraphic(errors);
     }
 
     public  Network mainy() throws IOException {//must create and tune network
@@ -86,16 +90,16 @@ public class Network_Teacher {
 //Может быть есть способ точнее, но так 100% будет работать.}
 
     // НА https://robocraft.ru/algorithm/560 НАПИСАНО ЧТО ОШИБИ НУЖНО СУММИРОВАТЬ
-    void teach(Network student,Data_Set data_set){
-
-        for(ArrayList<Dot> dotArr: student.dotsArr){//clear dots value
+    float teach(Network student,Data_Set data_set){//Ruturns final dot error
+        Dot crutch=new Dot(Dot_Type.OUTPUT);//TODO make it not crutch
+        for(ArrayList<Dot> dotArr: student.dotsArr){//clear dots value (DON`T DELETE)
             for(Dot dot:dotArr){
                 dot.clear();
             }
         }
 
         Random r=new Random();
-        int i=r.nextInt(data_set.inputs.size());
+        int i=r.nextInt(data_set.inputs.size());//Choose random data from data_set
         //System.out.println("ee:"+ student.evaluteFitness( data_set.inputs.get(i),true));
         student.evaluteFitness( data_set.inputs.get(i),true);
         //outputs correction
@@ -104,6 +108,7 @@ public class Network_Teacher {
             ArrayList<Float> expected = new ArrayList<>(Arrays.asList(data_set.outputs.get(i)));
             //down :for more than one output, dont delete
             dot.error=dot.value -expected.get(yy);
+            crutch=dot;
             dot.weightsDelta=dot.error* Dot.activationFunctionDX(dot.value);
             yy++;
            // System.out.println("error:"+dot.error);
@@ -113,8 +118,8 @@ public class Network_Teacher {
 //TODO  В слоях ближе к концу такой проблемы нет,можно попробовать увеличить количество итераций обучения.
 //TODO В нодах из первых дот огромные веса(10+),данные превращаются в еденицу
 //TODO  Нужно оптимизировать обучение в многопоточность.
-        for (int j = 1; j < student.dotsArr.size(); j++) {//hidden layer calculation(error,weightsDelta)
-            for (Dot dot : student.dotsArr.get(student.dotsArr.size()-(j+1))) {
+        for (int j = 1; j < student.dotsArr.size(); j++) {//hidden layer calculation(error,weightsDelta),just calculation, not changing
+            for (Dot dot : student.dotsArr.get(student.dotsArr.size()-(j+1))) {//dotsArr contains Arraylist that contains dots
                 int counter=0;
                 for (Node node:dot.nodesFromMe) {
                   dot.error+=node.getWeight()*node.to.weightsDelta;
@@ -130,19 +135,16 @@ public class Network_Teacher {
             for (Dot dot : student.dotsArr.get(student.dotsArr.size()-j)) {
                 for (Node node: dot.nodesToMe) {
                     float weight=node.getWeight()-node.from.value*dot.weightsDelta*LEARNING_RATE;
-                    if(weight>THRESHOLD_NODE_VALUE){
+                    if(weight>THRESHOLD_NODE_VALUE){//fixes gradient boom(very big node values that turns value into 1)
                         weight=THRESHOLD_NODE_VALUE;
                     }
                     //nodes to dot weight correction  :  weight=weight-node_fromDot_value*weightsDelta*learning_rate
                     node.setWeight(weight);
-                    int yu=0;
-                    yu++;
-
                 }
             }
 
         }
-
+    return crutch.error;
     }
 
     static void suitabilityTest(Network student) {//testі network

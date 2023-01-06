@@ -17,8 +17,13 @@ public class Graphic_Builder {
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         frame.setVisible(true);
         Graphics g= frame.getGraphics();
+        float[] floats=new float[990000];
+        for (int i = 0; i < 990000; i++) {
+            floats[i]=0.4f;
+        }
+
         while(true){
-        paintTest(0.1f,g);
+        paint(floats,g);
             try {
                 sleep(90);
             } catch (InterruptedException e) {
@@ -35,7 +40,7 @@ public class Graphic_Builder {
             frame.setVisible(true);
             Graphics g= frame.getGraphics();
             while(true){
-                paintTest(1,g);
+                paint(errors,g);
                 try {
                     sleep(90);
                 } catch (InterruptedException e) {
@@ -63,12 +68,15 @@ public class Graphic_Builder {
     private static void paint(float[] errors, Graphics g){
 
         ArrayList<Integer> realValue=new ArrayList<>();
-        int di = errors.length/weight;
-        for (int i = 0; i < weight; i++) {
+        int di = (errors.length/weight)*INDENT_BETWEEN_GRAPHIC_COORDS;//THIS
+        for (int i = 0; i < weight/INDENT_BETWEEN_GRAPHIC_COORDS; i++) {//AND THIS CAN WORK INCORRECT, NEED TO FIX
             int[] buffer=new int[di];
+            int forDebug=0;
             for (int j = 0; j < di; j++) {
-                buffer[j]=((int)errors[j+i]*100);
+                buffer[j]=(int)(errors[j+di*i]*1000);
+                forDebug=j+di*i;
             }
+            int fg=forDebug;
             int sum = 0;
             for(int bb:buffer){
                 sum+=bb;
@@ -77,9 +85,16 @@ public class Graphic_Builder {
         }
         int iter=0;
         int x1=0;
+        int counter =0;
         while(x1<weight && realValue.get(iter)<heigh){
-            g.drawRect(x1,realValue.get(iter),1,1);
-            x1+=1;
+            int y1=heigh/2;
+            g.drawLine(x1,y1,x1+INDENT_BETWEEN_GRAPHIC_COORDS,realValue.get(counter)+ INDENT_Y);
+            y1=realValue.get(counter)+INDENT_Y;
+            x1+=INDENT_BETWEEN_GRAPHIC_COORDS;
+            counter++;
+        }
+        if(realValue.get(iter)<heigh){
+            System.out.println("to big values (Graphic_Builder(92))");
         }
     }
 

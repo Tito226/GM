@@ -17,7 +17,7 @@ public class Dot {
             value=BIAS_VALUE;
         }
     }
-     void clear(){
+     void clear(){//clears teach values
         if(myType!=Dot_Type.BIAS_TYPE){
          value=0;}
          error=0f;
