@@ -308,9 +308,6 @@ public class StepThread extends Thread{
         }
 
 
-
-
-
         byte countt=0;
 
 
@@ -321,7 +318,7 @@ public class StepThread extends Thread{
     Thread.yield();
     long startTime = System.currentTimeMillis();
         if(!pause){
-            try {
+            try {//TODO delete it
                 Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();

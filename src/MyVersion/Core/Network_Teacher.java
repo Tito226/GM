@@ -34,8 +34,9 @@ public class Network_Teacher {
 
     public  Network mainy() throws IOException {//must create and tune network
         Network student=new Network(1);
-        fullTeach(student);
+        float[] errors=fullTeach(student);
         suitabilityTest(student);
+        Graphic_Builder.createGraphic(errors);
         return student;
     }
 
