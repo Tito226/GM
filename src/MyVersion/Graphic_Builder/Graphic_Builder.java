@@ -9,7 +9,7 @@ import static java.lang.Thread.sleep;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 import static MyVersion.Graphic_Builder.Graphic_Builder_Config.VALUE_MULTIPLIER;
 public class Graphic_Builder {
-    static int weight=900;
+    static int weight=1200;
     static int heigh=700;
     public static void main(String[] args) {//run it to test
         JFrame frame=new JFrame("Frame");
@@ -100,7 +100,7 @@ public class Graphic_Builder {
             int y2=(heigh-realValue.get(counter))- INDENT_Y;
             g.drawLine(x1,y1,x1+INDENT_BETWEEN_GRAPHIC_COORDS,y2);
             g.setColor(Color.BLUE);
-            g.drawLine(0,heigh,weight,heigh);
+            g.drawLine(0,heigh-INDENT_Y,weight,heigh-INDENT_Y);
             g.setColor(Color.BLACK);
             y1=y2;
             x1+=INDENT_BETWEEN_GRAPHIC_COORDS;

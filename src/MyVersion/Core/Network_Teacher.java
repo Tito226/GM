@@ -19,8 +19,13 @@ public class Network_Teacher {
         Data_Set data_set=new Data_Set();
         Network_Teacher teacher=new Network_Teacher();
         teacher.randomize(student);
+
         for (int i = 0; i < TEACH_ITERATIONS; i++) {
-            errors[i]=teacher.teach(student,data_set);//teaches network and save error
+            if(!(TEACH_ITERATIONS/2<i)){
+                errors[i]=teacher.teach(student,data_set,false);//teaches network and save error
+            }else{
+                errors[i]=teacher.teach(student,data_set,true);
+            }
         }
         return errors;
     }
@@ -91,7 +96,7 @@ public class Network_Teacher {
 //Может быть есть способ точнее, но так 100% будет работать.}
 
     // НА https://robocraft.ru/algorithm/560 НАПИСАНО ЧТО ОШИБИ НУЖНО СУММИРОВАТЬ
-    float teach(Network student,Data_Set data_set){//Ruturns final dot error
+    float teach(Network student,Data_Set data_set,boolean secondLRate){//Ruturns final dot error
         Dot crutch=new Dot(Dot_Type.OUTPUT);//TODO make it not crutch
         for(ArrayList<Dot> dotArr: student.dotsArr){//clear dots value (DON`T DELETE)
             for(Dot dot:dotArr){
@@ -135,7 +140,12 @@ public class Network_Teacher {
         for (int j = 1; j < student.dotsArr.size()+1; j++) {//hidden layer correction
             for (Dot dot : student.dotsArr.get(student.dotsArr.size()-j)) {
                 for (Node node: dot.nodesToMe) {
-                    float weight=node.getWeight()-node.from.value*dot.weightsDelta*LEARNING_RATE;
+                    float weight = 0;
+                    if(!secondLRate){
+                        weight=node.getWeight()-node.from.value*dot.weightsDelta*LEARNING_RATE;
+                    }else{
+                        weight=node.getWeight()-node.from.value*dot.weightsDelta*SECOND_LEARNING_RATE;
+                    }
                     if(weight>THRESHOLD_NODE_VALUE){//fixes gradient boom(very big node values that turns value into 1)
                         weight=THRESHOLD_NODE_VALUE;
                     }
