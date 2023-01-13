@@ -6,12 +6,13 @@ public class Core_Config {
     public static final int HIDDEN_DOTS =50;// MUST DIVIDE ON HIDDEN_DOTS_PER_MASSIVE
     public static final int OUTPUTS=1;
     public static final int BIAS=1;//MUST BE 0 OR 1
-    public static final float BIAS_VALUE=-1f;//Value of bias dots
-    public static final float LEARNING_RATE =0.09F;//0.08
-    public static final float SECOND_LEARNING_RATE=0.0005f;
+    public static final float BIAS_VALUE=1f;//Value of bias dots
+    public static final float LEARNING_RATE =0.04F;//0.08
+    public static final float SECOND_LEARNING_RATE=0.005f;
     //
     public static final int HIDDEN_DOTS_PER_ARRAY =25;
-    public static final int TEACH_ITERATIONS=990000;
+
+    public static final int TEACH_ITERATIONS=1000000;
 
     //Realization parameters                                DON'T CHANGE IF YOU DON'T KNOW WHAT THEY DO
     public static final boolean BLOCK_USELESS_INPUTS=true;//TRUE

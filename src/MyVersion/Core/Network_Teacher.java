@@ -188,4 +188,7 @@ public class Network_Teacher {
             Graphic_Builder.createGraphic(errors);
         }
 
+
+    //TODO MAKE PERCENT BAR
+
 }

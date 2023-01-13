@@ -104,9 +104,6 @@ public class Graphic_Builder {
             g.setColor(Color.BLACK);
             y1=y2;
             x1+=INDENT_BETWEEN_GRAPHIC_COORDS;
-            if(realValue.get(counter)>heigh){
-                System.out.println("to big values (Graphic_Builder(92))"+realValue.get(counter));
-            }
             counter++;
         }
 
