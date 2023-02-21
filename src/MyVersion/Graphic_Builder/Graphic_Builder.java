@@ -10,16 +10,18 @@ import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 import static MyVersion.Graphic_Builder.Graphic_Builder_Config.VALUE_MULTIPLIER;
 public class Graphic_Builder {
     static int weight=1200;
-    static int heigh=700;
+    static int height=700;
+    
+    
     public static void main(String[] args) {//run it to test
         JFrame frame=new JFrame("Frame");
-        frame.setSize(weight, heigh);
+        frame.setSize(weight, height);
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         frame.setVisible(true);
         Graphics g= frame.getGraphics();
         float[] floats=new float[990000];
         for (int i = 0; i < 990000; i++) {
-            floats[i]=0.4f;
+            floats[i]=0.6f;
         }
 
         while(true){
@@ -38,7 +40,7 @@ public class Graphic_Builder {
             @Override
             public void run() {
                 JFrame frame=new JFrame("Result");
-                frame.setSize(weight, heigh);
+                frame.setSize(weight, height);
                 frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
                 frame.setVisible(true);
                 Graphics g= frame.getGraphics();
@@ -61,10 +63,10 @@ public class Graphic_Builder {
 
    private static void paintTest(float step, Graphics g){
         float i=-25f;
-        int y1=heigh;
+        int y1=height;
         int x1=0;
         int down=200;
-       while(x1<weight && testFunc(i)<heigh){
+       while(x1<weight && testFunc(i)<height){
            g.drawLine(x1,y1,x1+INDENT_BETWEEN_GRAPHIC_COORDS,(int)testFunc(i)+ INDENT_Y);
            y1=(int)testFunc(i)+down;
            x1+=INDENT_BETWEEN_GRAPHIC_COORDS;
@@ -77,15 +79,12 @@ public class Graphic_Builder {
         int di = (errors.length/weight)*INDENT_BETWEEN_GRAPHIC_COORDS;//THIS
         for (int i = 0; i < weight/INDENT_BETWEEN_GRAPHIC_COORDS; i++) {//AND THIS CAN WORK INCORRECT, NEED TO FIX
             int[] buffer=new int[di];
-            int forDebug=0;
             for (int j = 0; j < di; j++) {
-                if(errors[j+di*i]<0){
+                if(errors[j+di*i]<0){//error = |error|
                     errors[j+di*i]=-errors[j+di*i];
                 }
                 buffer[j]=(int)(errors[j+di*i]* VALUE_MULTIPLIER);
-                forDebug=j+di*i;
             }
-            int fg=forDebug;
             int sum = 0;
             for(int bb:buffer){
                 sum+=bb;
@@ -93,15 +92,24 @@ public class Graphic_Builder {
             realValue.add(sum/di);
         }
 
-        int x1=0;
+        int x1=INDENT_X;
         int counter =0;
-        int y1=heigh/2;
-        while(x1<weight && realValue.get(counter)<heigh){
-            int y2=(heigh-realValue.get(counter))- INDENT_Y;
+        int y1=height/2;
+        int yLineIndent=20;
+        while(x1<weight && realValue.get(counter)<height){
+        	
+            int y2=(height-realValue.get(counter))- INDENT_Y;
             g.drawLine(x1,y1,x1+INDENT_BETWEEN_GRAPHIC_COORDS,y2);
             g.setColor(Color.BLUE);
-            g.drawLine(0,heigh-INDENT_Y,weight,heigh-INDENT_Y);
+            //draw y line
+            g.drawLine(yLineIndent,height-INDENT_Y,yLineIndent,0);
+            //draw zero line
+            g.drawLine(0,height-INDENT_Y,weight,height-INDENT_Y);
             g.setColor(Color.BLACK);
+            for(int i=0;i<10;i++) {
+            	float v=((float)i)/10f;
+            	g.drawString("0."+i,yLineIndent,height-(int)(v*VALUE_MULTIPLIER)- INDENT_Y);
+            }
             y1=y2;
             x1+=INDENT_BETWEEN_GRAPHIC_COORDS;
             counter++;

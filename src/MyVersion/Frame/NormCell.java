@@ -21,7 +21,7 @@ public class NormCell implements  Serializable {
     float readyToMultiply=0.0f;
     int lifeTime=0;
     int partNum=0;
-ArrayList< Integer[]> myParts=new ArrayList<>();
+    ArrayList< Integer[]> myParts=new ArrayList<>();
     float[] outputs;
     int multiplies=0;
     Random r=new Random();
@@ -33,7 +33,7 @@ ArrayList< Integer[]> myParts=new ArrayList<>();
     private int energy=20;
     private int x;
     private int y;
-NormCellType normCellType=NormCellType.MOVABLE;
+    NormCellType normCellType=NormCellType.MOVABLE;
     public String partName="part";
 
     public int getX() {
@@ -44,7 +44,7 @@ NormCellType normCellType=NormCellType.MOVABLE;
         this.energy = energy;
     }
 
-Color myColor=Color.green;
+    Color myColor=Color.green;
    /* public NormCell(long myParentNum){
         myNum=num;
         num++;
@@ -80,14 +80,14 @@ Color myColor=Color.green;
         cellls++;
     }
 
- float isRaedyToMultiply(){
+    float isRaedyToMultiply(){
         if(energy>ENERGY_NEEDED_TO_MULTIPLY+2){
             return 1;
         }else
             return 0;
  }
 
-boolean isMyPart(PartCell partCell){
+ 	boolean isMyPart(PartCell partCell){
    if (myParts.contains(partCell.myCoords)){
        System.out.println("WOOOOOOOOOOOOOOOOOOOOOOOOOOORK");
 
@@ -267,7 +267,7 @@ boolean isMyPart(PartCell partCell){
         return ii/dil;
     }
     float dil=1000f;
- float getRightDistance(){
+    float getRightDistance(){
         int ix=x;
 
         int i=1;
@@ -507,8 +507,8 @@ void transferEnergy(float output){
         if(x<width-1 && cells[x+1][y].secCell ==null && cells[x+1][y].partCell==null ){
 
     cells[x+1][y].setSecCell(new NormCell(brain));
-energy-=ENERGY_NEEDED_TO_MULTIPLY;
-multiplies++;
+    energy-=ENERGY_NEEDED_TO_MULTIPLY;
+    multiplies++;
         }
        }else if(xxx==1){
            if(x>0 && cells[x-1][y].secCell ==null   && cells[x-1][y].partCell==null){
@@ -542,12 +542,12 @@ multiplies++;
 
 
 
-float isController(){
+    float isController(){
      if (normCellType==NormCellType.CONTROLLER)  {
          return 10.0f;
      }
      else return 0f;
-}
+    }
 
 
     float lastRightDistance=0f;
@@ -564,7 +564,7 @@ float isController(){
     float lastLeftCell=0f;
     float lastRightCell=0f;
     int lastOrganic=0;
-  int lastSize=0;
+    int lastSize=0;
     void setLastThings(){
         lastEnergy=energy;
         lastUpCell=getUptCell();
@@ -586,7 +586,7 @@ float isController(){
 
 
 //*********************************************
-int gSuccess ;
+    int gSuccess ;
     public void setGSuccess(int gSuccess) {
         synchronized (this){
         this.gSuccess = gSuccess;
@@ -612,16 +612,16 @@ int gSuccess ;
     }
 
 
-void bestOutputsAdd(Float f){
+    void bestOutputsAdd(Float f){
         synchronized (NormCell.this){
         bestOutputs.add(f);
         }
-}
-void bestOuputsClear(){
+	}
+	void bestOuputsClear(){
         synchronized (NormCell.this){
             bestOutputs.clear();
         }
-}
+	}
 
     private float outputBuffer;
     ArrayList<Float> bestOutputs;
@@ -642,7 +642,7 @@ void bestOuputsClear(){
     //************************************************
     public float evaluateFitness() {
         Float[] inputs = {isRaedyToMultiply() , (float) getEnergy(), (float) cells[x][y].getOrganic(), getUptCell(), getDownCell(), getLeftCell(), getRightCell(),getRightDownCell(),getRightUpCell(),getLeftUpCell(),getLeftDownCell(), isSpaceAvailable(), isController(),getRightDistance(),getLeftDistance(),getUpDistance(),getDownDistance(), (float) lastEnergy,lastUpCell,lastDownCell,lastLeftCell,lastRightCell,lastRightDownCell,lastRightUpCell,lastLeftDownCell,lastLeftUpCell, (float) lastOrganic, (float) sunny, (float) myParts.size(), (float) lastSize,lastRightDistance,lastLeftDistace,lastUpDistance,lastDownDistance};
-
+        System.out.print(brain.evaluteFitness(inputs,false));
        return brain.evaluteFitness(inputs,false);
     }
 
@@ -796,7 +796,7 @@ void bestOuputsClear(){
               yyy=myCoords[1];
           }
         }
-     private    int xxx;
+       private    int xxx;
        private int yyy;
 
         void eatSunE(){
@@ -833,7 +833,7 @@ void bestOuputsClear(){
 
 
         interface PartCell{
-    Integer[] myCoords = new Integer[2];
+        Integer[] myCoords = new Integer[2];
         void step(float output);
         void test();
         int getEnergy();

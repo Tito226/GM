@@ -19,13 +19,12 @@ public class Data_Set {
             //INPUTS:(isReadyToMultiply,energy,organic,upCell,downCell,leftCell,rightCell)
 //TODO Попробовать уменьшить числа ,например поделить один на ето число,чтобы при суммировании на нейронах не получалась единица
                 inputs.add(new Float[]{0f,rnd(10,ENERGY_NEEDED_TO_MULTIPLY),rnd(0,3),0f,0f,0f,0f});
-
-                outputs.add(new Float[]{0.1f});//(output>0.125f && output<0.15f){move(Directions.DOWN);}
+                outputs.add(new Float[]{0.12f});//(output>0.125f && output<0.15f){move(Directions.DOWN);}
 
                 inputs.add(new Float[]{1f,rnd(ENERGY_NEEDED_TO_MULTIPLY,100),rnd(3,100),0f,0f,0f,0f});
                 outputs.add(new Float[]{0.95f});
 
-                inputs.add(new Float[]{0f,rnd(1,6),rnd(7,100),0f,0f,0f,0f});
+                inputs.add(new Float[]{0f,rnd(1,4),rnd(7,100),0f,0f,0f,0f});
                 outputs.add(new Float[]{0.26f});//(output>0.2 && output<0.3){eatOrganic();}
 
               //  inputs.add(new Float[]{1f,rnd(ENERGY_NEEDED_TO_MULTIPLY,500),rnd(3,100),0f,0f,0f,0f});

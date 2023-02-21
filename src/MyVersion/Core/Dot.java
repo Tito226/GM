@@ -33,7 +33,14 @@ public class Dot {
                     nodesFromMe.get(i).evalute();
                 }
             }
-        }
+        }else if(myType==Dot_Type.BIAS_TYPE) {
+        	if (nodesFromMe.size() > 0) {
+                for (int i = 0; i < nodesFromMe.size(); i++) {
+                    nodesFromMe.get(i).evalute();
+                }
+            }	
+        	}
+        
     }
     float getOutpup(){
       return value;

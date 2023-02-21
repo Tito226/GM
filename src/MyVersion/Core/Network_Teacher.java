@@ -67,9 +67,10 @@ public class Network_Teacher {
                 //TODO  -BIAS решает ошибку(IndexOutOfBoundsExeption(вызов елемента на 1 больше масива))
                 for (int j = 0; j < student.dotsArr.get(1).size() - BIAS; j++) {//"< student.dotsArr.get(1).size()-1" may be changed to "student.dotsArr.get(0).get(i).nodesFromMe.size()"
                     student.dotsArr.get(0).get(i).nodesFromMe.get(j).setWeight(FIRST_LAYER_NODES_VALUE);
+                    student.dotsArr.get(0).get(i).nodesFromMe.get(j).changeble=false;//TODO delete it
                 }
             }
-        }else if(BLOCK_USELESS_INPUTS){
+        }	  if(BLOCK_USELESS_INPUTS){
 
                 for (int i = student.dotsArr.get(0).size()-BIAS-1; i >HOW_MUCH_INPUTS_MUST_BE_USED-BIAS-1; i--) {
                     for (int j = 0; j < student.dotsArr.get(1).size()-BIAS; j++) {//"< student.dotsArr.get(1).size()-1" may be changed to "student.dotsArr.get(0).get(i).nodesFromMe.size()"
@@ -147,7 +148,7 @@ public class Network_Teacher {
                         weight=node.getWeight()-node.from.value*dot.weightsDelta*SECOND_LEARNING_RATE;
                     }
                     if(weight>THRESHOLD_NODE_VALUE){//fixes gradient boom(very big node values that turns value into 1)
-                        weight=THRESHOLD_NODE_VALUE;
+                        weight=THRESHOLD_NODE_VALUE;//
                     }
                     //nodes to dot weight correction  :  weight=weight-node_fromDot_value*weightsDelta*learning_rate
                     node.setWeight(weight);
@@ -159,7 +160,7 @@ public class Network_Teacher {
     }
 
     static void suitabilityTest(Network student) {//testі network
-        float weightBuffer=student.evaluteFitness(new Float[]{1f,rnd(ENERGY_NEEDED_TO_MULTIPLY,500),rnd(3,100),0f,0f,0f,0f},false);
+        float weightBuffer=student.evaluteFitness(new Float[]{1f,rnd(ENERGY_NEEDED_TO_MULTIPLY,100),rnd(3,100),0f,0f,0f,0f,4f,4f,4f},false);
         String answer;
         if(weightBuffer<1f && weightBuffer>0.9f){
            answer=" passed";

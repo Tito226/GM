@@ -25,7 +25,7 @@ class PaintThread extends Thread{
     inPaintThread paint2;
     inPaintThread paint3;
    static byte paintMode=PAINT_MODE;
-  public   void rept(){
+  public   void rept(){/** full repaint, used in multi thread paint mode*/
       if(!pause){
         pause=true;
         for (int i = 0; i < width ; i++) {
