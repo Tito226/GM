@@ -1,0 +1,10 @@
+package MyVersion.Core;
+
+public enum ERROR_FROM {
+	MULTIPLY,
+	MOVE_DOWN,
+	EAT_ORGANIC,
+	MOVE_LEFT_ON_UP_WALL,
+	MOVE_DOWN_ON_RIGHT_WALL
+
+}

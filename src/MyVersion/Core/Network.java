@@ -132,7 +132,7 @@ public class Network {
               }
           }
        }
-
+       
         outputs=new ArrayList<>();
         //Set inputs
         for (int i = 0; i < inputs.length; i++) {

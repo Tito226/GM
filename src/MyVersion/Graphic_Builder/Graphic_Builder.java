@@ -100,15 +100,14 @@ public class Graphic_Builder {
         	
             int y2=(height-realValue.get(counter))- INDENT_Y;
             g.drawLine(x1,y1,x1+INDENT_BETWEEN_GRAPHIC_COORDS,y2);
-            g.setColor(Color.BLUE);
-            //draw y line
-            g.drawLine(yLineIndent,height-INDENT_Y,yLineIndent,0);
-            //draw zero line
-            g.drawLine(0,height-INDENT_Y,weight,height-INDENT_Y);
+            g.setColor(Color.BLUE);//set color before paint
+            g.drawLine(yLineIndent,height-INDENT_Y,yLineIndent,0);//draw y line
+            g.drawLine(0,height-INDENT_Y,weight,height-INDENT_Y);//draw zero line
+            g.drawLine(weight/2+40,height-INDENT_Y-20,weight/2+40,height-INDENT_Y+20);
             g.setColor(Color.BLACK);
             for(int i=0;i<10;i++) {
             	float v=((float)i)/10f;
-            	g.drawString("0."+i,yLineIndent,height-(int)(v*VALUE_MULTIPLIER)- INDENT_Y);
+            	g.drawString("0."+i,yLineIndent,height-(int)(v*VALUE_MULTIPLIER)- INDENT_Y);//draw error level
             }
             y1=y2;
             x1+=INDENT_BETWEEN_GRAPHIC_COORDS;

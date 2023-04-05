@@ -319,7 +319,7 @@ public class StepThread extends Thread{
     long startTime = System.currentTimeMillis();
         if(!pause){
             try {//TODO delete it
-                Thread.sleep(100);
+                Thread.sleep(1);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

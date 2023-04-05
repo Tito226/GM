@@ -57,20 +57,7 @@ public class NormCell implements  Serializable {
         }
     }*/
 
-    public NormCell(int anyNum){
-        myNum=num;
-        num++;
-
-
-
-
-            Random r=new Random();
-            if(r.nextInt(20)==1){
-
-            }
-        cellls++;
-        energy=NORM_CELL_START_ENERGY;
-    }
+    
 
     public NormCell(Network brain){
         this.brain=brain;
@@ -642,7 +629,7 @@ void transferEnergy(float output){
     //************************************************
     public float evaluateFitness() {
         Float[] inputs = {isRaedyToMultiply() , (float) getEnergy(), (float) cells[x][y].getOrganic(), getUptCell(), getDownCell(), getLeftCell(), getRightCell(),getRightDownCell(),getRightUpCell(),getLeftUpCell(),getLeftDownCell(), isSpaceAvailable(), isController(),getRightDistance(),getLeftDistance(),getUpDistance(),getDownDistance(), (float) lastEnergy,lastUpCell,lastDownCell,lastLeftCell,lastRightCell,lastRightDownCell,lastRightUpCell,lastLeftDownCell,lastLeftUpCell, (float) lastOrganic, (float) sunny, (float) myParts.size(), (float) lastSize,lastRightDistance,lastLeftDistace,lastUpDistance,lastDownDistance};
-        System.out.print(brain.evaluteFitness(inputs,false));
+       //System.out.print(brain.evaluteFitness(inputs,false));
        return brain.evaluteFitness(inputs,false);
     }
 
