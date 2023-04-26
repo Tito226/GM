@@ -484,7 +484,7 @@ void transferEnergy(float output){
 
 
     void multiply(){
-        //TODO REMAKE
+        //TODO ПЕРЕДЕЛАТЬ
        if(isSpaceAvailable()==1.00f && energy>ENERGY_NEEDED_TO_MULTIPLY){
        boolean shitHappened=false;
        Random random1=new Random();

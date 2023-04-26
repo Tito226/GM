@@ -6,13 +6,13 @@ public class Core_Config {
     public static final int HIDDEN_DOTS=150;// MUST DIVIDE ON HIDDEN_DOTS_PER_MASSIVE
     public static final int OUTPUTS=1;
     public static final int BIAS=1;//MUST BE 0 OR 1
-    public static final float BIAS_VALUE=-8f;//Value of bias dots//-7
+    public static final float BIAS_VALUE=-6f;//Value of bias dots//-7
     public static final float LEARNING_RATE =0.001F;//0.0009
-    public static final float SECOND_LEARNING_RATE=0.0007f;//0.005
+    public static final float SECOND_LEARNING_RATE=0.000007f;//0.000007
     //
     public static final int HIDDEN_DOTS_PER_ARRAY =25;
 
-    public static final int TEACH_ITERATIONS=800000;//800000
+    public static final int TEACH_ITERATIONS=900000;//800000
 
     //Realization parameters                                DON'T CHANGE IF YOU DON'T KNOW WHAT THEY DO
     public static final boolean BLOCK_USELESS_INPUTS=true;//TRUE
@@ -21,7 +21,29 @@ public class Core_Config {
     public static final boolean SET_FIRST_LAYER_NODES_NON_RANDOM_VALUE=false;//Has more priority than BLOCK_USELESS_INPUTS, rules it out
     public static final float FIRST_LAYER_NODES_VALUE=-0.15f;//-0.15f
     public static final float THRESHOLD_WEIGHT_RESET_VALUE=0.07f;
+    public static final boolean NODES_BECOMES_UNCHANGEBLE_IF_WEIGHT_BIGGER_THAN_THRESHOLD=false;
 }
+
+/* //Network
+    public static final int INPUTS =35;
+    public static final int HIDDEN_DOTS=150;// MUST DIVIDE ON HIDDEN_DOTS_PER_MASSIVE
+    public static final int OUTPUTS=1;
+    public static final int BIAS=1;//MUST BE 0 OR 1
+    public static final float BIAS_VALUE=-8f;//Value of bias dots//-7
+    public static final float LEARNING_RATE =0.0006F;//0.0009
+    public static final float SECOND_LEARNING_RATE=0.000007f;//0.000007
+    //
+    public static final int HIDDEN_DOTS_PER_ARRAY =25;
+
+    public static final int TEACH_ITERATIONS=1500000;//800000
+
+    //Realization parameters                                DON'T CHANGE IF YOU DON'T KNOW WHAT THEY DO
+    public static final boolean BLOCK_USELESS_INPUTS=true;//TRUE
+    public static final int HOW_MUCH_INPUTS_MUST_BE_USED=7;//7
+    public static final float THRESHOLD_NODE_VALUE=2.09F;//Nodes weight can't become bigger than this
+    public static final boolean SET_FIRST_LAYER_NODES_NON_RANDOM_VALUE=false;//Has more priority than BLOCK_USELESS_INPUTS, rules it out
+    public static final float FIRST_LAYER_NODES_VALUE=-0.15f;//-0.15f
+    public static final float THRESHOLD_WEIGHT_RESET_VALUE=0.07f;*/
 
 /*//Network
     public static final int INPUTS =35;

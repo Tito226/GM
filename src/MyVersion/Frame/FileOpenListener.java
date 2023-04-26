@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 
 public class FileOpenListener implements ActionListener {
-    //TODO MAKE
+    //TODO СДЕЛАТЬ ЗАГРУЗКУ
 
     @Override
     public void actionPerformed(ActionEvent e) {

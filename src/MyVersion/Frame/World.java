@@ -107,8 +107,11 @@ class PaintThread extends Thread{
 
                         }
                         case 3->{
+                        	g.setColor(Color.BLACK);
+                            g.drawString("Restarts: " + Restarts, 7, 9);
                             for (int i = 0; i < width; i++) {
                             for (int j = 0; j < height; j++) {
+                            	
                                 if (cells[i][j] != null) {
                                     if (cells[i][j].secCell == null && cells[i][j].partCell == null) {
                                             g.setColor(cells[i][j].getColor());
@@ -124,12 +127,10 @@ class PaintThread extends Thread{
                                 }
                             }
                         }
-                            g.setColor(Color.BLACK);
-                            g.drawString("Restarts: " + Restarts, 7, 9);
+                            
                         }
                     }
-                    g.setColor(Color.BLACK);
-                    g.drawString("Restarts: " + Restarts, 7, 9);
+                    
             }
          }
         }
@@ -312,14 +313,14 @@ public class StepThread extends Thread{
 
 
     while(true) {
-
+    	//TODO сохранять значения продолжительности жизни в случае неудовлетворительных значений запускать тест выжываемости и сравнивать значения с таковыми на практике
     boolean isStep=false;
     countt2++;
     Thread.yield();
     long startTime = System.currentTimeMillis();
         if(!pause){
-            try {//TODO delete it
-                Thread.sleep(1);
+            try {//TODO удалить позже
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
