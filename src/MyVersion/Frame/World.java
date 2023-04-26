@@ -2,6 +2,7 @@ package MyVersion.Frame;
 
 
 
+import MyVersion.Core.Core_Config;
 import MyVersion.Core.Network;
 import MyVersion.Core.Network_Teacher;
 
@@ -376,7 +377,7 @@ public class StepThread extends Thread{
          }
 
             //Summon cells
-             for (int i = 0; i < 10; i++) {
+             for (int i = 0; i < Core_Config.CELLS_ON_START; i++) {
                  Random r =new Random();
                  cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(relative));
              }
