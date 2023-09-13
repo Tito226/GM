@@ -30,7 +30,7 @@ public class NormCell implements  Serializable {
     static long num = 0L;
     private final long myNum;
     boolean stepN=false;
-    private int energy=20;
+    private int energy;
     private int x;
     private int y;
     NormCellType normCellType=NormCellType.MOVABLE;
@@ -63,7 +63,7 @@ public class NormCell implements  Serializable {
         this.brain=brain;
         myNum=num;
         num++;
-        energy=15;
+        energy=NORM_CELL_START_ENERGY;
         cellls++;
     }
 
@@ -327,9 +327,8 @@ public class NormCell implements  Serializable {
         if (normCellType==NormCellType.CONTROLLER){
             setMyColor(Color.darkGray);
             step1();
-
         }
-    else {
+        else {
         if(myParts.size()>0){
             normCellType=NormCellType.CONTROLLER;
             step1();
@@ -339,47 +338,48 @@ public class NormCell implements  Serializable {
        if(isSpaceAvailable()==0){
            energy-=1;
        }
-            float output=evaluateFitness();
+       float output=evaluateFitness();
+       System.out.println(output);
             //  System.out.println(output);
-    if(output>0.1f && output<0.125f){
+       if(output>0.1f && output<0.125f){
         move(Directions.UP);
-    }else if (output>0.125f && output<0.15f){
+       }else if (output>0.125f && output<0.15f){
         move(Directions.DOWN);
-    }else if (output>0.15f && output<0.175f){
-        move(Directions.LEFT);
-    } else if (output>0.175f && output<0.2f){
-        move(Directions.RIGHT);
-           }
-     if (output>0.2 && output<0.3){eatOrganic();}
-    else  if(output>0.6 && output<0.61){
-        if(!eatCell(Directions.RIGHT)){energy--;}
+       }else if (output>0.15f && output<0.175f){
+    	   move(Directions.LEFT);
+       } else if (output>0.175f && output<0.2f){
+    	   move(Directions.RIGHT);
+       }
+       if (output>0.2 && output<0.3){eatOrganic();}
+       else  if(output>0.6 && output<0.61){
+    	   if(!eatCell(Directions.RIGHT)){energy--;}
 
-    }else if(output>0.61 && output<0.62){
-        if(!eatCell(Directions.LEFT)){energy--;}
+       }else if(output>0.61 && output<0.62){
+    	   if(!eatCell(Directions.LEFT)){energy--;}
 
-    }else if(output>0.62 && output<0.63){
-        if(!eatCell(Directions.UP)){energy--;}
+       }else if(output>0.62 && output<0.63){
+    	   if(!eatCell(Directions.UP)){energy--;}
 
-    }else if(output>0.63 && output<0.64){
-        if (!eatCell(Directions.DOWN)){energy--;}
+       }else if(output>0.63 && output<0.64){
+      	 if (!eatCell(Directions.DOWN)){energy--;}
 
-    }else if(output>0.64 && output<0.68){
-        protoplast=new Protoplast(output,x,y);
-}else if(output>0.68 && output<0.8){
+       }else if(output>0.64 && output<0.68){
+    	   protoplast=new Protoplast(output,x,y);
+       }else if(output>0.68 && output<0.8){
 
 
-     } else if(output>0.9f && output<1 ){
-         multiply();
-     }
-            setLastThings();
-    energy--;
-    lifeTime++;
-    Random r=new Random();
+       } else if(output>0.9f && output<1f ){
+    	   multiply();
+       }
+       setLastThings();
+       energy--;
+       lifeTime++;
+       Random r=new Random();
 
             //Mutate on first gen
 
             //
-        }
+       }
     }
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
@@ -410,17 +410,17 @@ void transferEnergy(float output){
 }
 
  float isSpaceAvailable(){
-       boolean b1=true;
+     boolean b1=true;
      boolean b2=true;
      boolean b3=true;
      boolean b4=true;
-       if(y>0 && cells[x][y-1].secCell==null){}else b1=false;
-       if(y<height-1 && cells[x][y+1].secCell==null){}else b2=false;
-       if(x<width-1 &&  cells[x+1][y].secCell==null){}else b3=false;
-       if( x>0 && cells[x-1][y].secCell==null){}else b4=false;
-       if(!b1 && !b2 && !b3 && !b4){
+     if(y>0 && cells[x][y-1].secCell==null){}else b1=false;
+     if(y<height-1 && cells[x][y+1].secCell==null){}else b2=false;
+     if(x<width-1 &&  cells[x+1][y].secCell==null){}else b3=false;
+     if( x>0 && cells[x-1][y].secCell==null){}else b4=false;
+     if(!b1 && !b2 && !b3 && !b4){
            return 0.0f;
-       }else{return 1.0f;}
+     }else{return 1.0f;}
  }
     int enValue=10;
     public boolean eatCell(Directions dirs){
@@ -431,7 +431,7 @@ void transferEnergy(float output){
             case UP -> {
                 if( y>0 && cells[x][y-1].secCell!=null ){
                     energy+= cells[x][y-1].secCell.energy;
-                cells[x][y-1].secCell= cells[x][y].secCell;
+                    cells[x][y-1].secCell= cells[x][y].secCell;
                     cells[x][y].secCell=null;
                     done= true;
                 }else done= false;
@@ -492,27 +492,23 @@ void transferEnergy(float output){
         //   System.out.println(xxx+"-Random");
        if(xxx==0){
         if(x<width-1 && cells[x+1][y].secCell ==null && cells[x+1][y].partCell==null ){
-
-    cells[x+1][y].setSecCell(new NormCell(brain));
-    energy-=ENERGY_NEEDED_TO_MULTIPLY;
-    multiplies++;
+        	cells[x+1][y].setSecCell(new NormCell(brain));
+        	energy-=ENERGY_NEEDED_TO_MULTIPLY;
+        	multiplies++;
         }
        }else if(xxx==1){
            if(x>0 && cells[x-1][y].secCell ==null   && cells[x-1][y].partCell==null){
-
                cells[x-1][y].setSecCell(new NormCell(brain));
                energy-=ENERGY_NEEDED_TO_MULTIPLY;
                multiplies++;
            }
        } else if (xxx==2){
            if(y>0 && cells[x][y-1].secCell ==null && cells[x][y-1].partCell==null){
-
                cells[x][y-1].setSecCell(new NormCell(brain));
                energy-=ENERGY_NEEDED_TO_MULTIPLY;
                multiplies++;
            } else if(xxx==3){
                if(y<height-1 && cells[x][y+1].secCell ==null && cells[x][y+1].partCell==null ){
-
                    cells[x][y+1].setSecCell(new NormCell(brain));
                    energy-=ENERGY_NEEDED_TO_MULTIPLY;
                    multiplies++;
@@ -564,10 +560,10 @@ void transferEnergy(float output){
         lastLeftDistace=getLeftDistance();
         lastUpDistance=getUpDistance();
         lastDownDistance=getDownDistance();
-         lastRightUpCell=getRightUpCell();
-         lastRightDownCell=getRightDownCell();
-         lastLeftUpCell=getLeftUpCell();
-         lastLeftDownCell=getLeftDownCell();
+        lastRightUpCell=getRightUpCell();
+        lastRightDownCell=getRightDownCell();
+        lastLeftUpCell=getLeftUpCell();
+        lastLeftDownCell=getLeftDownCell();
     }
 
 
@@ -626,13 +622,29 @@ void transferEnergy(float output){
         }
     }
 
+    Float[] getInputData() {
+    	 Float[] inputs = {isRaedyToMultiply() , (float) getEnergy(), (float) cells[x][y].getOrganic(), getUptCell(), getDownCell(), getLeftCell(),
+    			 
+    			 getRightCell(),getRightDownCell(),getRightUpCell(),getLeftUpCell(),getLeftDownCell(), isSpaceAvailable(), isController(),
+    			 
+    			 getRightDistance(),getLeftDistance(),getUpDistance(),getDownDistance(), (float) lastEnergy,lastUpCell,lastDownCell,lastLeftCell,
+    			 
+    			 lastRightCell,lastRightDownCell,lastRightUpCell,lastLeftDownCell,lastLeftUpCell, (float) lastOrganic, (float) sunny, (float) myParts.size(),
+    			 
+    			 (float) lastSize,lastRightDistance,lastLeftDistace,lastUpDistance,lastDownDistance};
+    	 return inputs;
+    }
+    
+    
     //************************************************
     public float evaluateFitness() {
-        Float[] inputs = {isRaedyToMultiply() , (float) getEnergy(), (float) cells[x][y].getOrganic(), getUptCell(), getDownCell(), getLeftCell(), getRightCell(),getRightDownCell(),getRightUpCell(),getLeftUpCell(),getLeftDownCell(), isSpaceAvailable(), isController(),getRightDistance(),getLeftDistance(),getUpDistance(),getDownDistance(), (float) lastEnergy,lastUpCell,lastDownCell,lastLeftCell,lastRightCell,lastRightDownCell,lastRightUpCell,lastLeftDownCell,lastLeftUpCell, (float) lastOrganic, (float) sunny, (float) myParts.size(), (float) lastSize,lastRightDistance,lastLeftDistace,lastUpDistance,lastDownDistance};
-       //System.out.print(brain.evaluteFitness(inputs,false));
-       return brain.evaluteFitness(inputs,false);
+        //System.out.print(brain.evaluteFitness(inputs,false));
+       return brain.evaluteFitness(getInputData(),false);
     }
-
+    public float evaluateFitness(Float[] inputData) {
+        //System.out.print(brain.evaluteFitness(inputs,false));
+       return brain.evaluteFitness(inputData,false);
+    }
 
      public int eatCellT(Directions dirs){
         int done = 0;

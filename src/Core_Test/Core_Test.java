@@ -12,7 +12,7 @@ public class Core_Test {
 	public static void main(String[] args) {
 		int b=15;
 		 
-		System.out.println(b/2f);
+		System.out.println("b/2f рпгшпшгшгнщшнгщ");
 		/*HashMap<Float,Float> map =new HashMap();
 		for(int i=0;i<100;i++) {
 			map.put(1f, 1f);

@@ -8,8 +8,8 @@ public class Core_Config {
     public static final int BIAS=1;//MUST BE 0 OR 1
     public static final float BIAS_VALUE=-6f;//Value of bias dots//-7
     public static final float LEARNING_RATE =0.001F;//0.0009
-    public static final float SECOND_LEARNING_RATE=0.000007f;//0.000007
-    public static final int CELLS_ON_START=10;
+    public static final float SECOND_LEARNING_RATE=0.0000007f;//0.000007
+    public static final int CELLS_ON_START=3;
     //
     public static final int HIDDEN_DOTS_PER_ARRAY =25;
 
@@ -23,6 +23,7 @@ public class Core_Config {
     public static final float FIRST_LAYER_NODES_VALUE=-0.15f;//-0.15f
     public static final float THRESHOLD_WEIGHT_RESET_VALUE=0.07f;
     public static final boolean NODES_BECOMES_UNCHANGEBLE_IF_WEIGHT_BIGGER_THAN_THRESHOLD=false;
+    public static final boolean FIRST_INPUT_MULTIPLIER=true;
 }
 
 /* //Network

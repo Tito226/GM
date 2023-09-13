@@ -9,15 +9,15 @@ import static MyVersion.Frame.World.*;
 
 public  class Cell {
     boolean isChanged=true;
-public static int startEnergy=CELL_START_ORGANIC;
+//public static int startEnergy=CELL_START_ORGANIC;
 int[] color;
     Color myColor ;
-    int energy=1;
+    //int energy=1;
 NormCell secCell;
 PartCell partCell;
    private int x;
     private int y;
-    public int organic=30;
+    public int organic=CELL_START_ORGANIC;
 private boolean nothing=true;
     public int getX() {
         return x;

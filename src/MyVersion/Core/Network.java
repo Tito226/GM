@@ -10,6 +10,7 @@ public class Network {
 // если мало нейронов, то она не достаточно гибкая, не сможет ухватить закономерность
 //Лучше мало нейронов но больше слоев чем больше нейронов но 1 слой
     ArrayList<ArrayList<Dot>> dotsArr =new ArrayList<>();
+    
     public Network(int iii){
         dotsArr.add(new ArrayList<>());//inputs (0)
 
@@ -21,6 +22,7 @@ public class Network {
         for (int i = 0; i < INPUTS; i++) {//adding input Dots to array,if bias,add dias Dot and add notes to it
             dotsArr.get(0).add(new Dot(Dot_Type.INPUT));
         }
+       
         if(BIAS==1){
             dotsArr.get(0).add(new Dot(Dot_Type.BIAS_TYPE));
             for (int j = 0; j < dotsArr.get(1).size() ; j++) {
@@ -121,7 +123,9 @@ public class Network {
     public ArrayList<ArrayList<Dot>> getDotsArr() {
         return dotsArr;
     }
+    
     ArrayList< Float> outputs;
+    
   public float evaluteFitness(Float[] inputs,boolean forTeaching){
 
       //Dots value , error and weightsDelta clears in next method call
@@ -136,13 +140,17 @@ public class Network {
         outputs=new ArrayList<>();
         //Set inputs
         for (int i = 0; i < inputs.length; i++) {
-            dotsArr.get(0).get(i).setValue(inputs[i]);
+        	 if(FIRST_INPUT_MULTIPLIER && i==0 ) {
+        		 dotsArr.get(0).get(0).setValue(inputs[i]*10);
+            }else {
+             	dotsArr.get(0).get(i).setValue(inputs[i]);
+            }
             dotsArr.get(0).get(i).evalute();
         }
         //evalute hidden layer
       for (int i = 1; i <HIDDEN_DOTS / HIDDEN_DOTS_PER_ARRAY+1; i++) {
           for (int j = 0; j < dotsArr.get(i).size() ; j++) {
-           dotsArr.get(i).get(j).evalute();
+        	  dotsArr.get(i).get(j).evalute();
           }
       }
       //Getting outputs
@@ -150,17 +158,17 @@ public class Network {
           //вызов метода точки(возможно повторный)
           dotsArr.get(dotsArr.size()-1).get(i).evalute();
           //
-         outputs.add( dotsArr.get(dotsArr.size()-1).get(i).getOutpup());
+          outputs.add( dotsArr.get(dotsArr.size()-1).get(i).getOutpup());
 
       }
       if(!forTeaching){
-      for(ArrayList<Dot> dotArr: dotsArr){
-          for(Dot dot:dotArr){
-              dot.clear();
-          }
+    	  for(ArrayList<Dot> dotArr: dotsArr){
+    		  for(Dot dot:dotArr){
+    			  dot.clear();
+    		  }
+    	  }
       }
-      }
-return outputs.get(0);
+   return outputs.get(0);
    }
 
 

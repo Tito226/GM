@@ -93,7 +93,7 @@ public class Network_Teacher {
         for (ArrayList<Dot> dotM:student.dotsArr) {
             for(Dot dot:dotM) {
                 for(Node node:dot.nodesFromMe){
-                    node.setWeight(r.nextFloat());// node.setWeight( r.nextFloat());
+                	node.setWeight(r.nextFloat());// node.setWeight( r.nextFloat());
                 }
             }
         }
@@ -126,7 +126,7 @@ public class Network_Teacher {
    
     
     
-    ERROR_FROM errorFrom(float weightBuffer) {
+    /*ERROR_FROM errorFrom(float weightBuffer) {
     	if(weightBuffer<1f && weightBuffer>0.9f){
     		return ERROR_FROM.EAT_ORGANIC;
          }       
@@ -143,7 +143,7 @@ public class Network_Teacher {
         	 return ERROR_FROM.MOVE_DOWN_ON_RIGHT_WALL;
          }
          return null;
-    }
+    }*/
     
     //TODO СОХРАНЯТЬ ТИП ОЩИБКИ(ОШИБКА ПОЕДАНИЯ ОРГАНИКИ,ОШИБКА ДЕЛЕНИЯ)
     
@@ -233,8 +233,9 @@ public class Network_Teacher {
     return crutch.error;
     }
     //TODO Тест не работает правильно 
-    public static void suitabilityTest(Network student) {//tests network
-        float weightBuffer=student.evaluteFitness(new Float[]{1f,rnd(ENERGY_NEEDED_TO_MULTIPLY,100),rnd(3,100),0f,0f,0f,0f},false);
+    public static void suitabilityTest(Network student) {//tests network,ввыводит что на входе и на выходе и подходит ли ответ 
+    	Float[] f =new Float[]{1f,rnd(ENERGY_NEEDED_TO_MULTIPLY,100),rnd(3,100),0f,0f,0f,0f};
+        float weightBuffer=student.evaluteFitness(f,false);
         String answer;
         Random r = new Random();
         if(weightBuffer<1f && weightBuffer>0.9f){
@@ -242,35 +243,43 @@ public class Network_Teacher {
         }else{
            answer=" failed";
         }
-        System.out.println("Multiply:"+ weightBuffer+answer+"              ");//print evaluteFitness parametres
-        weightBuffer=student.evaluteFitness(new Float[]{0f,rnd(3,ENERGY_NEEDED_TO_MULTIPLY),rnd(0,3),0f,0f,0f,0f},false);
+        System.out.println("Multiply:"+ weightBuffer+answer+"_______________"+Arrays.toString(f));//print evaluteFitness parametres
+        
+        f =new Float[]{0f,rnd(3,ENERGY_NEEDED_TO_MULTIPLY),rnd(0,3),0f,0f,0f,0f};
+        weightBuffer=student.evaluteFitness(f,false);
         if(weightBuffer<0.125 && weightBuffer>0.1f){
             answer=" passed";
         }else{
             answer=" failed";
         }
-        System.out.println("Move up:"+weightBuffer+answer);
+        System.out.println("Move up:"+weightBuffer+answer+"_______________"+Arrays.toString(f));
+        
+        f=new Float[]{0f,rnd(1,4),rnd(7,100),(float) r.nextInt(2),(float) r.nextInt(2),(float) r.nextInt(2),(float) r.nextInt(2)};
         weightBuffer=student.evaluteFitness(new Float[]{0f,rnd(1,4),rnd(7,100),(float) r.nextInt(2),(float) r.nextInt(2),(float) r.nextInt(2),(float) r.nextInt(2)},false);
         if(weightBuffer<0.3f && weightBuffer>0.2f){
             answer=" passed";
         }else{
             answer=" failed";
         }
-        System.out.println("Eat organic:"+weightBuffer+answer);
+        System.out.println("Eat organic:"+weightBuffer+answer+"_______________"+Arrays.toString(f));
+        
+        f=new Float[]{0f,rnd(4,30),rnd(1,4),1f,0f,0f,0f};
         weightBuffer=student.evaluteFitness(new Float[]{0f,rnd(4,30),rnd(1,4),1f,0f,0f,0f},false);
         if(weightBuffer>0.15f && weightBuffer<0.175f){
             answer=" passed";
         }else{
             answer=" failed";
         }
-        System.out.println("move left on up wall:"+weightBuffer+answer);
+        System.out.println("move left on up wall:"+weightBuffer+answer+"_______________"+Arrays.toString(f));
+        
+        f=new Float[]{0f,rnd(4,30),rnd(1,4),0f,0f,0f,1f};
         weightBuffer=student.evaluteFitness(new Float[]{0f,rnd(4,30),rnd(1,4),0f,0f,0f,1f},false);
         if(weightBuffer>0.125 && weightBuffer<0.15){
             answer=" passed";
         }else{
             answer=" failed";
         }
-        System.out.println("move down on right wall:"+weightBuffer+answer);
+        System.out.println("move down on right wall:"+weightBuffer+answer+"_______________"+Arrays.toString(f));
 
     }
 
