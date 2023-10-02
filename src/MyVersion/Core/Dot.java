@@ -11,18 +11,30 @@ public class Dot {
     Dot_Type myType;
     public ArrayList<Node> nodesFromMe=new ArrayList<>();
     public ArrayList<Node> nodesToMe=new ArrayList<>();
+    
+    public Dot(float weightsDelta,float error,float value,Dot_Type myType,ArrayList<Node> nodesFromMe,ArrayList<Node> nodesToMe) {
+    	this.weightsDelta=weightsDelta;
+    	this.error=error;
+    	this.value=value;
+    	this.myType=myType;
+    	
+    }
     public Dot( Dot_Type myType){
         this.myType=myType;
         if (myType==Dot_Type.BIAS_TYPE){
             value=BIAS_VALUE;
         }
     }
-     void clear(){//clears teach values
+    
+	public Dot() {
+		// TODO Автоматически созданная заглушка конструктора
+	}
+	void clear(){//clears teach values
         if(myType!=Dot_Type.BIAS_TYPE){
          value=0;}
          error=0f;
          weightsDelta=0f;
-     }
+    }
     void evalute(){
         if(myType==Dot_Type.OUTPUT){
             value=activaionFunction(value);
@@ -46,8 +58,6 @@ public class Dot {
       return value;
     }
 
-
-
     public void setValue(float value) {
         this.value = value;
     }
@@ -55,21 +65,36 @@ public class Dot {
     public float getValue() {
         return value;
     }
+    
     void addNode(Dot to){
         if(to.myType==Dot_Type.BIAS_TYPE){
 
         }else {
-      Node node=  new Node(this,to);
+        Node node=new Node(this,to);
         nodesFromMe.add(node);
         to.nodesToMe.add(node);}
     }
+    
+    void addNodeClone(Dot to,Node nodeToClone){
+        if(to.myType==Dot_Type.BIAS_TYPE){
+        	return;
+        }else {
+        Node node=new Node(this,to);
+        nodesFromMe.add(node);
+        to.nodesToMe.add(node);
+        node.changeble=nodeToClone.changeble;
+        node.setWeight(nodeToClone.getWeight());
+        }
+    }
 
-
-  static   float activaionFunction(float x){
+    static float activaionFunction(float x){
         float e =2.71828f;
         return (float) (1/(1+ Math.pow(e,-x)));
     }
-   static float activationFunctionDX(float x){
+    
+    static float activationFunctionDX(float x){
       return   activaionFunction(x)*(1-activaionFunction(x));
     }
+   
+    
 }

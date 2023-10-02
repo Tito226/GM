@@ -1,6 +1,7 @@
 package MyVersion.Frame;
 
 
+import MyVersion.Core.BrainCloneClass;
 import MyVersion.Core.Network;
 
 
@@ -59,12 +60,13 @@ public class NormCell implements  Serializable {
 
     
 
-    public NormCell(Network brain){
-        this.brain=brain;
+    public NormCell(Network brain){//brain doesnt copy need to clone
+        this.brain=BrainCloneClass.networkClone(brain);
         myNum=num;
         num++;
         energy=NORM_CELL_START_ENERGY;
         cellls++;
+        brain.mutate(10);//TODO delete it   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     }
 
     float isRaedyToMultiply(){
@@ -299,21 +301,21 @@ public class NormCell implements  Serializable {
     }
 
     void step1(){
-
+    	outputs=new float[brain.getDotsArr().size()];
         for (int i = 0; i < myParts.size(); i++) {
-            cells[myParts.get(i)[0]][myParts.get(i)[1]].partCell.step(outputs[i+1]);
+          //  cells[myParts.get(i)[0]][myParts.get(i)[1]].partCell.step(outputs[i+1]);
 
         }
         if(outputs[0]>0.64 && outputs[0]<0.68){
-      new  Protoplast(outputs[0],x,y);
-       //     System.out.println("WRYYYYY");
+        	new  Protoplast(outputs[0],x,y);
+       //   System.out.println("WRYYYYY");
         }
         if (outputs[0]>0.3 && outputs[0]<0.35){
             multiply();
         }
         Random r=new Random();
 
-        energy-=2;
+        energy--;
         lifeTime++;
        }
     Protoplast protoplast;
@@ -339,7 +341,7 @@ public class NormCell implements  Serializable {
            energy-=1;
        }
        float output=evaluateFitness();
-       System.out.println(output);
+       //System.out.println(output);//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             //  System.out.println(output);
        if(output>0.1f && output<0.125f){
         move(Directions.UP);

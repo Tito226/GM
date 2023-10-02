@@ -251,15 +251,15 @@ public static Cell[][] getCells(){
         controls2.add(button2);
 
 
-         world=new World(width/cellSize-5,height/cellSize-20);
+        world=new World(width/cellSize-5,height/cellSize-20);
         frame.add(controls2,BorderLayout.NORTH);
         frame.add(controls, BorderLayout.EAST); // справа будет панель с управлением
         frame.add(world, BorderLayout.CENTER);
         frame.setSize(width, height);
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         frame.setVisible(true);
-         wor =new Thread(world);
-         paintThread= new PaintThread();
+        wor =new Thread(world);
+        paintThread= new PaintThread();
         paintThread.start();
         wor.start();
 
@@ -300,21 +300,18 @@ public static Cell[][] getCells(){
 
 
         byte countt=0;
-    boolean tested=false;
-    ArrayList<Float[]> inputData=new ArrayList<Float[]>();
+        boolean tested=false;
+        ArrayList<Float[]> inputData=new ArrayList<Float[]>();
+        
     while(true) {
     	//TODO сохранять значения продолжительности жизни в случае неудовлетворительных значений запускать тест выжываемости и сравнивать значения с таковыми на практике
-    boolean isStep=false;
-    countt2++;
-    Thread.yield();
-    long startTime = System.currentTimeMillis();
-        if(!pause){
+    	boolean isStep=false;
+    	countt2++;
+    	Thread.yield();
+    	long startTime = System.currentTimeMillis();
+    	if(!pause){
         	
-            try {//TODO удалить позже
-                Thread.sleep(100);//для замедления симуляции
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+           
             //step{*************************************************************************
             //******************************************************************************
             int NULL_CELLS=0;
@@ -327,33 +324,33 @@ public static Cell[][] getCells(){
                 }
             }
 
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height ; j++) {
-            if (cells[i][j].secCell==null){//подсчет населения наоборот
-                NULL_CELLS++;
-            }
+            for (int i = 0; i < width; i++) {
+            	for (int j = 0; j < height ; j++) {
+            		if (cells[i][j].secCell==null){//подсчет населения наоборот
+            			NULL_CELLS++;
+            		}
 
-                if(cells[i][j].secCell!=null){
-                    cells[i][j].secCell.setX(i);
-                    cells[i][j].secCell.setY(j);
-                    if(cells[i][j].secCell.lifeTime>bestLifeTime)
-                    	bestLifeTime=cells[i][j].secCell.lifeTime;
-                    if(cells[i][j].secCell.lifeTime>thisBestLifeTime){
-                        thisBestLifeTime=cells[i][j].secCell.lifeTime;
-                    }
+            		if(cells[i][j].secCell!=null){
+            			cells[i][j].secCell.setX(i);
+            			cells[i][j].secCell.setY(j);
+            			if(cells[i][j].secCell.lifeTime>bestLifeTime)
+            				bestLifeTime=cells[i][j].secCell.lifeTime;
+            			if(cells[i][j].secCell.lifeTime>thisBestLifeTime){
+            				thisBestLifeTime=cells[i][j].secCell.lifeTime;
+            			}
                     
-                    if(!cells[i][j].secCell.stepN){
-                        cells[i][j].secCell.stepN=true;
-                        //получение входной информации ,для диагностики клетки
-                        inputData.add(cells[i][j].secCell.getInputData());//сделать ход если еще не ходил
-                        cells[i][j].secCell.step();
-                        isStep=true;
+            			if(!cells[i][j].secCell.stepN){
+            				cells[i][j].secCell.stepN=true;
+            				//получение входной информации ,для диагностики клетки
+            				inputData.add(cells[i][j].secCell.getInputData());//сделать ход если еще не ходил
+            				cells[i][j].secCell.step();
+            				isStep=true;
 
-                    }
+            			}
 
-                }
+            		}
 
-            }
+            	}
             //   Thread.yield();
         }
 
@@ -375,8 +372,8 @@ public static Cell[][] getCells(){
         	 	for (int i = 0; i < Core_Config.CELLS_ON_START; i++) {
         	 		Random r =new Random();
         	 		if(r.nextInt(9)==2) {
-        	 		cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(relative));
-        	 		continue;
+        	 			cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(relative));
+        	 			continue;
         	 		}
         	 	}
 
@@ -409,9 +406,9 @@ public static Cell[][] getCells(){
         }
 
         countt++;
-   long endTime = System.currentTimeMillis();
-   if(endTime - startTime>100){
-   //System.out.println("Main took " + (endTime - startTime) + " milliseconds");
+        long endTime = System.currentTimeMillis();
+        if(endTime - startTime>100){
+        	//System.out.println("Main took " + (endTime - startTime) + " milliseconds");
 	   }
     }
 

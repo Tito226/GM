@@ -243,7 +243,7 @@ public class Network_Teacher {
         }else{
            answer=" failed";
         }
-        System.out.println("Multiply:"+ weightBuffer+answer+"_______________"+Arrays.toString(f));//print evaluteFitness parametres
+        System.out.println("Multiply:"+ weightBuffer+answer+"____________________"+Arrays.toString(f));//print evaluteFitness parametres
         
         f =new Float[]{0f,rnd(3,ENERGY_NEEDED_TO_MULTIPLY),rnd(0,3),0f,0f,0f,0f};
         weightBuffer=student.evaluteFitness(f,false);
@@ -252,7 +252,7 @@ public class Network_Teacher {
         }else{
             answer=" failed";
         }
-        System.out.println("Move up:"+weightBuffer+answer+"_______________"+Arrays.toString(f));
+        System.out.println("Move up:"+weightBuffer+answer+"____________________"+Arrays.toString(f));
         
         f=new Float[]{0f,rnd(1,4),rnd(7,100),(float) r.nextInt(2),(float) r.nextInt(2),(float) r.nextInt(2),(float) r.nextInt(2)};
         weightBuffer=student.evaluteFitness(new Float[]{0f,rnd(1,4),rnd(7,100),(float) r.nextInt(2),(float) r.nextInt(2),(float) r.nextInt(2),(float) r.nextInt(2)},false);
@@ -261,7 +261,7 @@ public class Network_Teacher {
         }else{
             answer=" failed";
         }
-        System.out.println("Eat organic:"+weightBuffer+answer+"_______________"+Arrays.toString(f));
+        System.out.println("Eat organic:"+weightBuffer+answer+"________________"+Arrays.toString(f));
         
         f=new Float[]{0f,rnd(4,30),rnd(1,4),1f,0f,0f,0f};
         weightBuffer=student.evaluteFitness(new Float[]{0f,rnd(4,30),rnd(1,4),1f,0f,0f,0f},false);
@@ -270,7 +270,7 @@ public class Network_Teacher {
         }else{
             answer=" failed";
         }
-        System.out.println("move left on up wall:"+weightBuffer+answer+"_______________"+Arrays.toString(f));
+        System.out.println("move left on up wall:"+weightBuffer+answer+"________"+Arrays.toString(f));
         
         f=new Float[]{0f,rnd(4,30),rnd(1,4),0f,0f,0f,1f};
         weightBuffer=student.evaluteFitness(new Float[]{0f,rnd(4,30),rnd(1,4),0f,0f,0f,1f},false);
@@ -279,7 +279,7 @@ public class Network_Teacher {
         }else{
             answer=" failed";
         }
-        System.out.println("move down on right wall:"+weightBuffer+answer+"_______________"+Arrays.toString(f));
+        System.out.println("move down on right wall:"+weightBuffer+answer+"____"+Arrays.toString(f));
 
     }
 

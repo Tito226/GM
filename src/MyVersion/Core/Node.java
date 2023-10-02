@@ -21,11 +21,16 @@ public class Node {
        }
        this.to=to;
     }
-   void evalute(){
-	   if(changeble) {
-        to.value+= from.value* weight;
+    
+    public Node() {
+		// TODO Автоматически созданная заглушка конструктора
+	}
+
+	void evalute(){
+    	if(changeble) {
+    		to.value+= from.value* weight;
         }
-   }
+    }
 
     public void setWeight(float weight)  {
         this.weight=weight;
