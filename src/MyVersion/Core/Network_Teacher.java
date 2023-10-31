@@ -79,7 +79,7 @@ public class Network_Teacher {
         Graphic_Builder.createGraphic(errors);
     }
 
-    public  Network mainy() throws IOException {//must create and tune network
+    public  Network createAndTeachNetwork() throws IOException {//must create and tune network
         Network student=new Network(1);
         float[] errors=fullTeach(student);
         suitabilityTest(student);
@@ -97,10 +97,10 @@ public class Network_Teacher {
                 }
             }
         }
-        //число точек на которые подается информация(не включая биос точки)
+        /*число точек на которые подается информация(не включая биос точки)
         //TODO проблема возникает в неправильно забракованых(false) нодах
-        //бракуются не те ноды ,которые необходимо менять ,если запретить происходит магия(работает дольше ,результат неверный
-        //и веса нод становятся огромными
+        бракуются не те ноды ,которые необходимо менять ,если запретить происходит магия(работает дольше ,результат неверный
+        и веса нод становятся огромными*/
 
         //всю ето парашуу еще и удалить нельзя ,выдает результат неверный
         if(SET_FIRST_LAYER_NODES_NON_RANDOM_VALUE) {
@@ -145,19 +145,19 @@ public class Network_Teacher {
          return null;
     }*/
     
-    //TODO СОХРАНЯТЬ ТИП ОЩИБКИ(ОШИБКА ПОЕДАНИЯ ОРГАНИКИ,ОШИБКА ДЕЛЕНИЯ)
+    //TODO Розделять ошибки в зависимости от ожидаемого результата
     
     
-    float teach(Network student,Data_Set data_set,boolean secondLRate){//Ruturns final dot error
+    float teach(Network student,Data_Set data_set,boolean secondLRate){//Returns final dot error
         Dot crutch=new Dot(Dot_Type.OUTPUT);//TODO УБРАТЬ КОСТЫЛЬ
         for(ArrayList<Dot> dotArr: student.dotsArr){//clear dots value (DON`T DELETE)
             for(Dot dot:dotArr){
-                dot.clear();//сбросс данных точки(значение,ошибка,дельта весов)
+                dot.clear();//сброс данных точки(значение,ошибка,дельта весов)
             }
         }
         Random r=new Random();
         int i=r.nextInt(data_set.inOuts.size());//Choose random data from data_set
-        //System.out.println("ee:"+ student.evaluteFitness( data_set.inputs.get(i),true));
+        /*System.out.println("ee:"+ student.evaluteFitness( data_set.inputs.get(i),true));
         /*Random r=new Random();
         int i=r.nextInt(data_set.inOuts.size());//Choose random data from data_set
         //System.out.println("ee:"+ student.evaluteFitness( data_set.inputs.get(i),true));

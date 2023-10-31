@@ -46,7 +46,21 @@ public class NormCell implements  Serializable {
     }
 
     Color myColor=Color.green;
-   /* public NormCell(long myParentNum){
+   
+
+    
+
+    public NormCell(Network brain){//brain doesnt copy need to clone
+    	Random r=new Random();
+        this.brain=BrainCloneClass.networkClone(brain);
+        myNum=num;
+        num++;
+        energy=NORM_CELL_START_ENERGY;
+        cellls++;
+        if(r.nextBoolean());
+        brain.mutate(2);//TODO delete it   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    }
+/* public NormCell(long myParentNum){
         myNum=num;
         num++;
         cellls++;
@@ -57,18 +71,6 @@ public class NormCell implements  Serializable {
 
         }
     }*/
-
-    
-
-    public NormCell(Network brain){//brain doesnt copy need to clone
-        this.brain=BrainCloneClass.networkClone(brain);
-        myNum=num;
-        num++;
-        energy=NORM_CELL_START_ENERGY;
-        cellls++;
-        brain.mutate(10);//TODO delete it   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    }
-
     float isRaedyToMultiply(){
         if(energy>ENERGY_NEEDED_TO_MULTIPLY+2){
             return 1;
@@ -92,11 +94,11 @@ public class NormCell implements  Serializable {
     public void move(Directions d){
         Random random=new Random();
         int i5 = random.nextInt(2);
-        switch (d){
+        switch (d){/*TODO THINK ABOUT*/
             case DOWN ->{
                 y++;
                 if (  y<height && cells[x][y].secCell==null && cells[x][y].partCell==null  && myParts.size()==0){
-                cells[x][y].setSecCell(cells[x][y-1].secCell);
+                cells[x][y].setSecCell(this);
                 cells[x][y-1].setSecCell(null);
                 }
                 else {
@@ -107,7 +109,7 @@ public class NormCell implements  Serializable {
             case UP -> {
                 y--;
                 if (y>-1 &&  y<height-1 && cells[x][y].secCell==null && cells[x][y].partCell==null  && myParts.size()==0){
-                cells[x][y].setSecCell(cells[x][y+1].secCell);
+                cells[x][y].setSecCell(this);
                 cells[x][y+1].setSecCell(null);}
                 else{
                     y++;
@@ -118,7 +120,7 @@ public class NormCell implements  Serializable {
             case LEFT ->{
                 x--;
                 if (x>-1 && cells[x][y].secCell==null && cells[x][y].partCell==null && myParts.size()==0){
-                cells[x][y].setSecCell(cells[x+1][y].secCell);
+                cells[x][y].setSecCell(this);
                 cells[x+1][y].setSecCell(null);
                 }
                 else {
@@ -128,7 +130,7 @@ public class NormCell implements  Serializable {
             }
             case RIGHT ->{ x++;
                 if(x<width && cells[x][y].secCell==null && cells[x][y].partCell==null  && myParts.size()==0){
-                cells[x][y].setSecCell(cells[x-1][y].secCell);
+                cells[x][y].setSecCell(this);
                 cells[x-1][y].setSecCell(null);
                 }
                 else {
@@ -137,7 +139,8 @@ public class NormCell implements  Serializable {
                 }
              }
         }
-      energy-=1;
+      //energy-=1; TODO ПЕРЕСМОТРЕТЬ
+        
     }
     ///////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////

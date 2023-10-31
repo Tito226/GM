@@ -2,6 +2,8 @@ package MyVersion.Frame;
 
 
 import static MyVersion.Frame.GM2_CONFIG.CELL_START_ORGANIC;
+
+import MyVersion.Core.BrainCloneClass;
 import MyVersion.Core.Core_Config;
 import MyVersion.Core.Data_Set;
 import MyVersion.Core.Network;
@@ -27,8 +29,8 @@ class PaintThread extends Thread{
     inPaintThread paint1;
     inPaintThread paint2;
     inPaintThread paint3;
-   static byte paintMode=PAINT_MODE;
-  public   void rept(){/** full repaint, used in multi thread paint mode*/
+    static byte paintMode=PAINT_MODE;
+    public   void rept(){/** full repaint, used in multi thread paint mode*/
       if(!pause){
         pause=true;
         for (int i = 0; i < width ; i++) {
@@ -47,12 +49,12 @@ class PaintThread extends Thread{
         }
     }
     }
-    public PaintThread(){
+    	public PaintThread(){
 
-    }
-    class inPaintThread extends Thread {
-        int type;
-        Graphics g;
+    	}
+    	class inPaintThread extends Thread {
+    		int type;
+    		Graphics g;
 
         public inPaintThread(Graphics g, int type) {
             this.g = g;
@@ -107,53 +109,55 @@ class PaintThread extends Thread{
                                     }
                                 }
                             }
-
                         }
                         case 3->{
                         	g.setColor(Color.BLACK);
                             g.drawString("Restarts: " + Restarts, 7, 9);
                             for (int i = 0; i < width; i++) {
-                            for (int j = 0; j < height; j++) {
+                            	for (int j = 0; j < height; j++) {
                             	
-                                if (cells[i][j] != null) {
-                                    if (cells[i][j].secCell == null && cells[i][j].partCell == null) {
+                            		if (cells[i][j] != null) {
+                            			if (cells[i][j].secCell == null && cells[i][j].partCell == null) {
                                             g.setColor(cells[i][j].getColor());
                                             g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-                                    } else if (cells[i][j].secCell != null && cells[i][j].partCell == null) {
+                            			} else if (cells[i][j].secCell != null && cells[i][j].partCell == null) {
                                             g.setColor(cells[i][j].secCell.getColor());
                                             g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-                                    }
-                                    if (cells[i][j] != null && cells[i][j].partCell != null) {
+                            			}
+                            			if (cells[i][j] != null && cells[i][j].partCell != null) {
                                             g.setColor(cells[i][j].partCell.getColor());
                                             g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-                                    }
-                                }
-                            }
+                            			}
+                            		}
+                            	}
+                            }  
+                            g.setColor(Color.BLACK);
+                            g.drawString("Restarts: " + Restarts, 7, 9);
                         }
-                            
-                        }
+                        
                     }
                     
             }
+             
          }
         }
 
-    }
+    	}
 
-    @Override
-    public void run() {
-                paint(world.getGraphics());
-    }
+    	@Override
+    	public void run() {
+    		paint(world.getGraphics());
+    	}
 
-    public void paint(Graphics g) {
-        long startTime = System.currentTimeMillis();
-        if(paintMode==2) {
-            if (paint1 == null) {
+    	public void paint(Graphics g) {
+    		long startTime = System.currentTimeMillis();
+    		if(paintMode==2) {
+    			if (paint1 == null) {
 
-                paint1 = new inPaintThread(g, 1);
-                paint2 = new inPaintThread(g, 2);
-                paint1.start();
-                paint2.start();
+    				paint1 = new inPaintThread(g, 1);
+                	paint2 = new inPaintThread(g, 2);
+                	paint1.start();
+                	paint2.start();
             }
         }else if (paintMode==1){
             if (paint1 == null) {
@@ -184,13 +188,13 @@ public class World extends JPanel implements Runnable  {
     static PaintThread paintThread;
     public World(int width,int height) throws IOException {
         Network_Teacher network_teacher=new Network_Teacher();
-        relative=network_teacher.mainy();
+        relative=network_teacher.createAndTeachNetwork();
         this.height=height;
         this.width=width;
         cells=new Cell[width][height];
     }
     static World world;
-  static   Thread wor;
+    static   Thread wor;
 
 
 public static Cell[][] getCells(){
@@ -259,8 +263,10 @@ public static Cell[][] getCells(){
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         frame.setVisible(true);
         wor =new Thread(world);
-        paintThread= new PaintThread();
-        paintThread.start();
+        if(PAINT_MODE!=0) {
+        	paintThread= new PaintThread();
+        	paintThread.start();
+        }
         wor.start();
 
 
@@ -268,8 +274,8 @@ public static Cell[][] getCells(){
 
 
     
-    public static  NormCell topLifeTimeCell=null;
-    public static NormCell topMultipliesCell=null;
+    public static Network topLifeTimeBrain=null;
+    public static Network topMultipliesCell=null;
     static  byte countt2=0;
     public static int Restarts=0;
     public  static int lastRestarts=0;
@@ -299,12 +305,11 @@ public static Cell[][] getCells(){
         }
 
 
-        byte countt=0;
+        int countt=0;
         boolean tested=false;
         ArrayList<Float[]> inputData=new ArrayList<Float[]>();
         
     while(true) {
-    	//TODO сохранять значения продолжительности жизни в случае неудовлетворительных значений запускать тест выжываемости и сравнивать значения с таковыми на практике
     	boolean isStep=false;
     	countt2++;
     	Thread.yield();
@@ -312,8 +317,8 @@ public static Cell[][] getCells(){
     	if(!pause){
         	
            
-            //step{*************************************************************************
-            //******************************************************************************
+            /*step{*************************************************************************
+            *******************************************************************************/
             int NULL_CELLS=0;
             for (int i = 0; i < width; i++) {//очистка состояния(сделал ход)
                 for (int j = 0; j < height ; j++) {
@@ -336,14 +341,15 @@ public static Cell[][] getCells(){
             			if(cells[i][j].secCell.lifeTime>bestLifeTime)
             				bestLifeTime=cells[i][j].secCell.lifeTime;
             			if(cells[i][j].secCell.lifeTime>thisBestLifeTime){
+            				topLifeTimeBrain=BrainCloneClass.networkClone(cells[i][j].secCell.brain);
             				thisBestLifeTime=cells[i][j].secCell.lifeTime;
             			}
-                    
+            			
             			if(!cells[i][j].secCell.stepN){
             				cells[i][j].secCell.stepN=true;
             				//получение входной информации ,для диагностики клетки
-            				inputData.add(cells[i][j].secCell.getInputData());//сделать ход если еще не ходил
-            				cells[i][j].secCell.step();
+            				inputData.add(cells[i][j].secCell.getInputData());
+            				cells[i][j].secCell.step();//сделать ход если еще не ходил
             				isStep=true;
 
             			}
@@ -352,34 +358,42 @@ public static Cell[][] getCells(){
 
             	}
             //   Thread.yield();
-        }
-
-        if(!isStep){
-        	System.out.println("shit");
-        }
+            }
+            paint(world.getGraphics());    
+            if(!isStep){
+            	System.out.println("shit");
+            }
             //***************************************************************
             //***************************************************************}step
 
             //reset field organic
-         if (NULL_CELLS==width*height){//установка начального состояния органики,если все умерли
+            if (NULL_CELLS==width*height){//установка начального состояния органики,если все умерли
         	 	for (int i = 0; i < height; i++) {
         	 		for (int j = 0; j < width; j++) {
         	 			cells[j][i].organic=CELL_START_ORGANIC;
         	 		}
-        	 	}
+        	 }
 
         	 	//Summon cells
         	 	for (int i = 0; i < Core_Config.CELLS_ON_START; i++) {
         	 		Random r =new Random();
-        	 		if(r.nextInt(9)==2) {
+        	 		int buff=r.nextInt(2);
+        	 		if(buff==1) {
         	 			cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(relative));
         	 			continue;
+        	 		}else  {
+        	 			cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(topLifeTimeBrain));
         	 		}
         	 	}
-
+        	 	
         	 	Restarts++;
         	 	//+++++++++++++++++++
+        	 	if(PAINT_MODE!=0) {
         	 	paintThread.rept();
+        	 	}
+        	 	else {
+        	 	paint(world.getGraphics());
+        	 	}
         	 	Thread.yield();
 
         	 	lastRestarts++;
@@ -398,10 +412,10 @@ public static Cell[][] getCells(){
 
           // long usedBytes = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
            // usedBytes/1048576>500
-           if (countt%5000==0){
-             //  System.out.println("Garbage collector started");
-               // System.gc();
-                countt=0;
+           if (countt%1000==0){
+        	   System.out.println("Garbage collector started");
+               System.gc();
+               countt=0;
            }
         }
 
@@ -410,10 +424,36 @@ public static Cell[][] getCells(){
         if(endTime - startTime>100){
         	//System.out.println("Main took " + (endTime - startTime) + " milliseconds");
 	   }
+        
     }
 
     }
 
+    public void paint(Graphics g) {
+    	g.setColor(Color.BLACK);
+        g.drawString("Restarts: " + Restarts, 7, 9);
+        for (int i = 0; i < width; i++) {
+        	for (int j = 0; j < height; j++) {
+        	
+        		if (cells[i][j] != null) {
+        			if (cells[i][j].secCell == null && cells[i][j].partCell == null) {
+                        g.setColor(cells[i][j].getColor());
+                        g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+        			} else if (cells[i][j].secCell != null && cells[i][j].partCell == null) {
+                        g.setColor(cells[i][j].secCell.getColor());
+                        g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+        			}
+        			if (cells[i][j] != null && cells[i][j].partCell != null) {
+                        g.setColor(cells[i][j].partCell.getColor());
+                        g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+        			}
+        		}
+        	}
+        } 
+        g.setColor(Color.BLACK);
+        g.drawString("Restarts: " + Restarts, 7, 9);
+    }
+    
     void cellDiagnostic(NormCell norm,ArrayList<Float[]> inputData) {//TODO вывести на екран входные данные и полученый от клетки ответ
     	System.out.println("Run Cell diag.");//TODO НАЙТИ ОТЛИЧИЯ МЕЖДУ ВХОДНЫМИ ДАННЫМИ ,СЕЙЧАС ТУТ ЧЕРНАЯ МАГИЯ ВХОДНЫЕ ДАННЫЕ ОДИНАКОВЫЕ,МЕТОД ТОЖЕ,А РЕЗУЛЬТАТЫ РАЗНЫЕ
     	System.out.print(":::: "+

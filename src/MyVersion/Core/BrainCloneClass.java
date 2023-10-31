@@ -63,13 +63,5 @@ public class BrainCloneClass {
 		return result;
 	}*/
 	
-	private static Node nodeClone(Node node,Dot to,Dot from) {//клонирует Node, доты передавать уже клонированные
-		//TODO Stub
-		Node result=new Node();
-		result.setWeight(node.getWeight());
-		result.changeble=node.changeble;
-		result.to=to;
-		result.from=from;
-		return result;
-	}
+	
 }

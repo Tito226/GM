@@ -138,5 +138,29 @@ public class Network {
 	   }
    }
 
+   public void kill() {
+	   for(ArrayList<Dot> dots : dotsArr) {
+		   for(Dot dot : dots) {
+			   dot.nodesFromMe=null;
+			   dot.nodesToMe=null;
+			   dot=null;
+		   }
+	   }
+   }
+   
+   public boolean equals(Network net) {
+	   boolean result;
+	   for(int i=0;i<this.dotsArr.size();i++) {
+		   for(int j =0;j<this.dotsArr.get(i).size();j++) {
+			   for(int x =0;x<this.dotsArr.get(i).get(j).nodesFromMe.size();x++) {
+				  if(this.dotsArr.get(i).get(j).nodesFromMe.get(x).getWeight()!=net.dotsArr.get(i).get(j).nodesFromMe.get(x).getWeight()) {
+					  return false;
+				  }
+			   }
+		   }
+	   }
+	 return true;  
+   }
+   
 
 }

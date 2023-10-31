@@ -2,8 +2,8 @@ package MyVersion.Frame;
 
 public class GM2_CONFIG {
      //GENERAL
-    public final static int CELL_SIZE=3;
-    public final static int PAINT_MODE=1; //1-1 Thread 2-2 Threads
+    public final static int CELL_SIZE=4;
+    public final static int PAINT_MODE=1; //1-one Thread 2-two Threads
      //NORMCELL SETTINGS
      public static final boolean MULTI_THREAD_EVALUTE_FITNESS_METHOD=false;
     public static final int ENERGY_NEEDED_TO_MULTIPLY=30;
@@ -11,6 +11,6 @@ public class GM2_CONFIG {
     public static final int NORM_CELL_START_ENERGY=15;
     public static final int PROTOPLAST_START_ENERGY=4;
     //CELL SETTINGS
-    public static final int CELL_START_ORGANIC=6;
+    public static final int CELL_START_ORGANIC=6;//6
 
 }

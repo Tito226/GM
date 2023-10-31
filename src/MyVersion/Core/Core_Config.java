@@ -9,7 +9,7 @@ public class Core_Config {
     public static final float BIAS_VALUE=-6f;//Value of bias dots//-7
     public static final float LEARNING_RATE =0.001F;//0.0009
     public static final float SECOND_LEARNING_RATE=0.0000007f;//0.000007
-    public static final int CELLS_ON_START=30;
+    public static final int CELLS_ON_START=90;
     //
     public static final int HIDDEN_DOTS_PER_ARRAY =25;
 

@@ -101,6 +101,7 @@ boolean isChanged(){
       if(secCell!=null  && secCell.getEnergy()>=10000 ){
           System.out.println("Cell with 10000 died");
           organic+=secCell.getEnergy();
+          secCell.brain.kill();
           secCell=null;
           cellls--;
       }
