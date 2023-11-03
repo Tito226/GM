@@ -141,6 +141,7 @@ public class Network {
    public void kill() {
 	   for(ArrayList<Dot> dots : dotsArr) {
 		   for(Dot dot : dots) {
+			   dot.kill();
 			   dot.nodesFromMe=null;
 			   dot.nodesToMe=null;
 			   dot=null;

@@ -39,4 +39,9 @@ public class Node {
     public float getWeight() {
         return weight;
     }
+
+    public void kill() {
+    	from=null;
+    	to=null;
+    }
 }

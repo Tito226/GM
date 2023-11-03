@@ -64,8 +64,7 @@ class PaintThread extends Thread{
         }
 
         public void oneThreadPaint(Graphics g) {
-    		g.setColor(Color.BLACK);
-    		g.drawString("Restarts: " + Restarts, 7, 9);
+        	Painter.statPaint(g);
     		for (int i = 0; i < width; i++) {
     			for (int j = 0; j < height; j++) {
         	
@@ -84,8 +83,7 @@ class PaintThread extends Thread{
     				}
     			}
     		}  
-    		g.setColor(Color.BLACK);
-    		g.drawString("Restarts: " + Restarts, 7, 9);
+    		Painter.statPaint(g);
         }
         
         public void two1ThreadPaint(Graphics g) {
@@ -198,7 +196,7 @@ class PaintThread extends Thread{
 }
 
 public class World extends JPanel implements Runnable  {
-
+	
     static FileInputStream fileInputStream;
     static ObjectInputStream objectInputStream;
     public Network relative;
@@ -213,6 +211,7 @@ public class World extends JPanel implements Runnable  {
     public World(int width,int height) throws IOException {
         Network_Teacher network_teacher=new Network_Teacher();
         relative=network_teacher.createAndTeachNetwork();
+        network_teacher=null;
         this.height=height;
         this.width=width;
         cells=new Cell[width][height];
@@ -232,37 +231,7 @@ public static Cell[][] getCells(){
         int width=1600;
         int height=1000;
         JFrame frame = new JFrame("GM");
-        /*frame.getRootPane().addComponentListener(new ComponentAdapter() {
-            public void componentResized(ComponentEvent e) {
-                if(!pause){
-                pause=true;
-                for (int i = 0; i < World.width; i++) {
-                    for (int j = 0; j < World.height; j++) {
-                        if(cells[i][j]!=null)
-                        cells[i][j].change=true;
-                    }
-                }
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ex) {
-                    throw new RuntimeException(ex);
-                }
-                pause=false;
-                }else{
-                    for (int i = 0; i < World.width; i++) {
-                        for (int j = 0; j < World.height; j++) {
-                            if(cells[i][j]!=null)
-                                cells[i][j].change=true;
-                        }
-                    }
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                }
-            }
-        });*/
+        
         JButton pauseButton = new JButton("Pause");
         JButton dePauseButton = new JButton("Continue");
         pauseButton.addActionListener(new PauseListener());
@@ -302,17 +271,17 @@ public static Cell[][] getCells(){
     
     public static Network topLifeTimeBrain=null;
     public static Network topMultipliesCell=null;
+    public static int bestLifeTime=0;
+    public static int bestMultiplies=-1;
+    public static int thisBestLifeTime=0;
+    public static int lastBestLifeTime=0;
+    public static int lastLastBestLifeTime=0;
     static  byte countt2=0;
     public static int Restarts=0;
-    public  static int lastRestarts=0;
+    public static int lastRestarts=0;
     @Override
     public void run() {
-    	int bestLifeTime=0;
-        int bestMultiplies=-1;
-        int thisBestLifeTime=0;
-        int lastBestLifeTime=0;
-        int lastLastBestLifeTime=0;
-        long cellsNum=0;
+    	
         for (int j = 0; j < height; j++) {
             for (int i = 0; i < width ; i++) {
                 cells[i][j]=new Cell();
@@ -377,7 +346,10 @@ public static Cell[][] getCells(){
             			if(!cells[i][j].secCell.stepN){
             				cells[i][j].secCell.stepN=true;
             				//получение входной информации ,для диагностики клетки
+            				if(Restarts<10) {
             				inputData.add(cells[i][j].secCell.getInputData());
+            				} else {inputData=null;
+            				}
             				cells[i][j].secCell.step();//сделать ход если еще не ходил
             				isStep=true;
 
@@ -386,7 +358,6 @@ public static Cell[][] getCells(){
             		}
 
             	}
-            //   Thread.yield();
             }
             
             
@@ -427,7 +398,6 @@ public static Cell[][] getCells(){
         	 		paint1(world.getGraphics());
         	 	}
         	 	
-        	 	Thread.yield();
 
         	 	lastRestarts++;
         	 	System.out.println("Restarted");
@@ -487,7 +457,7 @@ public static Cell[][] getCells(){
         g.drawString("Restarts: " + Restarts, 7, 9);
     }
     
-    void cellDiagnostic(NormCell norm,ArrayList<Float[]> inputData) {//TODO вывести на екран входные данные и полученый от клетки ответ
+    void cellDiagnostic(NormCell norm,ArrayList<Float[]> inputData) {
     	System.out.println("Run Cell diag.");//TODO НАЙТИ ОТЛИЧИЯ МЕЖДУ ВХОДНЫМИ ДАННЫМИ ,СЕЙЧАС ТУТ ЧЕРНАЯ МАГИЯ ВХОДНЫЕ ДАННЫЕ ОДИНАКОВЫЕ,МЕТОД ТОЖЕ,А РЕЗУЛЬТАТЫ РАЗНЫЕ
     	System.out.print(":::: "+
         		norm.evaluateFitness(new Float[]{0f,15f,6f,0f,0f,0f,0f})+"тест 1     ");

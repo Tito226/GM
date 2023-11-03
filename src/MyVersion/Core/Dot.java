@@ -95,6 +95,12 @@ public class Dot {
     static float activationFunctionDX(float x){
       return   activaionFunction(x)*(1-activaionFunction(x));
     }
+    
+    public void kill() {
+    	for(Node node: nodesToMe) {
+    		node.kill();
+    	}
+    }
    
     
 }

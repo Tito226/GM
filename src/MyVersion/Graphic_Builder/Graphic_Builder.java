@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import static MyVersion.Core.Core_Config.TEACH_ITERATIONS;
 import static MyVersion.Graphic_Builder.Graphic_Builder_Config.*;
 import static java.lang.Thread.sleep;
-import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
+import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 import static MyVersion.Graphic_Builder.Graphic_Builder_Config.VALUE_MULTIPLIER;
 public class Graphic_Builder {
     static int weight=1200;
@@ -16,7 +16,7 @@ public class Graphic_Builder {
     public static void main(String[] args) {//run it to test
         JFrame frame=new JFrame("Frame");
         frame.setSize(weight, height);
-        frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         frame.setVisible(true);
         Graphics g= frame.getGraphics();
         float[] floats=new float[990000];
@@ -41,7 +41,7 @@ public class Graphic_Builder {
             public void run() {
                 JFrame frame=new JFrame("Result");
                 frame.setSize(weight, height);
-                frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+                frame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
                 frame.setVisible(true);
                 Graphics g= frame.getGraphics();
                 while(true){

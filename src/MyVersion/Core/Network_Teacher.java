@@ -1,31 +1,80 @@
 package MyVersion.Core;
 
+import MyVersion.Frame.ContinueListener;
+import MyVersion.Frame.FileOpenListener;
+import MyVersion.Frame.FileSaveListener;
+import MyVersion.Frame.PauseListener;
 import MyVersion.Frame.World;
 import MyVersion.Graphic_Builder.Graphic_Builder;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.GridLayout;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Random;
 
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
 import static MyVersion.Core.Core_Config.*;
 import static MyVersion.Core.Data_Set.rnd;
 import static MyVersion.Frame.GM2_CONFIG.ENERGY_NEEDED_TO_MULTIPLY;
+import static MyVersion.Frame.World.Restarts;
+import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
+import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
-public class Network_Teacher {
+public class Network_Teacher extends JPanel {
+	public static int percent=0;
 
-    public static float[] fullTeach(Network student){
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 123425L;
+	public static float[] fullTeach(Network student){
         float[] errors=new float[TEACH_ITERATIONS];//TODO may change to long
         Data_Set data_set=new Data_Set();
         Network_Teacher teacher=new Network_Teacher();
         teacher.randomize(student);
         int percent=0;
+        Runnable task = () -> {
+        	 JFrame frame = new JFrame("Wait...");  
+             JPanel controls = new JPanel();
+             controls.setLayout(new GridLayout(2, 1));
+             JPanel controls2 = new JPanel(); // справа будет панель с управлением
+             frame.add(teacher, BorderLayout.CENTER);
+             frame.setSize(300, 100);
+             frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
+             frame.setVisible(true);
+            while(Network_Teacher.percent!=100) {
+            	teacher.getGraphics().clearRect(0, 0, 50, 20);
+            	teacher.getGraphics().setColor(Color.BLACK);
+            	teacher.getGraphics().drawString( Network_Teacher.percent+"%", 7, 9);
+            	try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Автоматически созданный блок catch
+					e.printStackTrace();
+				}
+    
+            } 
+            frame.setVisible(false);
+            frame=null;
+            controls=null;
+            };
+    	Thread thread = new Thread(task);
+    	thread.start();
         for (int i = 0; i < TEACH_ITERATIONS; i++) {
         	
         	if((int)(percent/100f*TEACH_ITERATIONS)==i  ) {//this is progress counter
             	System.out.println(percent+"%");
             	percent++;
+            	Network_Teacher.percent=percent;
             }//else if(i>116998 && i<117003)
             	//System.out.println(percent/100f*TEACH_ITERATIONS);
             	
@@ -78,7 +127,6 @@ public class Network_Teacher {
         suitabilityTest(student);
         Graphic_Builder.createGraphic(errors);
     }
-
     public  Network createAndTeachNetwork() throws IOException {//must create and tune network
         Network student=new Network(1);
         float[] errors=fullTeach(student);
@@ -97,16 +145,12 @@ public class Network_Teacher {
                 }
             }
         }
-        /*число точек на которые подается информация(не включая биос точки)
-        //TODO проблема возникает в неправильно забракованых(false) нодах
-        бракуются не те ноды ,которые необходимо менять ,если запретить происходит магия(работает дольше ,результат неверный
-        и веса нод становятся огромными*/
+        
 
         //всю ето парашуу еще и удалить нельзя ,выдает результат неверный
         if(SET_FIRST_LAYER_NODES_NON_RANDOM_VALUE) {
 
             for (int i = student.dotsArr.get(0).size() - 1 - BIAS; i > 0; i--) {
-                //TODO  -BIAS решает ошибку(IndexOutOfBoundsExeption(вызов елемента на 1 больше масива))
                 for (int j = 0; j < student.dotsArr.get(1).size() - BIAS; j++) {//"< student.dotsArr.get(1).size()-1" may be changed to "student.dotsArr.get(0).get(i).nodesFromMe.size()"
                     student.dotsArr.get(0).get(i).nodesFromMe.get(j).setWeight(FIRST_LAYER_NODES_VALUE);
                     student.dotsArr.get(0).get(i).nodesFromMe.get(j).changeble=false;//TODO delete it
