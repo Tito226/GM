@@ -9,16 +9,16 @@ import static MyVersion.Frame.World.*;
 
 public  class Cell {
     boolean isChanged=true;
-//public static int startEnergy=CELL_START_ORGANIC;
-int[] color;
+    //public static int startEnergy=CELL_START_ORGANIC;
+    int[] color;
     Color myColor ;
     //int energy=1;
-NormCell secCell;
-PartCell partCell;
-   private int x;
+    NormCell secCell;
+    PartCell partCell;
+    private int x;
     private int y;
     public int organic=CELL_START_ORGANIC;
-private boolean nothing=true;
+    private boolean nothing=true;
     public int getX() {
         return x;
     }
@@ -26,9 +26,9 @@ private boolean nothing=true;
     public int getY() {
         return y;
     }
-public void setSecCell(NormCell secCell){
-      this.secCell=secCell;
-}
+    public void setSecCell(NormCell secCell){
+    	this.secCell=secCell;
+    }
     public void setSecCell(int i){
 
     }
@@ -45,60 +45,71 @@ public void setSecCell(NormCell secCell){
     }
 
     void step(){
-if( secCell!=null){
-    secCell.step();
-}
-else{} //System.out.println(" ");
+    	if( secCell!=null){
+    		secCell.step();
+    	}
+    	else{} //System.out.println(" ");
     }
-   boolean getSecCell(){
+    boolean getSecCell(){
         if(secCell!=null){
             return true;
-        }else return false;
-   }
-   boolean getPartCell(){
+        }else
+        	return false;
+    }
+    boolean getPartCell(){
         if(partCell!=null){
             return true;
         }else return false;
     }
-    boolean change=false;
-   boolean lastNCell=false;
+    private boolean change=false;
+    boolean lastNCell=false;
     boolean lastPCell=false;
     int lastOrganic=0;
-boolean isChanged(){
-        if (lastPCell!=getPartCell() || lastNCell!=getSecCell() || lastOrganic!=organic || lastRestarts!=Restarts){
+    private boolean isChanged(){
+        if (lastPCell!=getPartCell() || lastNCell!=getSecCell() 
+        	 || lastOrganic!=organic || lastRestarts!=Restarts){
             return true;
+        }else{
+            return false;
         }
-        if(change){
-            change=false;
-            return true;
-        }
-        else{
-            return false;}
-}
+    }
+    
+    private synchronized boolean getOrSetChange(boolean get,boolean value) {
+    	if(get) {
+    		return change;
+    	} else {
+    		change=value;
+    		return false;
+    	}
+    }
   void testCell(){
-    lastNCell=getSecCell();
-    lastPCell=getPartCell();
-    lastOrganic=organic;
-        try{
-        if(organic<255 && organic>0){
-        color=new int[3];
+	  setChange(isChanged());
+      lastNCell=getSecCell();
+	  lastPCell=getPartCell();
+	  lastOrganic=organic;
+	  //TODO  ПОФИКСИТЬ
+	  try{
+		  if(organic<255 && organic>0){
+			  color=new int[3];
 
-          color[0]=255-organic;
-          color[1]=255-organic;
-            color[2]=255-organic;
-        myColor=new Color(color[0],color[1],color[2]);
-         }
-        }catch (IllegalArgumentException e){
-            System.out.println(color[0]);
-            System.out.println(color[1]);
-            System.out.println(color[2]);
-        }
-        if(secCell!=null  && secCell.getEnergy()<=0  ){
-            organic+=secCell.getEnergy();
-            secCell=null;
-            cellls--;
-        }
-      if(secCell!=null  && secCell.getEnergy()>=10000 ){
+			  color[0]=255-organic;
+			  color[1]=255-organic;
+			  color[2]=255-organic;
+			  myColor=new Color(color[0],color[1],color[2]);
+		  }
+	  }catch (IllegalArgumentException e){
+		  System.out.println(color[0]);
+		  System.out.println(color[1]);
+		  System.out.println(color[2]);
+	  }
+	  if(secCell!=null  && secCell.getEnergy()<=0  ){
+		  organic+=secCell.getEnergy();
+		  secCell.brain.kill();
+		  secCell=null;
+		  cellls--;
+		  setChange(true);
+	  }
+	  if(secCell!=null  && secCell.getEnergy()>=10000 ){
           System.out.println("Cell with 10000 died");
           organic+=secCell.getEnergy();
           secCell.brain.kill();
@@ -108,11 +119,12 @@ boolean isChanged(){
       if(partCell!=null){
           partCell.test();
       }
+      
   }
 
-public Color getColor(){
+  	public Color getColor(){
         return myColor;
-}
+  	}
 
 
     public void setOrganic(int organic) {
@@ -122,4 +134,12 @@ public Color getColor(){
     public int getOrganic() {
         return organic;
     }
+
+	public boolean isChange() {
+		return getOrSetChange(true,change);
+	}
+
+	public void setChange(boolean change) {
+		getOrSetChange(false,change);
+	}
 }

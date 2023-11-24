@@ -36,7 +36,7 @@ class PaintThread extends Thread{
         for (int i = 0; i < width ; i++) {
             for (int j = 0; j < World.height; j++) {
                 if(cells[i][j]!=null)
-                    cells[i][j].change=true;
+                    cells[i][j].setChange(true);;//set,true
             }
         }
         pause=false;
@@ -44,7 +44,7 @@ class PaintThread extends Thread{
         for (int i = 0; i < width ; i++) {
             for (int j = 0; j < World.height; j++) {
                 if(cells[i][j]!=null)
-                    cells[i][j].change=true;
+                    cells[i][j].setChange(true);
             }
         }
     }
@@ -87,45 +87,60 @@ class PaintThread extends Thread{
         }
         
         public void two1ThreadPaint(Graphics g) {
+        	Painter.statPaint(g);
         	for (int i = 0; i < width / 2; i++) {
                 for (int j = 0; j < height; j++) {
                     if (cells[i][j] != null) {
-                        if (cells[i][j].secCell == null && cells[i][j].partCell == null) {
-                            if(cells[i][j].isChanged()){
+                        if (cells[i][j].secCell == null && cells[i][j].partCell == null && cells[i][j].organic!=CELL_START_ORGANIC) {
+                            if(cells[i][j].isChange()){//get change TODO ПОЧИНИТЬ
                             g.setColor(cells[i][j].getColor());
-                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);}
+                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+                            cells[i][j].setChange(false);
+                            }
                         } else if (cells[i][j].secCell != null && cells[i][j].partCell == null) {
-                            if(cells[i][j].isChanged()){
+                            if(cells[i][j].isChange()){
                             g.setColor(cells[i][j].secCell.getColor());
-                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);}
+                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+                            cells[i][j].setChange(false);
+                            }
                         }
                         if (cells[i][j] != null && cells[i][j].partCell != null) {
-                            if(cells[i][j].isChanged()){
+                            if(cells[i][j].isChange()){
                             g.setColor(cells[i][j].partCell.getColor());
-                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);}
+                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+                            cells[i][j].setChange(false);
+                            }
                         }
                     }
                 }
             }
+        	Painter.statPaint(g);
     	}
         
         public void two2ThreadPaint(Graphics g) {
         	for (int i = width / 2; i < width; i++) {
                 for (int j = 0; j < height; j++) {
                     if (cells[i][j] != null) {
-                        if (cells[i][j].secCell == null && cells[i][j].partCell == null) {
-                            if(cells[i][j].isChanged()){
+                        if (cells[i][j].secCell == null && cells[i][j].partCell == null
+                        		&& cells[i][j].organic!=CELL_START_ORGANIC) {
+                            if(cells[i][j].isChange()){
                             g.setColor(cells[i][j].getColor());
-                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);}
+                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+                            cells[i][j].setChange(false);
+                            }
                         } else if (cells[i][j].secCell != null && cells[i][j].partCell == null) {
-                            if(cells[i][j].isChanged()){
+                            if(cells[i][j].isChange()){
                             g.setColor(cells[i][j].secCell.getColor());
-                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);}
+                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+                            cells[i][j].setChange(false);
+                            }
                         }
                         if (cells[i][j] != null && cells[i][j].partCell != null) {
-                            if(cells[i][j].isChanged()){
+                            if(cells[i][j].isChange()){
                             g.setColor(cells[i][j].partCell.getColor());
-                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);}
+                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+                            cells[i][j].setChange(false);
+                            }
                         }
                     }
                 }
@@ -228,8 +243,8 @@ public static Cell[][] getCells(){
 	
 
     public static void main(String[] args) throws  IOException {
-        int width=1600;
-        int height=1000;
+        int width=1200;
+        int height=800;
         JFrame frame = new JFrame("GM");
         
         JButton pauseButton = new JButton("Pause");
@@ -311,10 +326,9 @@ public static Cell[][] getCells(){
     	if(!pause){
         	
     		if(PAINT_MODE==0) {
-    	 		paint1(world.getGraphics());
+    	 		Painter.ecoPaint(world.getGraphics());
     	 	}
-    	 		
-    	 	         
+      
             /*step{*************************************************************************
             *******************************************************************************/
             int NULL_CELLS=0;
@@ -326,7 +340,6 @@ public static Cell[][] getCells(){
                     cells[i][j].testCell();//проверяет на ошибки, убивает клетку ,если кончилась енергия, назначает цвет
                 }
             }
-
             for (int i = 0; i < width; i++) {
             	for (int j = 0; j < height ; j++) {
             		if (cells[i][j].secCell==null){//подсчет населения наоборот
@@ -358,58 +371,19 @@ public static Cell[][] getCells(){
             		}
 
             	}
-            }
-            
-            
-    	 	  
+            }	 	  
             if(!isStep){
             	System.out.println("shit");
             }
             //***************************************************************
             //***************************************************************}step
-
             //reset field organic
-            if (NULL_CELLS==width*height){//установка начального состояния органики,если все умерли
-        	 	for (int i = 0; i < height; i++) {
-        	 		for (int j = 0; j < width; j++) {
-        	 			cells[j][i].organic=CELL_START_ORGANIC;
-        	 		}
-        	 	}
-
-        	 	//Summon cells
-        	 	for (int i = 0; i < Core_Config.CELLS_ON_START; i++) {
-        	 		Random r =new Random();
-        	 		int buff=r.nextInt(2);
-        	 		if(buff==1) {
-        	 			cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(relative));
-        	 			continue;
-        	 		}else  {
-        	 			cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(topLifeTimeBrain));
-        	 		}
-        	 	}
-        	 	
-        	 	Restarts++;
-        	 	//+++++++++++++++++++
-        	 	if(PAINT_MODE!=0) {
-        	 		paintThread.rept();
-        	 		
-        	 	}
-        	 	else {
-        	 		paint1(world.getGraphics());
-        	 	}
-        	 	
-
-        	 	lastRestarts++;
-        	 	System.out.println("Restarted");
-        	 	System.out.println("best life time: "+ bestLifeTime);
-        	 	System.out.println("this Best Life Time: " +thisBestLifeTime);
-        	 	lastLastBestLifeTime=lastBestLifeTime;
-        	 	lastBestLifeTime=thisBestLifeTime;
+            if (NULL_CELLS==width*height){//on restart
         	 	if(lastBestLifeTime==thisBestLifeTime&& thisBestLifeTime!=0 && !tested) {
         	 		cellDiagnostic(new NormCell(relative),inputData);
         	 		tested=true;
         	 	}
-        	 	thisBestLifeTime=0;
+        	 	onRestart();
          	}
 
 
@@ -419,6 +393,9 @@ public static Cell[][] getCells(){
         	   System.out.println("Garbage collector started");
                System.gc();
                countt=0;
+           }
+           if(PAINT_MODE==0) {
+   	 		Painter.ecoPaint(world.getGraphics());
            }
         }
 
@@ -432,6 +409,46 @@ public static Cell[][] getCells(){
 
     }
 
+    private void onRestart() {
+    	//установка начального состояния органики,если все умерли
+	 	for (int i = 0; i < height; i++) {
+	 		for (int j = 0; j < width; j++) {
+	 			cells[j][i].organic=CELL_START_ORGANIC;
+	 		}
+	 	}
+
+	 	//Summon cells
+	 	for (int i = 0; i < Core_Config.CELLS_ON_START; i++) {
+	 		Random r =new Random();
+	 		int buff=r.nextInt(2);
+	 		if(buff==1) {
+	 			cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(relative));
+	 			continue;
+	 		}else  {
+	 			cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(topLifeTimeBrain));
+	 		}
+	 	}
+	 	
+	 	Restarts++;
+	 	//+++++++++++++++++++
+	 	if(PAINT_MODE!=0) {
+	 		paintThread.rept();
+	 		
+	 	}
+	 	else {
+	 		paint1(world.getGraphics());
+	 	}
+	 	
+
+	 	lastRestarts++;
+	 	System.out.println("Restarted");
+	 	System.out.println("best life time: "+ bestLifeTime);
+	 	System.out.println("this Best Life Time: " +thisBestLifeTime);
+	 	lastLastBestLifeTime=lastBestLifeTime;
+	 	lastBestLifeTime=thisBestLifeTime;
+	 	thisBestLifeTime=0;
+    }
+    
     public void paint1(Graphics g) {
     	g.setColor(Color.BLACK);
         g.drawString("Restarts: " + Restarts, 7, 9);
@@ -456,6 +473,8 @@ public static Cell[][] getCells(){
         g.setColor(Color.BLACK);
         g.drawString("Restarts: " + Restarts, 7, 9);
     }
+    
+    
     
     void cellDiagnostic(NormCell norm,ArrayList<Float[]> inputData) {
     	System.out.println("Run Cell diag.");//TODO НАЙТИ ОТЛИЧИЯ МЕЖДУ ВХОДНЫМИ ДАННЫМИ ,СЕЙЧАС ТУТ ЧЕРНАЯ МАГИЯ ВХОДНЫЕ ДАННЫЕ ОДИНАКОВЫЕ,МЕТОД ТОЖЕ,А РЕЗУЛЬТАТЫ РАЗНЫЕ

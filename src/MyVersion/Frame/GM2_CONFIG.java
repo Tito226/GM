@@ -3,7 +3,7 @@ package MyVersion.Frame;
 public class GM2_CONFIG {
      //GENERAL
     public final static int CELL_SIZE=4;
-    public final static int PAINT_MODE=1; //1-one Thread 2-two Threads
+    public final static int PAINT_MODE=0; //1-one Thread 2-two Threads
      //NORMCELL SETTINGS
      public static final boolean MULTI_THREAD_EVALUTE_FITNESS_METHOD=false;
     public static final int ENERGY_NEEDED_TO_MULTIPLY=30;

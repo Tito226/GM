@@ -31,7 +31,7 @@ public class NormCell implements  Serializable {
     static long num = 0L;
     private final long myNum;
     boolean stepN=false;
-    private int energy;
+    int energy;
     private int x;
     private int y;
     NormCellType normCellType=NormCellType.MOVABLE;
@@ -310,7 +310,7 @@ public class NormCell implements  Serializable {
 
         }
         if(outputs[0]>0.64 && outputs[0]<0.68){
-        	new  Protoplast(outputs[0],x,y);
+        	new  Protoplast(this, outputs[0],x,y);
        //   System.out.println("WRYYYYY");
         }
         if (outputs[0]>0.3 && outputs[0]<0.35){
@@ -369,7 +369,7 @@ public class NormCell implements  Serializable {
       	 if (!eatCell(Directions.DOWN)){energy--;}
 
        }else if(output>0.64 && output<0.68){
-    	   protoplast=new Protoplast(output,x,y);
+    	   protoplast=new Protoplast(this, output,x,y);
        }else if(output>0.68 && output<0.8){
 
 
@@ -695,155 +695,5 @@ void transferEnergy(float output){
     }
 
 
-///////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////
-        public class Protoplast implements PartCell{
-            Integer[] myCoords=new Integer[2];
-         Color color=Color.CYAN;
-         String myName;
-         int energy1 =PROTOPLAST_START_ENERGY;
-
-         void transferEnergy(){
-         if(energy1>=4){
-         cells[x][y].secCell.energy+=energy1/2;
-         energy1-=energy1/2;
-         }
-         }
-         byte countb=0;
-
-         public int getEnergy() {
-            return energy1;
-        }
-
-          @Override
-          public void step(float output) {
-            eatSunE();
-            if(output>0.0 && output<0.2){
-            transferEnergy();
-            }else if(output>0.64 && output<0.68) {
-            new Protoplast(output,xxx,yyy);
-            }
-
-
-            if(countb%2==0){
-                energy1--;
-            }
-            countb++;
-          }
-
-        @Override
-        public void test() {
-
-            try {
-
-            if( cells[getX()][getY()].secCell==null ){
-              cells[xxx][yyy].partCell=null;
-              cells[xxx][yyy].organic+=energy1;
-              if(myParts!=null){
-                 myParts.remove(myCoords);
-              }
-            }
-            }catch (Exception e){
-                e.printStackTrace();
-               System.out.println("proto: "+getXx()+" "+getYy());
-                System.out.println("nomCell: "+getX()+" "+getY());
-            }
-        }
-
-        public Protoplast(float f,int x,int y){
-
-            boolean done=false;
-          if(f>0.64 && f<0.65){
-              if (y>0 && cells[x][y-1].secCell==null && cells[x][y-1].partCell==null) {
-                  myName = partName + partNum;
-                  partNum++;
-                  cells[x][y - 1].partCell = this;
-                  myCoords[0]=x;
-                  myCoords[1]=y-1;
-                  myParts.add(myCoords);
-                  done=true;
-              }
-          }  if(f>0.65 && f<0.66){
-                  if (y<height-1 && cells[x][y+1].secCell==null && cells[x][y+1].partCell==null) {
-                      myName=partName+partNum;
-                      partNum++;
-                      cells[x][y+1].partCell=this;
-                      myCoords[0]=x;
-                      myCoords[1]=y+1;
-                      myParts.add(myCoords);
-                      done=true;
-                  }
-              } if(f>0.66 && f<0.67){
-                  if (x<width-1 && cells[x+1][y].secCell==null && cells[x+1][y].partCell==null) {
-                      myName=partName+partNum;
-                      partNum++;
-                      cells[x+1][y].partCell=this;
-                      myCoords[0]=x+1;
-                      myCoords[1]=y;
-                      myParts.add(myCoords);
-                      done=true;
-                  }
-              }   if(f>0.67 && f<0.68){
-                  if (x>0 && cells[x-1][y].secCell==null && cells[x-1][y].partCell==null) {
-                      myName=partName+partNum;
-                      partNum++;
-                      cells[x-1][y].partCell=this;
-                      myCoords[0]=x-1;
-                      myCoords[1]=y;
-                      myParts.add(myCoords);
-                      done=true;
-                  }
-              }
-          if (done){
-              energy-=ENERGY_NEEDED_TO_MULTIPLY_PROTOPLAST;
-              xxx=myCoords[0];
-              yyy=myCoords[1];
-          }
-        }
-       private    int xxx;
-       private int yyy;
-
-        void eatSunE(){
-            energy1=energy1+ World.sunny;
-
-        }
-
-
-        public int getYy() {
-            return yyy;
-        }
-
-        public int getXx() {
-            return xxx;
-        }
-
-        public void setY(int y) {
-            yyy = y;
-        }
-
-        public void setX(int x) {
-            xxx = x;
-        }
-
-        @Override
-        public Color getColor() {
-            return color;
-        }
-    }
-
-
 
 }
-
-
-        interface PartCell{
-        Integer[] myCoords = new Integer[2];
-        void step(float output);
-        void test();
-        int getEnergy();
-        Color getColor();
-        void setY(int y);
-        void setX(int x);
-            int getXx();
-            int getYy();
-        }
