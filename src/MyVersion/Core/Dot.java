@@ -5,14 +5,14 @@ import java.util.ArrayList;
 import static MyVersion.Core.Core_Config.BIAS_VALUE;
 
 public class Dot {
-    float weightsDelta;
-    float error;
-    public float value=0.0f;
+	double weightsDelta;
+    double error;
+    public double value=0.0f;
     Dot_Type myType;
     public ArrayList<Node> nodesFromMe=new ArrayList<>();
     public ArrayList<Node> nodesToMe=new ArrayList<>();
     
-    public Dot(float weightsDelta,float error,float value,Dot_Type myType,ArrayList<Node> nodesFromMe,ArrayList<Node> nodesToMe) {
+    public Dot(double weightsDelta,double error,double value,Dot_Type myType,ArrayList<Node> nodesFromMe,ArrayList<Node> nodesToMe) {
     	this.weightsDelta=weightsDelta;
     	this.error=error;
     	this.value=value;
@@ -35,7 +35,7 @@ public class Dot {
          error=0f;
          weightsDelta=0f;
     }
-    void evalute(){
+    synchronized void evalute(){
         if(myType==Dot_Type.OUTPUT){
             value=activaionFunction(value);
         }else if(myType!= Dot_Type.BIAS_TYPE){
@@ -54,15 +54,15 @@ public class Dot {
         	}
         
     }
-    float getOutpup(){
+    double getOutpup(){
       return value;
     }
 
-    public void setValue(float value) {
+    public synchronized void setValue(double value) {
         this.value = value;
     }
 
-    public float getValue() {
+    public double getValue() {
         return value;
     }
     
@@ -87,12 +87,11 @@ public class Dot {
         }
     }
 
-    static float activaionFunction(float x){
-        float e =2.71828f;
-        return (float) (1/(1+ Math.pow(e,-x)));
+    static double activaionFunction(double x){
+        return (1/(1+ Math.pow(Math.E,-x)));
     }
     
-    static float activationFunctionDX(float x){
+    static double activationFunctionDX(double x){
       return   activaionFunction(x)*(1-activaionFunction(x));
     }
     

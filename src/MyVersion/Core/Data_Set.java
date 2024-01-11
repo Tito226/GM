@@ -13,7 +13,7 @@ public class Data_Set {
     //комплект {inputs.get(i);outputs.get(i)}
     //          входы--------выходы
     
-    public HashMap<Float[],Float[]> inOuts=new HashMap();
+    public HashMap<Double[],Double[]> inOuts=new HashMap();
 
     public Data_Set(){
 
@@ -21,10 +21,10 @@ public class Data_Set {
             //INPUTS:(isReadyToMultiply,energy,organic,upCell,downCell,leftCell,rightCell)
         	//TODO Сеть не различает 1 и 3 ,можно попробовать сменить входные данные
         		Random r = new Random();
-        		inOuts.put(new Float[]{1f,rnd(ENERGY_NEEDED_TO_MULTIPLY,100),rnd(3,100),(float) r.nextInt(2),(float) r.nextInt(2),(float) r.nextInt(2),(float) r.nextInt(2)}, new Float[]{0.95f});//Multiply
-                inOuts.put(new Float[]{0f,rnd(3,ENERGY_NEEDED_TO_MULTIPLY),rnd(0,3),0f,0f,0f,0f},new Float[]{0.11f});//(output>0.1f && output<0.125f){move(Directions.Up);}
-                inOuts.put(new Float[]{0f,rnd(1,4),rnd(7,100),(float) r.nextInt(2),(float) r.nextInt(2),(float) r.nextInt(2),(float) r.nextInt(2)}, new Float[]{0.25f});//(output>0.2 && output<0.3){eatOrganic();}
-                inOuts.put(new Float[]{0f,rnd(4,ENERGY_NEEDED_TO_MULTIPLY),rnd(1,4),(float) r.nextInt(2),0f,0f,1f}, new Float[]{0.13f});//move down if right wall
+        		inOuts.put(new Double[]{1d,rnd(ENERGY_NEEDED_TO_MULTIPLY,100),rnd(3,100),(double) r.nextInt(2),(double) r.nextInt(2),(double) r.nextInt(2),(double) r.nextInt(2)}, new Double[]{0.95d});//Multiply
+                inOuts.put(new Double[]{0d,rnd(3,ENERGY_NEEDED_TO_MULTIPLY),rnd(0,3),0d,0d,0d,0d},new Double[]{0.11d});//(output>0.1f && output<0.125f){move(Directions.Up);}
+                inOuts.put(new Double[]{0d,rnd(1,4),rnd(7,100),(double) r.nextInt(2),(double) r.nextInt(2),(double) r.nextInt(2),(double) r.nextInt(2)}, new Double[]{0.25d});//(output>0.2 && output<0.3){eatOrganic();}
+                inOuts.put(new Double[]{0d,rnd(4,ENERGY_NEEDED_TO_MULTIPLY),rnd(1,4),(double) r.nextInt(2),0d,0d,1d}, new Double[]{0.13d});//move down if right wall
                 ///inOuts.put(new Float[]{0f,rnd(4,ENERGY_NEEDED_TO_MULTIPLY),rnd(1,4),1f,0f,0f,0f}, new Float[]{0.16f});//move left on up wall
                 //inOuts.put(new Float[]{0f,rnd(4,30),rnd(1,4),0f,0f,0f,1f}, new Float[]{0.635f});
                 
@@ -45,7 +45,7 @@ public class Data_Set {
     }
 
 
-    public static float rnd(int min, int max){
+    public static double rnd(int min, int max){
         max -= min;
         return (int) (Math.random() * max) + min;
     }

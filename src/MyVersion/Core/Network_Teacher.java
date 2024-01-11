@@ -79,9 +79,9 @@ public class Network_Teacher extends JPanel {
             	//System.out.println(percent/100f*TEACH_ITERATIONS);
             	
             if(!(TEACH_ITERATIONS/2<i)){
-                errors[i]=teacher.teach(student,data_set,false);//teaches network and save error
+                errors[i]=(float) teacher.teach(student,data_set,false);//teaches network and save error
             }else{
-                errors[i]=teacher.teach(student,data_set,true);
+                errors[i]=(float) teacher.teach(student,data_set,true);
             } 
         }
         return errors;
@@ -107,9 +107,9 @@ public class Network_Teacher extends JPanel {
             	percent++;
             }
             if(!(TEACH_ITERATIONS/2<i)){
-                errors[i]=teacher.teach(student,data_set,false);//teaches network and save error
+                errors[i]=(float) teacher.teach(student,data_set,false);//teaches network and save error
             }else{
-                errors[i]=teacher.teach(student,data_set,true);    
+                errors[i]=(float) teacher.teach(student,data_set,true);    
             }
         }
         return errors;
@@ -160,7 +160,7 @@ public class Network_Teacher extends JPanel {
 
                 for (int i = student.dotsArr.get(0).size()-BIAS-1; i >HOW_MUCH_INPUTS_MUST_BE_USED; i--) {//Запрет на ввод данных из лишних точек
                     for (int j = 0; j < student.dotsArr.get(1).size()-BIAS; j++) {//"< student.dotsArr.get(1).size()-1" may be changed to "student.dotsArr.get(0).get(i).nodesFromMe.size()"
-                        student.dotsArr.get(0).get(i).nodesFromMe.get(j).setWeight(0f);
+                        student.dotsArr.get(0).get(i).nodesFromMe.get(j).setWeight(0d);
                         student.dotsArr.get(0).get(i).nodesFromMe.get(j).changeble=false;
                     }
                 }
@@ -192,7 +192,7 @@ public class Network_Teacher extends JPanel {
     //TODO Розделять ошибки в зависимости от ожидаемого результата
     
     
-    float teach(Network student,Data_Set data_set,boolean secondLRate){//Returns final dot error
+    double teach(Network student,Data_Set data_set,boolean secondLRate){//Returns final dot error
         Dot crutch=new Dot(Dot_Type.OUTPUT);//TODO УБРАТЬ КОСТЫЛЬ
         for(ArrayList<Dot> dotArr: student.dotsArr){//clear dots value (DON`T DELETE)
             for(Dot dot:dotArr){
@@ -221,12 +221,12 @@ public class Network_Teacher extends JPanel {
         if(entry==null)
         	throw new Exception("ENTRY WITH DATASET VALUES IS NULL");
         */
-        ArrayList<Float[]> keys=new ArrayList(data_set.inOuts.keySet());//TODO Сохранить массив вне метода для улучшения производительности
+        ArrayList<Double[]> keys=new ArrayList(data_set.inOuts.keySet());//TODO Сохранить массив вне метода для улучшения производительности
         student.evaluteFitness( keys.get(i),true);//TODO  ПРИДУМАТЬ КАК УСКОРИТЬ, ПРИ БОЛЬШОМ ДАТАСЕТЕ СИЛЬЕО ЗАМЕДЛЯЕТСЯ
         //outputs correction
         int yy=0;
         for (Dot dot : student.dotsArr.get(student.dotsArr.size()-1)) {
-            ArrayList<Float> expected = new ArrayList<>(Arrays.asList(data_set.inOuts.get( keys.get(i))));
+            ArrayList<Double> expected = new ArrayList<>(Arrays.asList(data_set.inOuts.get( keys.get(i))));
             //down :for more than one output, dont delete
             dot.error=dot.value -expected.get(yy);//TODO ФУНКЦИЯ ПОТЕРЬ 
             crutch=dot;
@@ -250,15 +250,17 @@ public class Network_Teacher extends JPanel {
             }
 
         }
-
+        Random rand=new Random();
+        rand.nextFloat();
         for (int j = 1; j < student.dotsArr.size()+1; j++) {//hidden layer correction ,счетчик обхода массива масивов с точками пропуская входной слой 
             for (Dot dot : student.dotsArr.get(student.dotsArr.size()-j)) {//обход масива масивов с точками с конца,используя счетчик из внешнего цыкла,выбор массива с точками с конца и перебор всех точек
                 for (Node node: dot.nodesToMe) {//обход всех связей точки
-                    float weight = 0;
+                	
+                	double weight = 0;
                     if(!secondLRate){
-                        weight=node.getWeight()-node.from.value*dot.weightsDelta*LEARNING_RATE;//использовать первый коеф. обучения
+                        weight=node.getWeight()-node.from.value*dot.weightsDelta*LEARNING_RATE* (USE_R_WHILE_LEARNING==true ?rand.nextFloat() :1d);//использовать первый коеф. обучения
                     }else{
-                        weight=node.getWeight()-node.from.value*dot.weightsDelta*SECOND_LEARNING_RATE;//использовать второй коеф. обучения
+                        weight=node.getWeight()-node.from.value*dot.weightsDelta*SECOND_LEARNING_RATE*rand.nextFloat();;//использовать второй коеф. обучения
                     }
                     if(weight>THRESHOLD_NODE_VALUE ||weight<-THRESHOLD_NODE_VALUE){//fixes gradient boom(very big node values that turns value into 1)//TODO ПЕРЕДЕЛАТЬ
                         weight=THRESHOLD_WEIGHT_RESET_VALUE;//установить число по умолчанию если число выходит за рамки
@@ -278,8 +280,8 @@ public class Network_Teacher extends JPanel {
     }
     //TODO Тест не работает правильно 
     public static void suitabilityTest(Network student) {//tests network,ввыводит что на входе и на выходе и подходит ли ответ 
-    	Float[] f =new Float[]{1f,rnd(ENERGY_NEEDED_TO_MULTIPLY,100),rnd(3,100),0f,0f,0f,0f};
-        float weightBuffer=student.evaluteFitness(f,false);
+    	Double[] f =new Double[]{1d,rnd(ENERGY_NEEDED_TO_MULTIPLY,100),rnd(3,100),0d,0d,0d,0d};
+    	double weightBuffer=student.evaluteFitness(f,false);
         String answer;
         Random r = new Random();
         if(weightBuffer<1f && weightBuffer>0.9f){
@@ -289,7 +291,7 @@ public class Network_Teacher extends JPanel {
         }
         System.out.println("Multiply:"+ weightBuffer+answer+"____________________"+Arrays.toString(f));//print evaluteFitness parametres
         
-        f =new Float[]{0f,rnd(3,ENERGY_NEEDED_TO_MULTIPLY),rnd(0,3),0f,0f,0f,0f};
+        f =new Double[]{0d,rnd(3,ENERGY_NEEDED_TO_MULTIPLY),rnd(0,3),0d,0d,0d,0d};
         weightBuffer=student.evaluteFitness(f,false);
         if(weightBuffer<0.125 && weightBuffer>0.1f){
             answer=" passed";
@@ -298,8 +300,8 @@ public class Network_Teacher extends JPanel {
         }
         System.out.println("Move up:"+weightBuffer+answer+"____________________"+Arrays.toString(f));
         
-        f=new Float[]{0f,rnd(1,4),rnd(7,100),(float) r.nextInt(2),(float) r.nextInt(2),(float) r.nextInt(2),(float) r.nextInt(2)};
-        weightBuffer=student.evaluteFitness(new Float[]{0f,rnd(1,4),rnd(7,100),(float) r.nextInt(2),(float) r.nextInt(2),(float) r.nextInt(2),(float) r.nextInt(2)},false);
+        f=new Double[]{0d,rnd(1,4),rnd(7,100),(double) r.nextInt(2),(double) r.nextInt(2),(double) r.nextInt(2),(double) r.nextInt(2)};
+        weightBuffer=student.evaluteFitness(new Double[]{0d,rnd(1,4),rnd(7,100), (double) r.nextInt(2),(double) r.nextInt(2),(double) r.nextInt(2),(double) r.nextInt(2)},false);
         if(weightBuffer<0.3f && weightBuffer>0.2f){
             answer=" passed";
         }else{
@@ -307,8 +309,8 @@ public class Network_Teacher extends JPanel {
         }
         System.out.println("Eat organic:"+weightBuffer+answer+"________________"+Arrays.toString(f));
         
-        f=new Float[]{0f,rnd(4,30),rnd(1,4),1f,0f,0f,0f};
-        weightBuffer=student.evaluteFitness(new Float[]{0f,rnd(4,30),rnd(1,4),1f,0f,0f,0f},false);
+        f=new Double[]{0d,rnd(4,30),rnd(1,4),1d,0d,0d,0d};
+        weightBuffer=student.evaluteFitness(new Double[]{0d,rnd(4,30),rnd(1,4),1d,0d,0d,0d},false);
         if(weightBuffer>0.15f && weightBuffer<0.175f){
             answer=" passed";
         }else{
@@ -316,8 +318,8 @@ public class Network_Teacher extends JPanel {
         }
         System.out.println("move left on up wall:"+weightBuffer+answer+"________"+Arrays.toString(f));
         
-        f=new Float[]{0f,rnd(4,30),rnd(1,4),0f,0f,0f,1f};
-        weightBuffer=student.evaluteFitness(new Float[]{0f,rnd(4,30),rnd(1,4),0f,0f,0f,1f},false);
+        f=new Double[]{0d,rnd(4,30),rnd(1,4),0d,0d,0d,1d};
+        weightBuffer=student.evaluteFitness(new Double[]{0d,rnd(4,30),rnd(1,4),0d,0d,0d,1d},false);
         if(weightBuffer>0.125 && weightBuffer<0.15){
             answer=" passed";
         }else{

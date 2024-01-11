@@ -2,7 +2,7 @@ package MyVersion.Core;
 
 public class Node {
     boolean changeble=true; //IF IT BECOME TRUE(IN RUNTIME) ,DONT CHANGE IT
-    private float weight =0.0f;
+    private double weight =0.0d;
     Dot from;
     Dot to;
     public Node(Dot from,Dot to){
@@ -17,7 +17,7 @@ public class Node {
 
 
        if(from.myType==Dot_Type.BIAS_TYPE){
-           weight =1.0f;
+           weight =1.0d;
        }
        this.to=to;
     }
@@ -26,17 +26,17 @@ public class Node {
 		// TODO Автоматически созданная заглушка конструктора
 	}
 
-	void evalute(){
+	synchronized void evalute(){
     	if(changeble) {
     		to.value+= from.value* weight;
         }
     }
 
-    public void setWeight(float weight)  {
+    public synchronized void setWeight(double weight)  {
         this.weight=weight;
     }
 
-    public float getWeight() {
+    public double getWeight() {
         return weight;
     }
 

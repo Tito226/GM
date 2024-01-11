@@ -4,7 +4,6 @@ package MyVersion.Frame;
 import static MyVersion.Frame.GM2_CONFIG.CELL_START_ORGANIC;
 
 import MyVersion.Core.BrainCloneClass;
-import MyVersion.Core.Core_Config;
 import MyVersion.Core.Data_Set;
 import MyVersion.Core.Network;
 import MyVersion.Core.Network_Teacher;
@@ -244,7 +243,7 @@ public static Cell[][] getCells(){
 
     public static void main(String[] args) throws  IOException {
         int width=1200;
-        int height=800;
+        int height=700;
         JFrame frame = new JFrame("GM");
         
         JButton pauseButton = new JButton("Pause");
@@ -317,7 +316,7 @@ public static Cell[][] getCells(){
 
         int countt=0;
         boolean tested=false;
-        ArrayList<Float[]> inputData=new ArrayList<Float[]>();
+        ArrayList<Double[]> inputData=new ArrayList<Double[]>();
         
     while(true) {
     	boolean isStep=false;
@@ -380,7 +379,7 @@ public static Cell[][] getCells(){
             //reset field organic
             if (NULL_CELLS==width*height){//on restart
         	 	if(lastBestLifeTime==thisBestLifeTime&& thisBestLifeTime!=0 && !tested) {
-        	 		cellDiagnostic(new NormCell(relative),inputData);
+        	 		//cellDiagnostic(new NormCell(relative),inputData);
         	 		tested=true;
         	 	}
         	 	onRestart();
@@ -418,7 +417,7 @@ public static Cell[][] getCells(){
 	 	}
 
 	 	//Summon cells
-	 	for (int i = 0; i < Core_Config.CELLS_ON_START; i++) {
+	 	for (int i = 0; i < GM2_CONFIG.CELLS_ON_START; i++) {
 	 		Random r =new Random();
 	 		int buff=r.nextInt(2);
 	 		if(buff==1) {
@@ -431,7 +430,7 @@ public static Cell[][] getCells(){
 	 	
 	 	Restarts++;
 	 	//+++++++++++++++++++
-	 	if(PAINT_MODE!=0) {
+	 	if(PAINT_MODE!=0) {//0
 	 		paintThread.rept();
 	 		
 	 	}
@@ -476,14 +475,16 @@ public static Cell[][] getCells(){
     
     
     
-    void cellDiagnostic(NormCell norm,ArrayList<Float[]> inputData) {
+    void cellDiagnostic(NormCell norm,ArrayList<Double[]> inputData) {//TODO FIX IT
     	System.out.println("Run Cell diag.");//TODO НАЙТИ ОТЛИЧИЯ МЕЖДУ ВХОДНЫМИ ДАННЫМИ ,СЕЙЧАС ТУТ ЧЕРНАЯ МАГИЯ ВХОДНЫЕ ДАННЫЕ ОДИНАКОВЫЕ,МЕТОД ТОЖЕ,А РЕЗУЛЬТАТЫ РАЗНЫЕ
     	System.out.print(":::: "+
-        		norm.evaluateFitness(new Float[]{0f,15f,6f,0f,0f,0f,0f})+"тест 1     ");
+        		norm.evaluateFitness(new Double[]{0d,15d,6d,0d,0d,0d,0d})+"тест 1     ");
     	System.out.print(":::: "+														// тесты 1 должны быть одинаковыми
-        		norm.evaluateFitness(new Float[]{0f,15f,6f,0f,0f,0f,0f,23456f})+"тест 1     ");
+        		norm.evaluateFitness(new Double[]{0d,15d,6d,0d,0d,0d,0d,23456d})+"тест 1     ");
     	Random r =new Random();
-    	System.out.print(norm.evaluateFitness(new Float[]{0f,Data_Set.rnd(1,4),Data_Set.rnd(7,100),(float) r.nextInt(2),(float) r.nextInt(2),(float) r.nextInt(2),(float) r.nextInt(2)})+"тест 2               ");
+    	System.out.print(norm.evaluateFitness(new Double[]{0d,(double) Data_Set.rnd(1,4),(double) Data_Set.rnd(7,100),(double) r.nextInt(2),(double) r.nextInt(2),(double) r.nextInt(2),(double) r.nextInt(2)})+"тест 2               ");
+    	if(inputData== null)
+    		return;
     	for(int i=0;i<inputData.size();i++) {
     		if(i%2==1)
     			continue;
@@ -509,13 +510,13 @@ public static Cell[][] getCells(){
     				System.out.print("rightCell:");
     			break;
     			}
-    			Float[] buf=inputData.get(i);
+    			Double[] buf=inputData.get(i);
     			System.out.print(buf[j]+" ");
     		}
     		System.out.println(":::: "+
     		norm.evaluateFitness(inputData.get(i)));
     		System.out.print(" ");
-    		System.out.print(norm.evaluateFitness(new Float[] {0f,Data_Set.rnd(3,15),6f,0f,0f,0f,0f}));
+    		System.out.print(norm.evaluateFitness(new Double[] {0d,(double) Data_Set.rnd(3,15),6d,0d,0d,0d,0d}));
     		System.out.print(" ");
     	}
     }

@@ -8,7 +8,7 @@ import static MyVersion.Frame.GM2_CONFIG.NORM_CELL_START_ENERGY;
 import static MyVersion.Frame.World.*;
 
 public  class Cell {
-    boolean isChanged=true;
+    
     //public static int startEnergy=CELL_START_ORGANIC;
     int[] color;
     Color myColor ;
@@ -18,7 +18,6 @@ public  class Cell {
     private int x;
     private int y;
     public int organic=CELL_START_ORGANIC;
-    private boolean nothing=true;
     public int getX() {
         return x;
     }
@@ -28,12 +27,12 @@ public  class Cell {
     }
     public void setSecCell(NormCell secCell){
     	this.secCell=secCell;
+    	setChange(true);
     }
-    public void setSecCell(int i){
-
-    }
+    
     public void setPartCell(PartCell partCell) {
         this.partCell = partCell;
+        setChange(true);
     }
 
     public void setX(int x) {
@@ -62,17 +61,18 @@ public  class Cell {
         }else return false;
     }
     private boolean change=false;
+    
     boolean lastNCell=false;
     boolean lastPCell=false;
     int lastOrganic=0;
-    private boolean isChanged(){
+    /*private boolean isChanged(){
         if (lastPCell!=getPartCell() || lastNCell!=getSecCell() 
         	 || lastOrganic!=organic || lastRestarts!=Restarts){
             return true;
         }else{
             return false;
         }
-    }
+    }*/
     
     private synchronized boolean getOrSetChange(boolean get,boolean value) {
     	if(get) {
@@ -83,7 +83,7 @@ public  class Cell {
     	}
     }
   void testCell(){
-	  setChange(isChanged());
+	  //setChange(isChanged());
       lastNCell=getSecCell();
 	  lastPCell=getPartCell();
 	  lastOrganic=organic;
@@ -105,15 +105,15 @@ public  class Cell {
 	  if(secCell!=null  && secCell.getEnergy()<=0  ){
 		  organic+=secCell.getEnergy();
 		  secCell.brain.kill();
-		  secCell=null;
+		  setSecCell(null);
 		  cellls--;
-		  setChange(true);
+		  //setChange(true);
 	  }
 	  if(secCell!=null  && secCell.getEnergy()>=10000 ){
           System.out.println("Cell with 10000 died");
           organic+=secCell.getEnergy();
           secCell.brain.kill();
-          secCell=null;
+          setSecCell(null);
           cellls--;
       }
       if(partCell!=null){

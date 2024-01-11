@@ -27,8 +27,7 @@ public class Painter {
      	for (int i = 0; i < width; i++) {
              for (int j = 0; j < height; j++) {
                  if (cells[i][j] != null) {
-                     if (cells[i][j].secCell == null && cells[i][j].partCell == null
-                     		&& cells[i][j].organic!=CELL_START_ORGANIC) {
+                     if (cells[i][j].secCell == null && cells[i][j].partCell == null) {
                          if(cells[i][j].isChange()){
                         	 g.setColor(cells[i][j].getColor());
                         	 g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
@@ -41,7 +40,7 @@ public class Painter {
                         	 cells[i][j].setChange(false);
                          }
                      }
-                     if (cells[i][j] != null && cells[i][j].partCell != null) {
+                     if (cells[i][j].partCell != null) {
                          if(cells[i][j].isChange()){
                         	 g.setColor(cells[i][j].partCell.getColor());
                         	 g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);

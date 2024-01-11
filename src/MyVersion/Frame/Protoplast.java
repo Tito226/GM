@@ -64,11 +64,11 @@ import java.awt.Color;
             }
         }
 
-        public Protoplast(NormCell normCell, float f,int x,int y){
+        public Protoplast(NormCell normCell, double nOutput,int x,int y){
 
             this.normCell = normCell;
 			boolean done=false;
-          if(f>0.64 && f<0.65){
+          if(nOutput>0.64 && nOutput<0.65){
               if (y>0 && cells[x][y-1].secCell==null && cells[x][y-1].partCell==null) {
                   myName = this.normCell.partName + this.normCell.partNum;
                   this.normCell.partNum++;
@@ -78,7 +78,7 @@ import java.awt.Color;
                   this.normCell.myParts.add(myCoords);
                   done=true;
               }
-          }  if(f>0.65 && f<0.66){
+          }  if(nOutput>0.65 && nOutput<0.66){
                   if (y<height-1 && cells[x][y+1].secCell==null && cells[x][y+1].partCell==null) {
                       myName=this.normCell.partName+this.normCell.partNum;
                       this.normCell.partNum++;
@@ -88,7 +88,7 @@ import java.awt.Color;
                       this.normCell.myParts.add(myCoords);
                       done=true;
                   }
-              } if(f>0.66 && f<0.67){
+              } if(nOutput>0.66 && nOutput<0.67){
                   if (x<width-1 && cells[x+1][y].secCell==null && cells[x+1][y].partCell==null) {
                       myName=this.normCell.partName+this.normCell.partNum;
                       this.normCell.partNum++;
@@ -98,7 +98,7 @@ import java.awt.Color;
                       this.normCell.myParts.add(myCoords);
                       done=true;
                   }
-              }   if(f>0.67 && f<0.68){
+              }   if(nOutput>0.67 && nOutput<0.68){
                   if (x>0 && cells[x-1][y].secCell==null && cells[x-1][y].partCell==null) {
                       myName=this.normCell.partName+this.normCell.partNum;
                       this.normCell.partNum++;

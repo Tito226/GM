@@ -73,9 +73,9 @@ public class Network {
         return dotsArr;
     }
     
-    ArrayList< Float> outputs;
+    ArrayList<Double> outputs;
     
-    public float evaluteFitness(Float[] inputs,boolean forTeaching){
+    public double evaluteFitness(Double[] inputs,boolean forTeaching){
 
       //Dots value , error and weightsDelta clears in next method call
     	if(!forTeaching){

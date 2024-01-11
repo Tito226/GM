@@ -71,7 +71,7 @@ public class NormCell implements  Serializable {
 
         }
     }*/
-    float isRaedyToMultiply(){
+    double isRaedyToMultiply(){
         if(energy>ENERGY_NEEDED_TO_MULTIPLY+2){
             return 1;
         }else
@@ -158,7 +158,7 @@ public class NormCell implements  Serializable {
 
 
 
-  public float getLeftCell(){
+  public double getLeftCell(){
        if(  x>1 && cells[x-1][y].secCell!=null ){
            if(isRelatives(  cells[x-1][y].secCell)){return 2.5f;}else
            return 1.00f;
@@ -169,7 +169,7 @@ public class NormCell implements  Serializable {
        else{
        return 0.00f;}
   }
-    public float getRightCell(){
+    public double getRightCell(){
         if( x<width-1 &&  cells[x+1][y].secCell!=null  ){
             if(isRelatives( cells[x+1][y].secCell)){return 2.5f;}else
             return 1.00f;
@@ -181,7 +181,7 @@ public class NormCell implements  Serializable {
         return 0.00f;
         }
     }
-    public float getUptCell(){
+    public double getUptCell(){
         if( y>0  && cells[x][y-1].secCell!=null  ){
             if(isRelatives( cells[x][y-1].secCell)){return 2.5f;}else
             return 1.00f;
@@ -192,7 +192,7 @@ public class NormCell implements  Serializable {
         else{
         return 0.00f;}
     }
-    public float getDownCell(){
+    public double getDownCell(){
         if(  y<height-1&& cells[x][y+1].secCell!=null ){
             if(isRelatives( cells[x][y+1].secCell)){return 2.5f;}else
             return 1.00f;
@@ -202,7 +202,7 @@ public class NormCell implements  Serializable {
         else{
         return 0.00f;}
     }
-    public float getRightDownCell(){
+    public double getRightDownCell(){
         if(  y<height-1&& x<width-1 && cells[x+1][y+1].secCell!=null ){
             if(isRelatives( cells[x+1][y+1].secCell)){return 2.5f;}else
                 return 1.00f;
@@ -212,7 +212,7 @@ public class NormCell implements  Serializable {
         else{
             return 0.00f;}
     }
-    public float getRightUpCell(){
+    public double getRightUpCell(){
         if(  y>0&& x<width-1 && cells[x+1][y-1].secCell!=null ){
             if(isRelatives(cells[x+1][y-1].secCell)){return 2.5f;}else
             return 1.00f;
@@ -223,7 +223,7 @@ public class NormCell implements  Serializable {
             return 0.00f;}
 
     }
-    public float getLeftUpCell(){
+    public double getLeftUpCell(){
         if(  y>0&& x>0 && cells[x-1][y-1].secCell!=null ){
             if(isRelatives( cells[x-1][y-1].secCell)){return 2.5f;}else
             return 1.00f;
@@ -233,7 +233,7 @@ public class NormCell implements  Serializable {
         else{
             return 0.00f;}
     }
-    public float getLeftDownCell(){
+    public double getLeftDownCell(){
         if(  y<height-1&& x>0 && cells[x-1][y+1].secCell!=null ){
             if(isRelatives( cells[x-1][y+1].secCell)){return 2.5f;}else
             return 1.00f;
@@ -243,7 +243,7 @@ public class NormCell implements  Serializable {
         else{
             return 0.00f;}
     }
-    float getLeftDistance(){
+    double getLeftDistance(){//TODO MAY FIX FOR DOUBLE
         int ix=x;
 
         int i=1;
@@ -259,7 +259,7 @@ public class NormCell implements  Serializable {
         return ii/dil;
     }
     float dil=1000f;
-    float getRightDistance(){
+    double getRightDistance(){
         int ix=x;
 
         int i=1;
@@ -274,7 +274,7 @@ public class NormCell implements  Serializable {
      float ii=i;
      return ii/dil;
  }
-    float getUpDistance(){
+    double getUpDistance(){
         int iy=y;
         int i=1;
         while (true){
@@ -288,7 +288,7 @@ public class NormCell implements  Serializable {
         float ii=i;
         return ii/dil;
     }
-    float getDownDistance(){
+    double getDownDistance(){
         int iy=y;
         int i=1;
         while (true){
@@ -343,7 +343,7 @@ public class NormCell implements  Serializable {
        if(isSpaceAvailable()==0){
            energy-=1;
        }
-       float output=evaluateFitness();
+       double output=evaluateFitness();
        //System.out.println(output);//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             //  System.out.println(output);
        if(output>0.1f && output<0.125f){
@@ -414,7 +414,7 @@ void transferEnergy(float output){
       }else if(output>0.72 && output>0.74){}
 }
 
- float isSpaceAvailable(){
+double isSpaceAvailable(){
      boolean b1=true;
      boolean b2=true;
      boolean b3=true;
@@ -424,8 +424,8 @@ void transferEnergy(float output){
      if(x<width-1 &&  cells[x+1][y].secCell==null){}else b3=false;
      if( x>0 && cells[x-1][y].secCell==null){}else b4=false;
      if(!b1 && !b2 && !b3 && !b4){
-           return 0.0f;
-     }else{return 1.0f;}
+           return 0.0d;
+     }else{return 1.0d;}
  }
     int enValue=10;
     public boolean eatCell(Directions dirs){
@@ -530,7 +530,7 @@ void transferEnergy(float output){
 
 
 
-    float isController(){
+    double isController(){
      if (normCellType==NormCellType.CONTROLLER)  {
          return 10.0f;
      }
@@ -538,19 +538,19 @@ void transferEnergy(float output){
     }
 
 
-    float lastRightDistance=0f;
-    float lastLeftDistace=0f;
-    float lastUpDistance=0f;
-    float lastDownDistance=0f;
+    double lastRightDistance=0d;
+    double lastLeftDistace=0d;
+    double lastUpDistance=0d;
+    double lastDownDistance=0d;
     int lastEnergy=0;
-    float lastRightUpCell=0f;
-    float lastRightDownCell=0f;
-    float lastLeftUpCell=0f;
-    float lastLeftDownCell=0f;
-    float lastUpCell=0f;
-    float lastDownCell=0f;
-    float lastLeftCell=0f;
-    float lastRightCell=0f;
+    double lastRightUpCell=0d;
+    double lastRightDownCell=0d;
+    double lastLeftUpCell=0d;
+    double lastLeftDownCell=0d;
+    double lastUpCell=0d;
+    double lastDownCell=0d;
+    double lastLeftCell=0d;
+    double lastRightCell=0d;
     int lastOrganic=0;
     int lastSize=0;
     void setLastThings(){
@@ -627,26 +627,26 @@ void transferEnergy(float output){
         }
     }
 
-    Float[] getInputData() {
-    	 Float[] inputs = {isRaedyToMultiply() , (float) getEnergy(), (float) cells[x][y].getOrganic(), getUptCell(), getDownCell(), getLeftCell(),
+    Double[] getInputData() {
+    	Double[] inputs = {isRaedyToMultiply() , (double) getEnergy(), (double) cells[x][y].getOrganic(), getUptCell(), getDownCell(), getLeftCell(),
     			 
-    			 getRightCell(),getRightDownCell(),getRightUpCell(),getLeftUpCell(),getLeftDownCell(), isSpaceAvailable(), isController(),
+    			 (double) getRightCell(),(double) getRightDownCell(),getRightUpCell(),getLeftUpCell(),getLeftDownCell(), isSpaceAvailable(), isController(),
     			 
-    			 getRightDistance(),getLeftDistance(),getUpDistance(),getDownDistance(), (float) lastEnergy,lastUpCell,lastDownCell,lastLeftCell,
+    			 getRightDistance(),getLeftDistance(),getUpDistance(),getDownDistance(), (double) lastEnergy,lastUpCell,lastDownCell,lastLeftCell,
     			 
-    			 lastRightCell,lastRightDownCell,lastRightUpCell,lastLeftDownCell,lastLeftUpCell, (float) lastOrganic, (float) sunny, (float) myParts.size(),
+    			  lastRightCell,lastRightDownCell,lastRightUpCell,lastLeftDownCell,lastLeftUpCell,  (double) lastOrganic, (double) sunny, (double) myParts.size(),
     			 
-    			 (float) lastSize,lastRightDistance,lastLeftDistace,lastUpDistance,lastDownDistance};
+    			 (double) lastSize,lastRightDistance,lastLeftDistace,lastUpDistance,lastDownDistance};
     	 return inputs;
     }
     
     
     //************************************************
-    public float evaluateFitness() {
+    public double evaluateFitness() {
         //System.out.print(brain.evaluteFitness(inputs,false));
        return brain.evaluteFitness(getInputData(),false);
     }
-    public float evaluateFitness(Float[] inputData) {
+    public double evaluateFitness(Double[] inputData) {
         //System.out.print(brain.evaluteFitness(inputs,false));
        return brain.evaluteFitness(inputData,false);
     }
