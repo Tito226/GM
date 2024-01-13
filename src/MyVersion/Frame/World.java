@@ -24,191 +24,6 @@ import static MyVersion.Frame.PaintThread.paintMode;
 import static MyVersion.Frame.World.*;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
-class PaintThread extends Thread{
-    inPaintThread paint1;
-    inPaintThread paint2;
-    inPaintThread paint3;
-    static byte paintMode=PAINT_MODE;
-    public   void rept(){/** full repaint, used in multi thread paint mode*/
-      if(!pause){
-        pause=true;
-        for (int i = 0; i < width ; i++) {
-            for (int j = 0; j < World.height; j++) {
-                if(cells[i][j]!=null)
-                    cells[i][j].setChange(true);;//set,true
-            }
-        }
-        pause=false;
-  }else {
-        for (int i = 0; i < width ; i++) {
-            for (int j = 0; j < World.height; j++) {
-                if(cells[i][j]!=null)
-                    cells[i][j].setChange(true);
-            }
-        }
-    }
-    }
-    	public PaintThread(){
-
-    	}
-    	
-    	
-    	class inPaintThread extends Thread {
-    		int type;
-    		Graphics g;
-
-        public inPaintThread(Graphics g, int type) {
-            this.g = g;
-            this.type = type;
-        }
-
-        public void oneThreadPaint(Graphics g) {
-        	Painter.statPaint(g);
-    		for (int i = 0; i < width; i++) {
-    			for (int j = 0; j < height; j++) {
-        	
-    				if (cells[i][j] != null) {
-    					if (cells[i][j].secCell == null && cells[i][j].partCell == null) {
-    						g.setColor(cells[i][j].getColor());
-    						g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-    					} else if (cells[i][j].secCell != null && cells[i][j].partCell == null) {
-    						g.setColor(cells[i][j].secCell.getColor());
-    						g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-    					}
-    					if (cells[i][j] != null && cells[i][j].partCell != null) {
-    						g.setColor(cells[i][j].partCell.getColor());
-    						g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-    					}
-    				}
-    			}
-    		}  
-    		Painter.statPaint(g);
-        }
-        
-        public void two1ThreadPaint(Graphics g) {
-        	Painter.statPaint(g);
-        	for (int i = 0; i < width / 2; i++) {
-                for (int j = 0; j < height; j++) {
-                    if (cells[i][j] != null) {
-                        if (cells[i][j].secCell == null && cells[i][j].partCell == null && cells[i][j].organic!=CELL_START_ORGANIC) {
-                            if(cells[i][j].isChange()){//get change TODO ПОЧИНИТЬ
-                            g.setColor(cells[i][j].getColor());
-                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-                            cells[i][j].setChange(false);
-                            }
-                        } else if (cells[i][j].secCell != null && cells[i][j].partCell == null) {
-                            if(cells[i][j].isChange()){
-                            g.setColor(cells[i][j].secCell.getColor());
-                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-                            cells[i][j].setChange(false);
-                            }
-                        }
-                        if (cells[i][j] != null && cells[i][j].partCell != null) {
-                            if(cells[i][j].isChange()){
-                            g.setColor(cells[i][j].partCell.getColor());
-                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-                            cells[i][j].setChange(false);
-                            }
-                        }
-                    }
-                }
-            }
-        	Painter.statPaint(g);
-    	}
-        
-        public void two2ThreadPaint(Graphics g) {
-        	for (int i = width / 2; i < width; i++) {
-                for (int j = 0; j < height; j++) {
-                    if (cells[i][j] != null) {
-                        if (cells[i][j].secCell == null && cells[i][j].partCell == null
-                        		&& cells[i][j].organic!=CELL_START_ORGANIC) {
-                            if(cells[i][j].isChange()){
-                            g.setColor(cells[i][j].getColor());
-                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-                            cells[i][j].setChange(false);
-                            }
-                        } else if (cells[i][j].secCell != null && cells[i][j].partCell == null) {
-                            if(cells[i][j].isChange()){
-                            g.setColor(cells[i][j].secCell.getColor());
-                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-                            cells[i][j].setChange(false);
-                            }
-                        }
-                        if (cells[i][j] != null && cells[i][j].partCell != null) {
-                            if(cells[i][j].isChange()){
-                            g.setColor(cells[i][j].partCell.getColor());
-                            g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-                            cells[i][j].setChange(false);
-                            }
-                        }
-                    }
-                }
-            }
-    	}
-        
-        @Override
-        public void run() {
-            while (true) {
-                if (0 == 0){
-                    switch (type) {
-                        case 1 -> {
-                        	two1ThreadPaint(g);
-                        	
-                        }
-                        case 2 -> {
-                        	two2ThreadPaint(g);
-                        
-                        }
-                        case 3->{
-                        
-                        	oneThreadPaint(world.getGraphics());
-                        
-                        	
-                        }
-                        
-                    }
-            }
-                try {
-					Thread.sleep(40);
-				} catch (InterruptedException e) {
-					// TODO Автоматически созданный блок catch
-					e.printStackTrace();
-				}
-         }
-            
-        }
-
-    	}
-
-    	@Override
-    	public void run() {
-    		paint(world.getGraphics());
-    	}
-
-    	public void paint(Graphics g) {
-    		long startTime = System.currentTimeMillis();
-    		if(paintMode==2) {
-    			if (paint1 == null) {
-
-    				paint1 = new inPaintThread(g, 1);
-                	paint2 = new inPaintThread(g, 2);
-                	paint1.start();
-                	paint2.start();
-            }
-        }else if (paintMode==1){
-            if (paint1 == null) {
-                paint1 = new inPaintThread(g, 3);
-                paint1.start();
-            }
-        }
-        long endTime = System.currentTimeMillis();
-        if (endTime - startTime > 100) {
-            System.out.println("Paint took " + (endTime - startTime) + " milliseconds");
-        }
-
-    }
-}
-
 public class World extends JPanel implements Runnable  {
 	
     static FileInputStream fileInputStream;
@@ -220,8 +35,10 @@ public class World extends JPanel implements Runnable  {
     public static int height;
     public static int sunny=1;
     static Cell[][] cells;
-    public static boolean pause=false;
+    private static boolean pause=false;
     static PaintThread paintThread;
+    static World world;
+    static   Thread wor;
     public World(int width,int height) throws IOException {
         Network_Teacher network_teacher=new Network_Teacher();
         relative=network_teacher.createAndTeachNetwork();
@@ -230,9 +47,13 @@ public class World extends JPanel implements Runnable  {
         this.width=width;
         cells=new Cell[width][height];
     }
-    static World world;
-    static   Thread wor;
-
+    
+    synchronized boolean getPause() {
+    	return pause;
+    }
+    synchronized static void setPause(boolean p) {
+    	pause=p;
+    }
 
 public static Cell[][] getCells(){
     return cells;
@@ -322,7 +143,7 @@ public static Cell[][] getCells(){
     	boolean isStep=false;
     	countt2++;
     	long startTime = System.currentTimeMillis();
-    	if(!pause){
+    	if(!getPause()){
         	
     		if(PAINT_MODE==0) {
     	 		Painter.ecoPaint(world.getGraphics());
@@ -376,8 +197,8 @@ public static Cell[][] getCells(){
             }
             //***************************************************************
             //***************************************************************}step
-            //reset field organic
-            if (NULL_CELLS==width*height){//on restart
+            /*reset field organic*/
+            if (NULL_CELLS==width*height){/*on restart*/
         	 	if(lastBestLifeTime==thisBestLifeTime&& thisBestLifeTime!=0 && !tested) {
         	 		//cellDiagnostic(new NormCell(relative),inputData);
         	 		tested=true;
@@ -415,19 +236,34 @@ public static Cell[][] getCells(){
 	 			cells[j][i].organic=CELL_START_ORGANIC;
 	 		}
 	 	}
-
+	 	ArrayList<Network> checkGroup=new ArrayList();
 	 	//Summon cells
 	 	for (int i = 0; i < GM2_CONFIG.CELLS_ON_START; i++) {
+	 		NormCell nBuf;
 	 		Random r =new Random();
 	 		int buff=r.nextInt(2);
 	 		if(buff==1) {
-	 			cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(relative));
+	 			nBuf=new NormCell(relative);
+	 			cells[r.nextInt(width)][r.nextInt(height)].setSecCell(nBuf);
 	 			continue;
 	 		}else  {
-	 			cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(topLifeTimeBrain));
+	 			nBuf=new NormCell(topLifeTimeBrain);
+	 			cells[r.nextInt(width)][r.nextInt(height)].setSecCell(nBuf);
 	 		}
+	 		checkGroup.add(nBuf.brain);
 	 	}
 	 	
+	 	int tltb=0,rel=0;
+	 	for (int i = 0; i < checkGroup.size(); i++) {
+	 		if(BrainCloneClass.networkCompare(topLifeTimeBrain,checkGroup.get(i))) {
+	 			tltb++;
+	 		}else if(BrainCloneClass.networkCompare(relative,checkGroup.get(i))) {
+	 			rel++;
+	 		}
+	 			
+		}
+	 	System.err.println("topLifeTimeBrain "+tltb);
+	 	System.err.println("relative "+rel);
 	 	Restarts++;
 	 	//+++++++++++++++++++
 	 	if(PAINT_MODE!=0) {//0
@@ -438,7 +274,7 @@ public static Cell[][] getCells(){
 	 		paint1(world.getGraphics());
 	 	}
 	 	
-
+	 	checkGroup=null;
 	 	lastRestarts++;
 	 	System.out.println("Restarted");
 	 	System.out.println("best life time: "+ bestLifeTime);

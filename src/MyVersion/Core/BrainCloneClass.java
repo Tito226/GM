@@ -29,13 +29,11 @@ public class BrainCloneClass {
 		result.myType=dot.myType;
 		result.weightsDelta=dot.weightsDelta;
 		result.value=dot.value;
-		//result.nodesToMe=nodeArrClone(dot.nodesToMe);
-		//result.nodesFromMe=nodeArrClone(dot.nodesFromMe);
 		return result;
 	}
 	
 	private static void allNodesClone(Network brain,Network clone,boolean clonesToMeArr) {
-		for (int i = 0; i < brain.dotsArr.size()-1; i++) {//копирование всех нод кроме тех что ведут к выходам
+		for (int i = 0; i < brain.dotsArr.size()-1; i++) {/*копирование всех нод кроме тех что ведут к выходам*/
             for (int j = 0; j < brain.dotsArr.get(i).size(); j++) {
                 for (int k = 0; k < brain.dotsArr.get(i+1).size()-BIAS; k++) {
                     clone.dotsArr.get(i).get(j).addNodeClone(clone.dotsArr.get(i+1).get(k),brain.dotsArr.get(i).get(j)
@@ -55,13 +53,25 @@ public class BrainCloneClass {
 
 	}
 	
-	/*private static ArrayList<Node> nodeArrClone(ArrayList<Node> arr,boolean clonesToMeArr) {//клонирует массив Node
-		ArrayList<Node> result=new ArrayList();
-		for(int i=0;i<arr.size();i++) {
-			result.add(nodeClone(arr.get(i)));
+	public static boolean networkCompare(Network first,Network second) {
+		for(int i=0;i<first.dotsArr.size();i++) {
+			for(int j=0;j<first.dotsArr.get(i).size();j++) {
+				for(int y=0;y<first.dotsArr.get(i).get(j).nodesFromMe.size();y++) {
+					if(!nodeCompare(first.dotsArr.get(i).get(j).nodesFromMe.get(y),second.dotsArr.get(i).get(j).nodesFromMe.get(y)))
+						return false;
+				}
+			}
 		}
-		return result;
-	}*/
+		return true;
+	}
+	
+	private static boolean nodeCompare(Node first,Node second) {
+		if(first.getWeight()==second.getWeight() && first.changeble==second.changeble) {
+			return true;
+		}else {
+			return false;
+		}
+	}
 	
 	
 }

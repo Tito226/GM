@@ -1,32 +1,26 @@
 package MyVersion.Core;
 
-import MyVersion.Frame.ContinueListener;
-import MyVersion.Frame.FileOpenListener;
-import MyVersion.Frame.FileSaveListener;
-import MyVersion.Frame.PauseListener;
-import MyVersion.Frame.World;
 import MyVersion.Graphic_Builder.Graphic_Builder;
+import MyVersion.NEAT.Pool;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import static MyVersion.Core.Core_Config.*;
 import static MyVersion.Core.Data_Set.rnd;
 import static MyVersion.Frame.GM2_CONFIG.ENERGY_NEEDED_TO_MULTIPLY;
-import static MyVersion.Frame.World.Restarts;
-import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 public class Network_Teacher extends JPanel {
@@ -37,7 +31,8 @@ public class Network_Teacher extends JPanel {
 	 */
 	private static final long serialVersionUID = 123425L;
 	public static float[] fullTeach(Network student){
-        float[] errors=new float[TEACH_ITERATIONS];//TODO may change to long
+		ExecutorService pool=Executors.newFixedThreadPool(2);
+        float[] errors=new float[TEACH_ITERATIONS];/*TODO may change to long*/
         Data_Set data_set=new Data_Set();
         Network_Teacher teacher=new Network_Teacher();
         teacher.randomize(student);
@@ -46,7 +41,7 @@ public class Network_Teacher extends JPanel {
         	 JFrame frame = new JFrame("Wait...");  
              JPanel controls = new JPanel();
              controls.setLayout(new GridLayout(2, 1));
-             JPanel controls2 = new JPanel(); // справа будет панель с управлением
+             JPanel controls2 = new JPanel(); //справа будет панель с управлением
              frame.add(teacher, BorderLayout.CENTER);
              frame.setSize(300, 100);
              frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -58,10 +53,8 @@ public class Network_Teacher extends JPanel {
             	try {
 					Thread.sleep(1000);
 				} catch (InterruptedException e) {
-					// TODO Автоматически созданный блок catch
 					e.printStackTrace();
 				}
-    
             } 
             frame.setVisible(false);
             frame=null;
@@ -70,14 +63,12 @@ public class Network_Teacher extends JPanel {
     	Thread thread = new Thread(task);
     	thread.start();
         for (int i = 0; i < TEACH_ITERATIONS; i++) {
-        	
-        	if((int)(percent/100f*TEACH_ITERATIONS)==i  ) {//this is progress counter
+        	/*progress counter*/
+        	if((int)(percent/100f*TEACH_ITERATIONS)==i  ) {
             	System.out.println(percent+"%");
             	percent++;
             	Network_Teacher.percent=percent;
-            }//else if(i>116998 && i<117003)
-            	//System.out.println(percent/100f*TEACH_ITERATIONS);
-            	
+            }	
             if(!(TEACH_ITERATIONS/2<i)){
                 errors[i]=(float) teacher.teach(student,data_set,false);//teaches network and save error
             }else{
@@ -86,13 +77,10 @@ public class Network_Teacher extends JPanel {
         }
         return errors;
     }
-    public static float[] fullTeach(Network student,Data_Set dataSet){//TODO НЕ ИИСПОЛЬЗОВАТЬ (ЕТО НЕ ОСНОВНОЙ МЕТОД)
+	/*TODO НЕ ИИСПОЛЬЗОВАТЬ (ЕТО НЕ ОСНОВНОЙ МЕТОД)*/
+    public static float[] fullTeach(Network student,Data_Set dataSet){
     	Object[] errorsErr=new Object[4];
         float[] errors=new float[TEACH_ITERATIONS];
-        //ArrayList errorsFromEatOrganic=new ArrayList();
-        //ArrayList errorsFromMultiply=new ArrayList();
-        //ArrayList errorsFromMoveDown=new ArrayList();
-        //ArrayList errorsFromMoveDownOnLeftWall=new ArrayList();
         Data_Set data_set=dataSet;
         Network_Teacher teacher=new Network_Teacher();
         teacher.randomize(student);
@@ -115,7 +103,8 @@ public class Network_Teacher extends JPanel {
         return errors;
     }
 
-    public static void main(String[] args) throws IOException {//run this to test network teacher
+    public static void main(String[] args) throws IOException {
+    	/*run this to test network teacher*/
         Network student=new Network(1);
         float[] errors= fullTeach(student);
         suitabilityTest(student);
@@ -127,7 +116,7 @@ public class Network_Teacher extends JPanel {
         suitabilityTest(student);
         Graphic_Builder.createGraphic(errors);
     }
-    public  Network createAndTeachNetwork() throws IOException {//must create and tune network
+    public  Network createAndTeachNetwork() throws IOException {/*create and tune network*/
         Network student=new Network(1);
         float[] errors=fullTeach(student);
         suitabilityTest(student);
@@ -136,12 +125,11 @@ public class Network_Teacher extends JPanel {
     }
 
     void randomize(Network student){
-        //попробовать выставлять не случайные числа
         Random r=new Random();
         for (ArrayList<Dot> dotM:student.dotsArr) {
             for(Dot dot:dotM) {
                 for(Node node:dot.nodesFromMe){
-                	node.setWeight(r.nextFloat());// node.setWeight( r.nextFloat());
+                	node.setWeight(r.nextFloat());
                 }
             }
         }
@@ -168,99 +156,61 @@ public class Network_Teacher extends JPanel {
     }
     }
    
-    
-    
-    /*ERROR_FROM errorFrom(float weightBuffer) {
-    	if(weightBuffer<1f && weightBuffer>0.9f){
-    		return ERROR_FROM.EAT_ORGANIC;
-         }       
-         if(weightBuffer<0.15 && weightBuffer>0.125f){
-            return ERROR_FROM.MOVE_DOWN;
-         }         
-         if(weightBuffer<0.3f && weightBuffer>0.2f){
-        	 return ERROR_FROM.EAT_ORGANIC;
-         }         
-         if(weightBuffer>0.15f && weightBuffer<0.175f){
-        	 return ERROR_FROM.MOVE_LEFT_ON_UP_WALL;
-         }         
-         if(weightBuffer>0.63 && weightBuffer<0.64){
-        	 return ERROR_FROM.MOVE_DOWN_ON_RIGHT_WALL;
-         }
-         return null;
-    }*/
-    
-    //TODO Розделять ошибки в зависимости от ожидаемого результата
-    
+   
+    /*TODO Розделять ошибки в зависимости от ожидаемого результата*/
     
     double teach(Network student,Data_Set data_set,boolean secondLRate){//Returns final dot error
-        Dot crutch=new Dot(Dot_Type.OUTPUT);//TODO УБРАТЬ КОСТЫЛЬ
-        for(ArrayList<Dot> dotArr: student.dotsArr){//clear dots value (DON`T DELETE)
+    	/*TODO УБРАТЬ КОСТЫЛЬ*/
+        Dot crutch=new Dot(Dot_Type.OUTPUT);
+        for(ArrayList<Dot> dotArr: student.dotsArr){/*clear dots value (DON`T DELETE)*/
             for(Dot dot:dotArr){
-                dot.clear();//сброс данных точки(значение,ошибка,дельта весов)
+                dot.clear();/*сброс данных точки(значение,ошибка,дельта весов)*/
             }
         }
         Random r=new Random();
         int i=r.nextInt(data_set.inOuts.size());//Choose random data from data_set
-        /*System.out.println("ee:"+ student.evaluteFitness( data_set.inputs.get(i),true));
-        /*Random r=new Random();
-        int i=r.nextInt(data_set.inOuts.size());//Choose random data from data_set
-        //System.out.println("ee:"+ student.evaluteFitness( data_set.inputs.get(i),true));
-        Iterator itr = data_set.inOuts.entrySet().iterator();
-        long count=-1;
-        Map.Entry<Float[],Float[]> entry=null ;
-        while(itr.hasNext()) {//выбор случайного елемента
-        	count++;
-        	if(count!=i)
-        		continue;
-        	else {
-        		entry =  (Entry<Float[], Float[]>) itr.next();
-        		break;
-        		}
-        }
-       
-        if(entry==null)
-        	throw new Exception("ENTRY WITH DATASET VALUES IS NULL");
-        */
-        ArrayList<Double[]> keys=new ArrayList(data_set.inOuts.keySet());//TODO Сохранить массив вне метода для улучшения производительности
-        student.evaluteFitness( keys.get(i),true);//TODO  ПРИДУМАТЬ КАК УСКОРИТЬ, ПРИ БОЛЬШОМ ДАТАСЕТЕ СИЛЬЕО ЗАМЕДЛЯЕТСЯ
+        ArrayList<Double[]> keys=new ArrayList(data_set.inOuts.keySet());/*TODO Сохранить массив вне метода для улучшения производительности*/
+        student.evaluteFitness( keys.get(i),true);/*TODO  ПРИДУМАТЬ КАК УСКОРИТЬ, ПРИ БОЛЬШОМ ДАТАСЕТЕ СИЛЬЕО ЗАМЕДЛЯЕТСЯ*/
         //outputs correction
         int yy=0;
         for (Dot dot : student.dotsArr.get(student.dotsArr.size()-1)) {
             ArrayList<Double> expected = new ArrayList<>(Arrays.asList(data_set.inOuts.get( keys.get(i))));
-            //down :for more than one output, dont delete
-            dot.error=dot.value -expected.get(yy);//TODO ФУНКЦИЯ ПОТЕРЬ 
+            /*down :for more than one output, dont delete*/
+            dot.error=dot.value -expected.get(yy);/*ФУНКЦИЯ ПОТЕРЬ */
             crutch=dot;
             dot.weightsDelta=dot.error* Dot.activationFunctionDX(dot.value);
             yy++;
-           // System.out.println("error:"+dot.error);
-           // System.out.println("output:"+dot.getOutpup());
+
         }
-/*TODO  При более чем 2х слоях большая ошибка(3+) в первых слоях дот,изза чего данные превращаются в единицу,выяснить почему.
-  		В слоях ближе к концу такой проблемы нет.
-  		Нужно оптимизировать обучение в многопоточность.*/
+        /*Происходит взрыв градиента*/
         for (int j = 1; j < student.dotsArr.size(); j++) {//hidden layer calculation(error,weightsDelta),just calculation, not changing
             for (Dot dot : student.dotsArr.get(student.dotsArr.size()-(j+1))) {//dotsArr contains Arraylist that contains dots
-                int counter=0;//счетчик для подсчета процента готовности
-                for (Node node:dot.nodesFromMe) {
-                  dot.error+=node.getWeight()*node.to.weightsDelta;
-                  counter++;
+                int counter=0;/*счетчик для подсчета процента готовности*/
+                for (Node node:dot.nodesFromMe) {                	
+                	dot.error+=node.getWeight()*node.to.weightsDelta;
+                	counter++;
                 }
                 // dot.error=dot.error/counter;
                 dot.weightsDelta= dot.error* Dot.activationFunctionDX(dot.value);
-            }
 
+            }
+          
         }
         Random rand=new Random();
         rand.nextFloat();
+        //pool.;
         for (int j = 1; j < student.dotsArr.size()+1; j++) {//hidden layer correction ,счетчик обхода массива масивов с точками пропуская входной слой 
-            for (Dot dot : student.dotsArr.get(student.dotsArr.size()-j)) {//обход масива масивов с точками с конца,используя счетчик из внешнего цыкла,выбор массива с точками с конца и перебор всех точек
+        	for (Dot dot : student.dotsArr.get(student.dotsArr.size()-j)) {//обход масива масивов с точками с конца,используя счетчик из внешнего цыкла,выбор массива с точками с конца и перебор всех точек
                 for (Node node: dot.nodesToMe) {//обход всех связей точки
                 	
                 	double weight = 0;
-                    if(!secondLRate){
-                        weight=node.getWeight()-node.from.value*dot.weightsDelta*LEARNING_RATE* (USE_R_WHILE_LEARNING==true ?rand.nextFloat() :1d);//использовать первый коеф. обучения
+                    
+					if(!secondLRate){
+                        weight=node.getWeight()-node.from.value*dot.weightsDelta*LEARNING_RATE* 
+                        		(USE_R_WHILE_LEARNING==true ?rand.nextFloat() :1d);					/*использовать первый коеф. обучения*/
                     }else{
-                        weight=node.getWeight()-node.from.value*dot.weightsDelta*SECOND_LEARNING_RATE*rand.nextFloat();;//использовать второй коеф. обучения
+                        weight=node.getWeight()-node.from.value*dot.weightsDelta*SECOND_LEARNING_RATE*
+                        		(USE_R_WHILE_LEARNING==true ?rand.nextFloat() :1d);					/*использовать второй коеф. обучения*/
                     }
                     if(weight>THRESHOLD_NODE_VALUE ||weight<-THRESHOLD_NODE_VALUE){//fixes gradient boom(very big node values that turns value into 1)//TODO ПЕРЕДЕЛАТЬ
                         weight=THRESHOLD_WEIGHT_RESET_VALUE;//установить число по умолчанию если число выходит за рамки
@@ -269,16 +219,18 @@ public class Network_Teacher extends JPanel {
                         node.changeble=false;
                         continue;}
                     }
-                    //nodes to dot weight correction  :  weight=weight-node_fromDot_value*weightsDelta*learning_rate
+                    /*nodes to dot weight correction  :  weight=weight-node_fromDot_value*weightsDelta*learning_rate*/
                     node.setWeight(weight);
                 }
             }
-
         }
+        
+      
+
         
     return crutch.error;
     }
-    //TODO Тест не работает правильно 
+    /*TODO Тест не работает правильно */
     public static void suitabilityTest(Network student) {//tests network,ввыводит что на входе и на выходе и подходит ли ответ 
     	Double[] f =new Double[]{1d,rnd(ENERGY_NEEDED_TO_MULTIPLY,100),rnd(3,100),0d,0d,0d,0d};
     	double weightBuffer=student.evaluteFitness(f,false);
@@ -333,7 +285,5 @@ public class Network_Teacher extends JPanel {
             Graphic_Builder.createGraphic(errors);
         }
 
-
-    
 
 }

@@ -57,8 +57,8 @@ public class NormCell implements  Serializable {
         num++;
         energy=NORM_CELL_START_ENERGY;
         cellls++;
-        if(r.nextBoolean());
-        brain.mutate(2);//TODO delete it   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        if(r.nextInt(4)==1)
+        brain.mutate(2);//TODO delete it   !!!
     }
 /* public NormCell(long myParentNum){
         myNum=num;
@@ -139,7 +139,7 @@ public class NormCell implements  Serializable {
                 }
              }
         }
-      //energy-=1; TODO ПЕРЕСМОТРЕТЬ
+        energy-=1; /*TODO ПЕРЕСМОТРЕТЬ*/
         
     }
     ///////////////////////////////////////////////////////////
@@ -344,8 +344,6 @@ public class NormCell implements  Serializable {
            energy-=1;
        }
        double output=evaluateFitness();
-       //System.out.println(output);//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            //  System.out.println(output);
        if(output>0.1f && output<0.125f){
         move(Directions.UP);
        }else if (output>0.125f && output<0.15f){
@@ -379,11 +377,6 @@ public class NormCell implements  Serializable {
        setLastThings();
        energy--;
        lifeTime++;
-       Random r=new Random();
-
-            //Mutate on first gen
-
-            //
        }
     }
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
@@ -403,16 +396,18 @@ public class NormCell implements  Serializable {
 
     void eatOrganic(){
         if(cells[x][y].getOrganic()!=0  && cells[x][y].getOrganic()>2){
-           energy+= 3;
+           energy+=HOW_MUCH_ORGANIC_EATS_PER_STEP;
             cells[x][y].setOrganic(cells[x][y].getOrganic()-3);
         }
-}
+    }
 
-void transferEnergy(float output){
-      if (output>0.7 && output>0.72) {
-
-      }else if(output>0.72 && output>0.74){}
-}
+    void transferEnergy(float output){/*TODO ЗАГЛУШКА*/
+    	if (output>0.7 && output>0.72) {
+    		
+    	}else if(output>0.72 && output>0.74){
+    		
+    	}
+    }
 
 double isSpaceAvailable(){
      boolean b1=true;
@@ -478,23 +473,22 @@ double isSpaceAvailable(){
     }
 
    boolean isRelatives(NormCell normCell1){
-   if(normCell1.myParentNum ==myParentNum){
-       return true;
-   }else if (normCell1.myChildNum ==myParentNum){
-       return true;}
-   else {
-       return false;
-   }
+	   if(normCell1.myParentNum ==myParentNum){
+		   return true;
+	   }else if (normCell1.myChildNum ==myParentNum){
+		   return true;}
+	   else {
+		   return false;
+	   }
    }
 
 
     void multiply(){
-        //TODO ПЕРЕДЕЛАТЬ
+        /*TODO ПЕРЕДЕЛАТЬ*/
        if(isSpaceAvailable()==1.00f && energy>ENERGY_NEEDED_TO_MULTIPLY){
        boolean shitHappened=false;
        Random random1=new Random();
        int xxx =random1.nextInt(4);
-        //   System.out.println(xxx+"-Random");
        if(xxx==0){
         if(x<width-1 && cells[x+1][y].secCell ==null && cells[x+1][y].partCell==null ){
         	cells[x+1][y].setSecCell(new NormCell(brain));
@@ -525,7 +519,9 @@ double isSpaceAvailable(){
        }
        }else{
           energy--;
-           return;}
+          return;
+       }
+       
 }
 
 
@@ -574,19 +570,6 @@ double isSpaceAvailable(){
 
 
 //*********************************************
-    int gSuccess ;
-    public void setGSuccess(int gSuccess) {
-        synchronized (this){
-        this.gSuccess = gSuccess;
-        }
-    }
-
-    public int getGSuccess() {
-        synchronized (this){
-        return gSuccess;
-        }
-    }
-
     public float getOutputBuffer() {
         synchronized (this){
         return outputBuffer;
@@ -613,19 +596,6 @@ double isSpaceAvailable(){
 
     private float outputBuffer;
     ArrayList<Float> bestOutputs;
-    int threadsFinished;
-
-    public void setThreadsFinished(int threadsFinished) {
-        synchronized (World.class){
-        this.threadsFinished = threadsFinished;
-        }
-    }
-
-    public int getThreadsFinished() {
-        synchronized (World.class){
-        return threadsFinished;
-        }
-    }
 
     Double[] getInputData() {
     	Double[] inputs = {isRaedyToMultiply() , (double) getEnergy(), (double) cells[x][y].getOrganic(), getUptCell(), getDownCell(), getLeftCell(),
@@ -643,11 +613,9 @@ double isSpaceAvailable(){
     
     //************************************************
     public double evaluateFitness() {
-        //System.out.print(brain.evaluteFitness(inputs,false));
        return brain.evaluteFitness(getInputData(),false);
     }
     public double evaluateFitness(Double[] inputData) {
-        //System.out.print(brain.evaluteFitness(inputs,false));
        return brain.evaluteFitness(inputData,false);
     }
 

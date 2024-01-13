@@ -26,13 +26,13 @@ public class Node {
 		// TODO Автоматически созданная заглушка конструктора
 	}
 
-	synchronized void evalute(){
+	 void evalute(){
     	if(changeble) {
     		to.value+= from.value* weight;
         }
     }
 
-    public synchronized void setWeight(double weight)  {
+    public void setWeight(double weight)  {
         this.weight=weight;
     }
 

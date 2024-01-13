@@ -8,8 +8,7 @@ import static MyVersion.Frame.GM2_CONFIG.NORM_CELL_START_ENERGY;
 import static MyVersion.Frame.World.*;
 
 public  class Cell {
-    
-    //public static int startEnergy=CELL_START_ORGANIC;
+
     int[] color;
     Color myColor ;
     //int energy=1;
@@ -65,15 +64,6 @@ public  class Cell {
     boolean lastNCell=false;
     boolean lastPCell=false;
     int lastOrganic=0;
-    /*private boolean isChanged(){
-        if (lastPCell!=getPartCell() || lastNCell!=getSecCell() 
-        	 || lastOrganic!=organic || lastRestarts!=Restarts){
-            return true;
-        }else{
-            return false;
-        }
-    }*/
-    
     private synchronized boolean getOrSetChange(boolean get,boolean value) {
     	if(get) {
     		return change;
@@ -83,11 +73,10 @@ public  class Cell {
     	}
     }
   void testCell(){
-	  //setChange(isChanged());
       lastNCell=getSecCell();
 	  lastPCell=getPartCell();
 	  lastOrganic=organic;
-	  //TODO  ПОФИКСИТЬ
+
 	  try{
 		  if(organic<255 && organic>0){
 			  color=new int[3];

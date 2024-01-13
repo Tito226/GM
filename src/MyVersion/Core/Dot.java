@@ -35,7 +35,7 @@ public class Dot {
          error=0f;
          weightsDelta=0f;
     }
-    synchronized void evalute(){
+     void evalute(){
         if(myType==Dot_Type.OUTPUT){
             value=activaionFunction(value);
         }else if(myType!= Dot_Type.BIAS_TYPE){
