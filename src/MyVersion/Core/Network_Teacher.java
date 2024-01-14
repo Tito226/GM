@@ -97,7 +97,7 @@ public class Network_Teacher extends JPanel {
             if(!(TEACH_ITERATIONS/2<i)){
                 errors[i]=(float) teacher.teach(student,data_set,false);//teaches network and save error
             }else{
-                errors[i]=(float) teacher.teach(student,data_set,true);    
+                errors[i]=(float) teacher.teach(student,data_set,true);/*TODO ЗДЕЛАТЬ ФУНКЦИЮ УМЕНЬШЕНИЯ LEARNING RATE*/
             }
         }
         return errors;

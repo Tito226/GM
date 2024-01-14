@@ -58,7 +58,7 @@ public class NormCell implements  Serializable {
         energy=NORM_CELL_START_ENERGY;
         cellls++;
         if(r.nextInt(4)==1)
-        brain.mutate(2);//TODO delete it   !!!
+        brain.mutate(NUMBER_OF_MUTATIONS);//TODO delete it   !!!
     }
 /* public NormCell(long myParentNum){
         myNum=num;

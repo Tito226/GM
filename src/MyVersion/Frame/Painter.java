@@ -23,6 +23,7 @@ public class Painter {
 	public static void stringPaint(String[] strings) {}
 	
 	 public static void ecoPaint(Graphics g) {
+		try {/*TODO FIX MULTI THREAD PAINT EROR(SEC CELL==NULL),иногда остается "тень" зеленой клетки */
 		statPaint(g);
      	for (int i = 0; i < width; i++) {
              for (int j = 0; j < height; j++) {
@@ -51,6 +52,10 @@ public class Painter {
              }
          }
      	statPaint(g);
+     	}catch(Exception e) {
+     		System.err.println("paint eror");
+     	}
+		
  	}
 
 }

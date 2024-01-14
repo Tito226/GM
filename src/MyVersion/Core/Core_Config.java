@@ -23,6 +23,8 @@ public class Core_Config {
     public static final double THRESHOLD_WEIGHT_RESET_VALUE=0.07d;
     public static final boolean NODES_BECOMES_UNCHANGEBLE_IF_WEIGHT_BIGGER_THAN_THRESHOLD=false;
     public static final boolean FIRST_INPUT_MULTIPLIER=false;//true
+    /*возможно нужно перенести в другой конфиг*/
+    public static final double MUTATION_MULTIPLIER=0.5D;/*регулирует максимальную "силу" мутации*/
 }
 
 /* //Network

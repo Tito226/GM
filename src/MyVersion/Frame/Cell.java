@@ -124,11 +124,11 @@ public  class Cell {
         return organic;
     }
 
-	public boolean isChange() {
+	public synchronized boolean isChange() {
 		return getOrSetChange(true,change);
 	}
 
-	public void setChange(boolean change) {
+	public synchronized void setChange(boolean change) {
 		getOrSetChange(false,change);
 	}
 }

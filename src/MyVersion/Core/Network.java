@@ -130,9 +130,9 @@ public class Network {
 		   Node gettedNode= gettedDot.nodesFromMe.get(r.nextInt(
 				   gettedDot.nodesFromMe.size()));//выбор случайной ноды
 		   if(r.nextInt(2)==1) {
-			   gettedNode.setWeight(gettedNode.getWeight()+r.nextFloat()); 
+			   gettedNode.setWeight(gettedNode.getWeight()+r.nextFloat()*MUTATION_MULTIPLIER); 
 		   }else {
-			   gettedNode.setWeight(gettedNode.getWeight()-r.nextFloat()); 
+			   gettedNode.setWeight(gettedNode.getWeight()-r.nextFloat()*MUTATION_MULTIPLIER); 
 		   }
 		   
 	   }
