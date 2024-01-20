@@ -58,7 +58,7 @@ public class Dot {
       return value;
     }
 
-    public synchronized void setValue(double value) {
+    public void setValue(double value) {
         this.value = value;
     }
 

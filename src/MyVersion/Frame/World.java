@@ -7,12 +7,8 @@ import MyVersion.Core.BrainCloneClass;
 import MyVersion.Core.Data_Set;
 import MyVersion.Core.Network;
 import MyVersion.Core.Network_Teacher;
-import MyVersion.NEAT.Pool;
-
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -22,7 +18,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static MyVersion.Frame.GM2_CONFIG.CELL_SIZE;
-import static MyVersion.Frame.GM2_CONFIG.ENERGY_NEEDED_TO_MULTIPLY;
+import static MyVersion.Frame.GM2_CONFIG.*;
 import static MyVersion.Frame.GM2_CONFIG.PAINT_MODE;
 import static MyVersion.Frame.World.*;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
@@ -128,7 +124,7 @@ public static Cell[][] getCells(){
         }
 
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < CELLS_ON_START; i++) {
             Random r =new Random();
             cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(relative));
         }
@@ -142,7 +138,7 @@ public static Cell[][] getCells(){
     	while(true) {
     		Painter.ecoPaint(world.getGraphics());
     		try {
-				Thread.sleep(20);
+				Thread.sleep(10);//20
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -173,9 +169,6 @@ public static Cell[][] getCells(){
             }
             for (int i = 0; i < width; i++) {
             	for (int j = 0; j < height ; j++) {
-            		if (cells[i][j].secCell==null){//подсчет населения наоборот
-            			NULL_CELLS++;
-            		}
 
             		if(cells[i][j].secCell!=null){
             			cells[i][j].secCell.setX(i);
@@ -204,6 +197,8 @@ public static Cell[][] getCells(){
 
             			}
 
+            		}else {
+            			NULL_CELLS++;//подсчет населения наоборот
             		}
 
             	}
@@ -263,7 +258,7 @@ public static Cell[][] getCells(){
 	 	for (int i = 0; i < GM2_CONFIG.CELLS_ON_START; i++) {
 	 		NormCell nBuf;
 	 		Random r =new Random();
-	 		int buff=r.nextInt(2);
+	 		int buff=r.nextInt(3);
 	 		if(buff==1) {
 	 			nBuf=new NormCell(relative);
 	 			cells[r.nextInt(width)][r.nextInt(height)].setSecCell(nBuf);

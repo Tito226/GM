@@ -3,13 +3,11 @@ package MyVersion.Frame;
 
 import MyVersion.Core.BrainCloneClass;
 import MyVersion.Core.Network;
-
-
 import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
-
+import static MyVersion.Core.Core_Config.*;
 import static MyVersion.Frame.GM2_CONFIG.*;
 import static MyVersion.Frame.World.*;
 
@@ -57,7 +55,7 @@ public class NormCell implements  Serializable {
         num++;
         energy=NORM_CELL_START_ENERGY;
         cellls++;
-        if(r.nextInt(4)==1)
+        if(r.nextInt(MUTATION_CHANCE)==0)
         brain.mutate(NUMBER_OF_MUTATIONS);//TODO delete it   !!!
     }
 /* public NormCell(long myParentNum){
@@ -344,6 +342,15 @@ public class NormCell implements  Serializable {
            energy-=1;
        }
        double output=evaluateFitness();
+       if(DEBUG) {
+    	   System.out.println("energy: "+energy+"  organic:  "+cells[x][y].organic+"   ");
+    	   System.out.println("output: "+output+"output with act function: "+(1/(1+ Math.pow(Math.E,-output))));
+    	   try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+       }
        if(output>0.1f && output<0.125f){
         move(Directions.UP);
        }else if (output>0.125f && output<0.15f){
@@ -378,7 +385,7 @@ public class NormCell implements  Serializable {
        energy--;
        lifeTime++;
        }
-    }
+   }
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     public void setMyColor(Color myColor) {
