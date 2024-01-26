@@ -9,9 +9,12 @@ import MyVersion.Core.Network;
 import MyVersion.Core.Network_Teacher;
 import javax.swing.*;
 import java.awt.*;
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
@@ -24,9 +27,6 @@ import static MyVersion.Frame.World.*;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 public class World extends JPanel implements Runnable  {
-	
-    static FileInputStream fileInputStream;
-    static ObjectInputStream objectInputStream;
     public Network relative;
     public static int cellls=0;
     public static int cellSize=CELL_SIZE;
@@ -36,10 +36,27 @@ public class World extends JPanel implements Runnable  {
     static Cell[][] cells;
     private static boolean pause=false;
     static World world;
-    static   Thread wor;
+    static Thread wor;
     public World(int width,int height) throws IOException {
         Network_Teacher network_teacher=new Network_Teacher();
-        relative=network_teacher.createAndTeachNetwork();
+        if(!TEST_RUN) {
+        	relative=network_teacher.createAndTeachNetwork();
+        }else {
+        	
+            try {
+            	FileInputStream fileInputStream = new FileInputStream("C:\\Users\\Timurs1\\Desktop\\BrainSave.network");
+            	byte[] buff=fileInputStream.readAllBytes();
+            	fileInputStream.close();
+            	ByteArrayInputStream fis = new ByteArrayInputStream(buff);
+            	ObjectInputStream ois = new ObjectInputStream(fis);
+				relative=(Network) ois.readObject();
+	ois.close();
+				fis.close();
+			} catch (ClassNotFoundException | IOException e) {	
+				e.printStackTrace();
+			}
+        }
+    
         network_teacher=null;
         this.height=height;
         this.width=width;
@@ -109,15 +126,17 @@ public static Cell[][] getCells(){
     public static int Restarts=0;
     public static int lastRestarts=0;
     ExecutorService pool=Executors.newFixedThreadPool(1);
+    static FileOutputStream fileOutputStream ;
+    static ObjectOutputStream objectOutputStream ;
     @Override
     public void run() {
-    	
-        for (int j = 0; j < height; j++) {
-            for (int i = 0; i < width ; i++) {
-                cells[i][j]=new Cell();
-                if (cells[i][j]!=null) {
-                    cells[i][j].setX(i);
-                    cells[i][j].setY(j);
+        
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width ; x++) {
+                cells[x][y]=new Cell();
+                if (cells[x][y]!=null) {
+                    cells[x][y].setX(x);
+                    cells[x][y].setY(y);
                 }
 
             }
@@ -133,16 +152,16 @@ public static Cell[][] getCells(){
         int countt=0;
         boolean tested=false;
         ArrayList<Double[]> inputData=new ArrayList<Double[]>();
-    if(PAINT_MODE==1) {
-    	Runnable task = () -> {
-    	while(true) {
-    		Painter.ecoPaint(world.getGraphics());
-    		try {
-				Thread.sleep(10);//20
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-    	}
+        if(PAINT_MODE==1) {
+        	Runnable task = () -> {
+        		while(true) {
+        			Painter.ecoPaint(world.getGraphics());
+        			try {
+        				Thread.sleep(10);//20
+        			} catch (InterruptedException e) {
+        				e.printStackTrace();
+        			}	
+        		}
     	};
     	pool.execute(task);
 	}
@@ -163,7 +182,7 @@ public static Cell[][] getCells(){
                 for (int j = 0; j < height ; j++) {
                     if( cells[i][j].secCell!=null){
                     cells[i][j].secCell.stepN=false;
-                    }
+                    }/*TODO реализовать мезонизм восстановления органики*/
                     cells[i][j].testCell();//проверяет на ошибки, убивает клетку ,если кончилась енергия, назначает цвет
                 }
             }
@@ -175,11 +194,11 @@ public static Cell[][] getCells(){
             			cells[i][j].secCell.setY(j);
             			if(cells[i][j].secCell.lifeTime>bestLifeTime) {
             				bestLifeTime=cells[i][j].secCell.lifeTime;
-            				//topLifeTimeBrain=BrainCloneClass.networkClone(cells[i][j].secCell.brain);
+            				topLifeTimeBrain=BrainCloneClass.networkClone(cells[i][j].secCell.brain);
             			}
             			if(cells[i][j].secCell.lifeTime>thisBestLifeTime){
             				thisBestLifeTime=cells[i][j].secCell.lifeTime;
-            				topLifeTimeBrain=BrainCloneClass.networkClone(cells[i][j].secCell.brain);
+            				//topLifeTimeBrain=BrainCloneClass.networkClone(cells[i][j].secCell.brain);
             			}
             			if(cells[i][j].secCell.multiplies>bestMultiplies) {
             				bestMultiplies=cells[i][j].secCell.multiplies;
@@ -188,9 +207,10 @@ public static Cell[][] getCells(){
             			if(!cells[i][j].secCell.stepN){
             				cells[i][j].secCell.stepN=true;
             				//получение входной информации ,для диагностики клетки
-            				if(Restarts<10) {
-            				inputData.add(cells[i][j].secCell.getInputData());
-            				} else {inputData=null;
+            				if(Restarts<4) {
+            					inputData.add(cells[i][j].secCell.myMethods.getInputData());
+            				} else {
+            					inputData=null;
             				}
             				cells[i][j].secCell.step();//сделать ход если еще не ходил
             				isStep=true;
@@ -246,25 +266,36 @@ public static Cell[][] getCells(){
     }
 
     private void onRestart() {
+    	Random r=new Random();
     	//установка начального состояния органики,если все умерли
 	 	for (int i = 0; i < height; i++) {
 	 		for (int j = 0; j < width; j++) {
 	 			cells[j][i].organic=CELL_START_ORGANIC;
 	 		}
 	 	}
-	 	
+	 	if(thisBestLifeTime>5000) {
+	 		try {
+	 			fileOutputStream = new FileOutputStream("C:\\Users\\Timurs1\\Desktop\\brains\\BrainSave"+"5000"+r.nextLong()+".network");
+	 			objectOutputStream = new ObjectOutputStream(fileOutputStream);
+				objectOutputStream.writeObject(topLifeTimeBrain);
+				objectOutputStream.close();
+				fileOutputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	        
+	 	}
 	 	ArrayList<Network> checkGroup=new ArrayList();
 	 	//Summon cells
 	 	for (int i = 0; i < GM2_CONFIG.CELLS_ON_START; i++) {
 	 		NormCell nBuf;
-	 		Random r =new Random();
-	 		int buff=r.nextInt(3);
-	 		if(buff==1) {
+	 		int buff=r.nextInt(2);
+	 		/*if(buff==1) {
 	 			nBuf=new NormCell(relative);
 	 			cells[r.nextInt(width)][r.nextInt(height)].setSecCell(nBuf);
 	 			continue;
-	 		}else if(buff==2) {
-	 			nBuf=new NormCell(topMultipliesBrain);
+	 		}else*/ if(buff==0) {
+	 			nBuf=new NormCell(topLifeTimeBrain);
 	 			cells[r.nextInt(width)][r.nextInt(height)].setSecCell(nBuf);
 	 		} else {
 	 			nBuf=new NormCell(topLifeTimeBrain);
@@ -288,10 +319,10 @@ public static Cell[][] getCells(){
 	 	//+++++++++++++++++++
 	 	if(PAINT_MODE!=0) {//0
 	 		
-	 		paint1(world.getGraphics());
+	 		paintComponent(world.getGraphics());
 	 	}
 	 	else {
-	 		paint1(world.getGraphics());
+	 		paintComponent(world.getGraphics());
 	 	}
 	 	
 	 	checkGroup=null;
@@ -303,8 +334,8 @@ public static Cell[][] getCells(){
 	 	lastBestLifeTime=thisBestLifeTime;
 	 	thisBestLifeTime=0;
     }
-    
-    public void paint1(Graphics g) {
+    @Override
+    public void paintComponent(Graphics g) {
     	g.setColor(Color.BLACK);
         g.drawString("Restarts: " + Restarts, 7, 9);
         for (int i = 0; i < width; i++) {

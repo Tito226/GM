@@ -22,7 +22,7 @@ import static MyVersion.Core.Core_Config.*;
 import static MyVersion.Core.Data_Set.rnd;
 import static MyVersion.Frame.GM2_CONFIG.ENERGY_NEEDED_TO_MULTIPLY;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
-
+/*TODO сделать библиотекой*/
 public class Network_Teacher extends JPanel {
 	public static int percent=0;
 	ArrayList<Double[]> keys;
@@ -50,7 +50,7 @@ public class Network_Teacher extends JPanel {
              frame.setSize(300, 100);
              frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
              frame.setVisible(true);
-            while(Network_Teacher.percent!=100) {
+             while(Network_Teacher.percent!=100) {
             	teacher.getGraphics().clearRect(0, 0, 50, 20);
             	teacher.getGraphics().setColor(Color.BLACK);
             	teacher.getGraphics().drawString( Network_Teacher.percent+"%", 7, 9);
@@ -80,9 +80,10 @@ public class Network_Teacher extends JPanel {
         return errors;
     }
 	
-
+	
     public static void main(String[] args) throws IOException {
     	/*run this to test network teacher*/
+    	
     	Network_Teacher nt=new Network_Teacher();
         Network student=new Network(1);
         float[] errors= nt.fullTeach(student);
@@ -152,7 +153,7 @@ public class Network_Teacher extends JPanel {
         Random r=new Random();
         int i=r.nextInt(data_set.dataSetInputsOutputs.size());//Choose random data from data_set
         
-        student.evaluteFitness(this.keys.get(i),true);/*TODO  ПРИДУМАТЬ КАК УСКОРИТЬ, ПРИ БОЛЬШОМ ДАТАСЕТЕ СИЛЬЕО ЗАМЕДЛЯЕТСЯ*/
+        student.evaluteFitness(this.keys.get(i),true);
         //outputs correction
         int yy=0;
         for (Dot dot : student.dotsArr.get(student.dotsArr.size()-1)) {

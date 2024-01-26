@@ -91,16 +91,16 @@ public  class Cell {
 		  System.out.println(color[1]);
 		  System.out.println(color[2]);
 	  }
-	  if(secCell!=null  && secCell.getEnergy()<=0  ){
-		  organic+=secCell.getEnergy();
+	  if(secCell!=null  && secCell.myMethods.getEnergy(secCell)<=0  ){
+		  organic+=secCell.myMethods.getEnergy(secCell);
 		  secCell.brain.kill();
 		  setSecCell(null);
 		  cellls--;
 		  //setChange(true);
 	  }
-	  if(secCell!=null  && secCell.getEnergy()>=10000 ){
+	  if(secCell!=null  && secCell.myMethods.getEnergy(secCell)>=10000 ){
           System.out.println("Cell with 10000 died");
-          organic+=secCell.getEnergy();
+          organic+=secCell.myMethods.getEnergy(secCell);
           secCell.brain.kill();
           setSecCell(null);
           cellls--;

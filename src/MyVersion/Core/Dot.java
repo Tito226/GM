@@ -1,12 +1,14 @@
 package MyVersion.Core;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import static MyVersion.Core.Core_Config.BIAS_VALUE;
 
-public class Dot {
+public class Dot implements Serializable {
+	private static final long serialVersionUID = 3L;
 	double weightsDelta;
-    double error;
+	double error;
     public double value=0.0f;
     Dot_Type myType;
     public ArrayList<Node> nodesFromMe=new ArrayList<>();
@@ -35,24 +37,27 @@ public class Dot {
          error=0f;
          weightsDelta=0f;
     }
-     void evalute(){
-        if(myType==Dot_Type.OUTPUT){
-            value=activaionFunction(value);
-        }else if(myType!= Dot_Type.BIAS_TYPE){
+    void evalute(){
+        if(myType == Dot_Type.HIDDEN || myType == Dot_Type.INPUT){
             value = activaionFunction(value);
             if (nodesFromMe.size() > 0) {
                 for (int i = 0; i < nodesFromMe.size(); i++) {
                     nodesFromMe.get(i).evalute();
                 }
             }
-        }else if(myType==Dot_Type.BIAS_TYPE) {
+            return;
+        }
+        
+        else if(myType==Dot_Type.BIAS_TYPE) {
         	if (nodesFromMe.size() > 0) {
                 for (int i = 0; i < nodesFromMe.size(); i++) {
                     nodesFromMe.get(i).evalute();
                 }
             }	
-        	}
-        
+        }
+        else if(myType==Dot_Type.OUTPUT){
+            value=activaionFunction(value);
+        }
     }
     double getOutpup(){
       return value;
@@ -99,6 +104,8 @@ public class Dot {
     	for(Node node: nodesToMe) {
     		node.kill();
     	}
+    	nodesFromMe=null;
+    	nodesToMe=null;
     }
    
     

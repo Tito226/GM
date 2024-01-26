@@ -22,7 +22,7 @@ public class Core_Config {
     public static final double FIRST_LAYER_NODES_VALUE=-0.15d;//-0.15f
     public static final double THRESHOLD_WEIGHT_RESET_VALUE=0.07d;
     public static final boolean NODES_BECOMES_UNCHANGEBLE_IF_WEIGHT_BIGGER_THAN_THRESHOLD=false;
-    public static final boolean FIRST_INPUT_MULTIPLIER=false;//true
+    public static final boolean FIRST_INPUT_MULTIPLIER=true;//true
     /*возможно нужно перенести в другой конфиг*/
     public static final double MUTATION_MULTIPLIER=0.23D;/*регулирует максимальную "силу" мутации*///0.4
 }
