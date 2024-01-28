@@ -27,6 +27,7 @@ import static MyVersion.Frame.World.*;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 public class World extends JPanel implements Runnable  {
+	InfoPanel inf=new InfoPanel(this);
     public Network relative;
     public static int cellls=0;
     public static int cellSize=CELL_SIZE;
@@ -87,23 +88,27 @@ public static Cell[][] getCells(){
         pauseButton.addActionListener(new PauseListener());
         dePauseButton.addActionListener(new ContinueListener());
         JPanel controls = new JPanel();
+        JPanel controls2 = new JPanel();
         controls.setLayout(new GridLayout(2, 1));
+        //controls2.setLayout(new GridLayout(1, 3));
         controls.add(pauseButton);
         controls.add(dePauseButton);
-        JPanel controls2 = new JPanel();
-
+        
+        world=new World(width/cellSize-5,height/cellSize-20);
         JButton button = new JButton("save");
-        button.addActionListener(new FileSaveListener());
         JButton button2 = new JButton("load");
+        button.addActionListener(new FileSaveListener());
         button2.addActionListener(new FileOpenListener());
         controls2.add(button);
         controls2.add(button2);
+        controls2.add(world.inf);
+        world.inf.setPreferredSize(new Dimension(200,40));//метод для задания размера JPanel
 
-
-        world=new World(width/cellSize-5,height/cellSize-20);
+        
         frame.add(controls2,BorderLayout.NORTH);
         frame.add(controls, BorderLayout.EAST); // справа будет панель с управлением
         frame.add(world, BorderLayout.CENTER);
+        
         frame.setSize(width, height);
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         frame.setVisible(true);
@@ -114,7 +119,7 @@ public static Cell[][] getCells(){
     }
 
 
-    
+    public static Network thisTopLifeTimeBrain=null;
     public static Network topLifeTimeBrain=null;
     public static Network topMultipliesBrain=null;
     public static int bestLifeTime=0;
@@ -122,8 +127,9 @@ public static Cell[][] getCells(){
     public static int thisBestLifeTime=0;
     public static int lastBestLifeTime=0;
     public static int lastLastBestLifeTime=0;
+    public int stepsAtAll=0;
     static  byte countt2=0;
-    public static int Restarts=0;
+    public int Restarts=0;
     public static int lastRestarts=0;
     ExecutorService pool=Executors.newFixedThreadPool(1);
     static FileOutputStream fileOutputStream ;
@@ -155,7 +161,7 @@ public static Cell[][] getCells(){
         if(PAINT_MODE==1) {
         	Runnable task = () -> {
         		while(true) {
-        			Painter.ecoPaint(world.getGraphics());
+        			Painter.ecoPaint(world.getGraphics(),inf);
         			try {
         				Thread.sleep(10);//20
         			} catch (InterruptedException e) {
@@ -170,9 +176,9 @@ public static Cell[][] getCells(){
     	countt2++;
     	long startTime = System.currentTimeMillis();
     	if(!getPause()){
-        	
+    		stepsAtAll++;
     		if(PAINT_MODE==0) {
-    			Painter.ecoPaint(world.getGraphics());
+    			Painter.ecoPaint(world.getGraphics(),inf);
     	 	}
       
             /*step{*************************************************************************
@@ -198,7 +204,9 @@ public static Cell[][] getCells(){
             			}
             			if(cells[i][j].secCell.lifeTime>thisBestLifeTime){
             				thisBestLifeTime=cells[i][j].secCell.lifeTime;
-            				//topLifeTimeBrain=BrainCloneClass.networkClone(cells[i][j].secCell.brain);
+            				if(cells[i][j].secCell.lifeTime>200) {
+            					thisTopLifeTimeBrain=BrainCloneClass.networkClone(cells[i][j].secCell.brain);
+            				}
             			}
             			if(cells[i][j].secCell.multiplies>bestMultiplies) {
             				bestMultiplies=cells[i][j].secCell.multiplies;
@@ -245,7 +253,7 @@ public static Cell[][] getCells(){
                countt=0;
            }
            if(PAINT_MODE==0) {
-        	   Painter.ecoPaint(world.getGraphics());
+        	   Painter.ecoPaint(world.getGraphics(),inf);
            }
         } else {
         	try {
@@ -273,9 +281,9 @@ public static Cell[][] getCells(){
 	 			cells[j][i].organic=CELL_START_ORGANIC;
 	 		}
 	 	}
-	 	if(thisBestLifeTime>5000) {
+	 	if(thisBestLifeTime>CREATE_SAVE_ON_LIFETIME) {/*TODO реализовать механизм проверки тот ли мозг копируется*/
 	 		try {
-	 			fileOutputStream = new FileOutputStream("C:\\Users\\Timurs1\\Desktop\\brains\\BrainSave"+"5000"+r.nextLong()+".network");
+	 			fileOutputStream = new FileOutputStream("C:\\Users\\Timurs1\\Desktop\\BrainSave"+CREATE_SAVE_ON_LIFETIME+r.nextLong()+".network");
 	 			objectOutputStream = new ObjectOutputStream(fileOutputStream);
 				objectOutputStream.writeObject(topLifeTimeBrain);
 				objectOutputStream.close();
@@ -289,16 +297,16 @@ public static Cell[][] getCells(){
 	 	//Summon cells
 	 	for (int i = 0; i < GM2_CONFIG.CELLS_ON_START; i++) {
 	 		NormCell nBuf;
-	 		int buff=r.nextInt(2);
-	 		/*if(buff==1) {
-	 			nBuf=new NormCell(relative);
+	 		int buff=r.nextInt(3);
+	 		if(buff==1) {
+	 			nBuf=new NormCell(thisTopLifeTimeBrain);
 	 			cells[r.nextInt(width)][r.nextInt(height)].setSecCell(nBuf);
 	 			continue;
-	 		}else*/ if(buff==0) {
+	 		}else if(buff==0) {
 	 			nBuf=new NormCell(topLifeTimeBrain);
 	 			cells[r.nextInt(width)][r.nextInt(height)].setSecCell(nBuf);
 	 		} else {
-	 			nBuf=new NormCell(topLifeTimeBrain);
+	 			nBuf=new NormCell(topMultipliesBrain);
 	 			cells[r.nextInt(width)][r.nextInt(height)].setSecCell(nBuf);
 	 		}
 	 		checkGroup.add(nBuf.brain);
@@ -316,9 +324,10 @@ public static Cell[][] getCells(){
 	 	System.err.println("topLifeTimeBrain "+tltb);
 	 	System.err.println("relative "+rel);
 	 	Restarts++;
+	 	
 	 	//+++++++++++++++++++
 	 	if(PAINT_MODE!=0) {//0
-	 		
+	 		paintComponent(world.getGraphics());
 	 		paintComponent(world.getGraphics());
 	 	}
 	 	else {
@@ -328,16 +337,17 @@ public static Cell[][] getCells(){
 	 	checkGroup=null;
 	 	lastRestarts++;
 	 	System.out.println("Restarted");
+	 	System.err.println("Steps :"+stepsAtAll);
 	 	System.out.println("best life time: "+ bestLifeTime);
 	 	System.out.println("this Best Life Time: " +thisBestLifeTime);
 	 	lastLastBestLifeTime=lastBestLifeTime;
 	 	lastBestLifeTime=thisBestLifeTime;
 	 	thisBestLifeTime=0;
+	 	stepsAtAll=0;
     }
     @Override
     public void paintComponent(Graphics g) {
-    	g.setColor(Color.BLACK);
-        g.drawString("Restarts: " + Restarts, 7, 9);
+
         for (int i = 0; i < width; i++) {
         	for (int j = 0; j < height; j++) {
         	
@@ -356,8 +366,7 @@ public static Cell[][] getCells(){
         		}
         	}
         } 
-        g.setColor(Color.BLACK);
-        g.drawString("Restarts: " + Restarts, 7, 9);
+
     }
     
     

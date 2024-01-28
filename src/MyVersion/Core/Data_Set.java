@@ -45,7 +45,7 @@ public class Data_Set {
     }
 
     public static Double[] getEatOrganicTrainData() {
-    	return new Double[]{0d,rnd(1,ENERGY_NEEDED_TO_MULTIPLY),rnd(7,10),(double) r.nextInt(2),(double) r.nextInt(2),(double) r.nextInt(2),(double) r.nextInt(2)};
+    	return new Double[]{0d,rnd(1,ENERGY_NEEDED_TO_MULTIPLY),rnd(7,50),(double) r.nextInt(2),(double) r.nextInt(2),(double) r.nextInt(2),(double) r.nextInt(2)};
     } 
 
     public static Double[] getMultiplyTrainData() {

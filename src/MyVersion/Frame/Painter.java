@@ -1,7 +1,6 @@
 package MyVersion.Frame;
 
 import static MyVersion.Frame.GM2_CONFIG.CELL_START_ORGANIC;
-import static MyVersion.Frame.World.Restarts;
 import static MyVersion.Frame.World.bestLifeTime;
 import static MyVersion.Frame.World.cellSize;
 import static MyVersion.Frame.World.cells;
@@ -12,19 +11,15 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 public class Painter {
-	public static void statPaint(Graphics g) {
-		g.setColor(Color.BLACK);
-		g.drawString("Restarts: " + Restarts, 7, 9);
-		g.drawString("Best Life Time: " + bestLifeTime, 7, 19);
-	}
+	
 	
 	public static void stringPaint(String str) {}
 	
 	public static void stringPaint(String[] strings) {}
 	
-	 public static void ecoPaint(Graphics g) {
+	 public static void ecoPaint(Graphics g,InfoPanel inf) {
 		try {/*TODO FIX MULTI THREAD PAINT EROR(SEC CELL==NULL),иногда остается "тень" зеленой клетки */
-		statPaint(g);
+		inf.paint(inf.getGraphics());
      	for (int i = 0; i < width; i++) {
              for (int j = 0; j < height; j++) {
                  if (cells[i][j] != null) {
@@ -51,7 +46,7 @@ public class Painter {
                  }
              }
          }
-     	statPaint(g);
+     	
      	}catch(Exception e) {
      		System.err.println("paint eror");
      	}

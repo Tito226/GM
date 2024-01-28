@@ -187,7 +187,9 @@ public class NormCell implements  Serializable {
        } else if (output>0.175f && output<0.2f){
     	   move(Directions.RIGHT);
        }
-       if (output>0.2 && output<0.3){eatOrganic();}
+       if (output>0.2 && output<0.3){
+    	   eatOrganic();
+       }
        else  if(output>0.6 && output<0.61){
     	   if(!eatCell(Directions.RIGHT)){energy--;}
 
@@ -227,6 +229,9 @@ public class NormCell implements  Serializable {
         if(cells[x][y].getOrganic()!=0  && cells[x][y].getOrganic()>2){
            energy+=HOW_MUCH_ORGANIC_EATS_PER_STEP;
             cells[x][y].setOrganic(cells[x][y].getOrganic()-3);
+        }else {
+        	energy+=cells[x][y].getOrganic();
+        	cells[x][y].setOrganic(0);
         }
     }
 

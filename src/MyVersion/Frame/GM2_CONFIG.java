@@ -7,17 +7,19 @@ public class GM2_CONFIG {
     public static final boolean DEBUG=false;
     public static final boolean TEST_RUN=true;
     public static final boolean CREATE_SAVES=true;
+    public final static int CREATE_SAVE_ON_LIFETIME=3000;
      //NORMCELL SETTINGS
     public static final boolean MULTI_THREAD_EVALUTE_FITNESS_METHOD=false;
     public static final int NUMBER_OF_MUTATIONS=7;/*Сколько нод мутируют при делении клетки(в конструкторе)*/
-    public static final int MUTATION_CHANCE=200;//rand.nextInt(MUTATION_CHANCE)==1
+    public static final int MUTATION_CHANCE=90;//rand.nextInt(MUTATION_CHANCE)==1
     public static final int ENERGY_NEEDED_TO_MULTIPLY=30;//30
     public final static int ENERGY_NEEDED_TO_MULTIPLY_PROTOPLAST=10;//10
     public static final int NORM_CELL_START_ENERGY=15;//15
     public static final int PROTOPLAST_START_ENERGY=4;//4
     public static final int HOW_MUCH_ORGANIC_EATS_PER_STEP=3;//3
     //CELL SETTINGS
+    public static final int ORGANIC_PER_CELL_ON_NORMCELL_DEATH=5;
     public static final int CELL_START_ORGANIC=6;//6
-	public static final int CELLS_ON_START=200;
+	public static final int CELLS_ON_START=250;
 }
 /*TODO создать тестовый режим*/

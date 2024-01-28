@@ -2,9 +2,7 @@ package MyVersion.Frame;
 
 import java.awt.*;
 import java.util.Random;
-
-import static MyVersion.Frame.GM2_CONFIG.CELL_START_ORGANIC;
-import static MyVersion.Frame.GM2_CONFIG.NORM_CELL_START_ENERGY;
+import static MyVersion.Frame.GM2_CONFIG.*;
 import static MyVersion.Frame.World.*;
 
 public  class Cell {
@@ -92,11 +90,7 @@ public  class Cell {
 		  System.out.println(color[2]);
 	  }
 	  if(secCell!=null  && secCell.myMethods.getEnergy(secCell)<=0  ){
-		  organic+=secCell.myMethods.getEnergy(secCell);
-		  secCell.brain.kill();
-		  setSecCell(null);
-		  cellls--;
-		  //setChange(true);
+		  secCellKill();
 	  }
 	  if(secCell!=null  && secCell.myMethods.getEnergy(secCell)>=10000 ){
           System.out.println("Cell with 10000 died");
@@ -115,7 +109,21 @@ public  class Cell {
         return myColor;
   	}
 
-
+  	void secCellKill(){
+  		organic+=secCell.myMethods.getEnergy(secCell)+10;
+  		for (int i = -1; i < 2; i++) {
+  			for (int j = -1; j < 2; j++) {
+  				if(x+i<cells.length && x+i>0 && y+j>0 && y+j<cells[1].length) {
+  					cells[x+i][y+j].organic+=secCell.myMethods.getEnergy(secCell)+ORGANIC_PER_CELL_ON_NORMCELL_DEATH;
+  					cells[x+i][y+j].change=true;
+  				}
+  			}
+		}
+  		secCell.brain.kill();
+  		setSecCell(null);
+  		cellls--;
+  	}
+  	
     public void setOrganic(int organic) {
         this.organic = organic;
     }
