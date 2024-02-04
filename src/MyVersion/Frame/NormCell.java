@@ -7,6 +7,7 @@ import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
+import MyVersion.Frame.Action_Boundaries;
 import static MyVersion.Core.Core_Config.*;
 import static MyVersion.Frame.GM2_CONFIG.*;
 import static MyVersion.Frame.World.*;
@@ -178,16 +179,16 @@ public class NormCell implements  Serializable {
 			e.printStackTrace();
 		}
        }
-       if(output>0.1f && output<0.125f){
-        move(Directions.UP);
-       }else if (output>0.125f && output<0.15f){
-        move(Directions.DOWN);
-       }else if (output>0.15f && output<0.175f){
+       if(output>Action_Boundaries.moveUpBoundaries[0] && output<Action_Boundaries.moveUpBoundaries[1]){
+    	   move(Directions.UP);
+       }else if (output>Action_Boundaries.moveDownBoundaries[0] && output<Action_Boundaries.moveDownBoundaries[1]){
+    	   move(Directions.DOWN);
+       }else if (output>Action_Boundaries.moveLeftBoundaries[0] && output<Action_Boundaries.moveLeftBoundaries[1]){
     	   move(Directions.LEFT);
-       } else if (output>0.175f && output<0.2f){
+       } else if (output>Action_Boundaries.moveRightBoundaries[0] && output<Action_Boundaries.moveRightBoundaries[1]){
     	   move(Directions.RIGHT);
        }
-       if (output>0.2 && output<0.3){
+       if (output>Action_Boundaries.eatOrganicBoundaries[0] && output<Action_Boundaries.eatOrganicBoundaries[1]){
     	   eatOrganic();
        }
        else  if(output>0.6 && output<0.61){
@@ -207,7 +208,7 @@ public class NormCell implements  Serializable {
        }else if(output>0.68 && output<0.8){
 
 
-       } else if(output>0.9f && output<1f ){
+       } else if(output>Action_Boundaries.multiplyBoundaries[0] && output<Action_Boundaries.multiplyBoundaries[1] ){
     	   multiply();
        }
        setLastThings();

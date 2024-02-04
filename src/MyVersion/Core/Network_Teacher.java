@@ -1,5 +1,6 @@
 package MyVersion.Core;
 
+import MyVersion.Frame.Action_Boundaries;
 import MyVersion.Graphic_Builder.Graphic_Builder;
 import MyVersion.NEAT.Pool;
 
@@ -120,8 +121,9 @@ public class Network_Teacher extends JPanel {
 
             for (int i = student.dotsArr.get(0).size() - 1 - BIAS; i > 0; i--) {
                 for (int j = 0; j < student.dotsArr.get(1).size() - BIAS; j++) {//"< student.dotsArr.get(1).size()-1" may be changed to "student.dotsArr.get(0).get(i).nodesFromMe.size()"
-                    student.dotsArr.get(0).get(i).nodesFromMe.get(j).setWeight(FIRST_LAYER_NODES_VALUE);
-                    student.dotsArr.get(0).get(i).nodesFromMe.get(j).changeble=false;//TODO delete it
+                	Node curNode=student.dotsArr.get(0).get(i).nodesFromMe.get(j);
+                	curNode.setWeight(FIRST_LAYER_NODES_VALUE);
+                	curNode.changeble=false;//TODO delete it
                 }
             }
         }	  if(BLOCK_USELESS_INPUTS){
@@ -150,6 +152,7 @@ public class Network_Teacher extends JPanel {
                 dot.clear();//сброс данных точки(значение,ошибка,дельта весов)
             }
         }
+        
         Random r=new Random();
         int i=r.nextInt(data_set.dataSetInputsOutputs.size());//Choose random data from data_set
         
@@ -211,11 +214,11 @@ public class Network_Teacher extends JPanel {
     
     /*TODO Тест не работает правильно */
     public static void suitabilityTest(Network student) {//tests network,ввыводит что на входе и на выходе и подходит ли ответ 
-    	Double[] f =Data_Set.getMultiplyTrainData();
+    	Double[] f =Data_Set.getMultiplyTrainData()[0];
     	double weightBuffer=student.evaluteFitness(f,false);
         String answer;
         Random r = new Random();
-        if(weightBuffer<1f && weightBuffer>0.9f){
+        if(weightBuffer>Action_Boundaries.multiplyBoundaries[0] && weightBuffer<Action_Boundaries.multiplyBoundaries[1] ){
            answer=" passed";
         }else{
            answer=" failed";
@@ -224,34 +227,34 @@ public class Network_Teacher extends JPanel {
         
         f =new Double[]{0d,rnd(3,ENERGY_NEEDED_TO_MULTIPLY),rnd(0,3),0d,0d,0d,0d};
         weightBuffer=student.evaluteFitness(f,false);
-        if(weightBuffer<0.125 && weightBuffer>0.1f){
+        if( weightBuffer>Action_Boundaries.moveUpBoundaries[0] && weightBuffer<Action_Boundaries.moveUpBoundaries[1]){
             answer=" passed";
         }else{
             answer=" failed";
         }
         System.out.println("Move up:"+weightBuffer+answer+"____________________"+Arrays.toString(f));
         
-        f=Data_Set.getEatOrganicTrainData();
+        f=Data_Set.getEatOrganicTrainData()[0];
         weightBuffer=student.evaluteFitness(new Double[]{0d,rnd(1,4),rnd(7,100), (double) r.nextInt(2),(double) r.nextInt(2),(double) r.nextInt(2),(double) r.nextInt(2)},false);
-        if(weightBuffer<0.3f && weightBuffer>0.2f){
+        if(weightBuffer>Action_Boundaries.eatOrganicBoundaries[0] && weightBuffer<Action_Boundaries.eatOrganicBoundaries[0]){
             answer=" passed";
         }else{
             answer=" failed";
         }
         System.out.println("Eat organic:"+weightBuffer+answer+"________________"+Arrays.toString(f));
         
-        f=Data_Set.getMoveRightOnUpWallTrainData();
+        f=Data_Set.getMoveRightOnUpWallTrainData()[0];
         weightBuffer=student.evaluteFitness(new Double[]{0d,rnd(4,30),rnd(1,4),1d,0d,0d,0d},false);
-        if(weightBuffer>0.175f && weightBuffer<0.2f){
+        if(weightBuffer>Action_Boundaries.moveRightBoundaries[0] && weightBuffer<Action_Boundaries.moveRightBoundaries[1]){
             answer=" passed";
         }else{
             answer=" failed";
         }
         System.out.println("move right on up wall:"+weightBuffer+answer+"________"+Arrays.toString(f));
         
-        f=Data_Set.getMoveDownIfRightWallTrainData();
+        f=Data_Set.getMoveDownIfRightWallTrainData()[0];
         weightBuffer=student.evaluteFitness(new Double[]{0d,rnd(4,30),rnd(1,4),0d,0d,0d,1d},false);
-        if(weightBuffer>0.125 && weightBuffer<0.15){
+        if(weightBuffer>Action_Boundaries.moveDownBoundaries[0] && weightBuffer<Action_Boundaries.moveDownBoundaries[1]){
             answer=" passed";
         }else{
             answer=" failed";

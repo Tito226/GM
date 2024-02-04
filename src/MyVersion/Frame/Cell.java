@@ -106,7 +106,13 @@ public  class Cell {
   }
 
   	public Color getColor(){
-        return myColor;
+  		if(secCell==null && partCell==null) {
+  			return myColor;
+        }else if(secCell!=null) {
+        	return secCell.getColor();
+        }else {
+        	return partCell.getColor();
+        }  	
   	}
 
   	void secCellKill(){
@@ -119,7 +125,12 @@ public  class Cell {
   				}
   			}
 		}
-  		secCell.brain.kill();
+  		if(!secCell.brain.dontDelete) {
+  			secCell.brain.kill();
+  		}else {
+  			secCell.brain.isDead=true;
+  		}
+  		
   		setSecCell(null);
   		cellls--;
   	}

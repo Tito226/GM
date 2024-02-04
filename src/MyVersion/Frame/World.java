@@ -9,6 +9,7 @@ import MyVersion.Core.Network;
 import MyVersion.Core.Network_Teacher;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -27,6 +28,7 @@ import static MyVersion.Frame.World.*;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 public class World extends JPanel implements Runnable  {
+	Painter painter=new Painter(this);
 	InfoPanel inf=new InfoPanel(this);
     public Network relative;
     public static int cellls=0;
@@ -79,7 +81,7 @@ public static Cell[][] getCells(){
 	
 
     public static void main(String[] args) throws  IOException {
-        int width=1200;
+        int width=1250;
         int height=700;
         JFrame frame = new JFrame("GM");
         
@@ -94,7 +96,7 @@ public static Cell[][] getCells(){
         controls.add(pauseButton);
         controls.add(dePauseButton);
         
-        world=new World(width/cellSize-5,height/cellSize-20);
+        world=new World(width/cellSize,height/cellSize-30);
         JButton button = new JButton("save");
         JButton button2 = new JButton("load");
         button.addActionListener(new FileSaveListener());
@@ -117,26 +119,33 @@ public static Cell[][] getCells(){
 
 
     }
-
-
-    public static Network thisTopLifeTimeBrain=null;
-    public static Network topLifeTimeBrain=null;
-    public static Network topMultipliesBrain=null;
+    int stepsBuff=0;
+    int countt=0; 
+    public int stepsAtAll=0;
+    public int Restarts=0;
+    public volatile int fps=0;
+    public volatile int liveCells=0;
     public static int bestLifeTime=0;
     public static int bestMultiplies=-1;
     public static int thisBestLifeTime=0;
     public static int lastBestLifeTime=0;
     public static int lastLastBestLifeTime=0;
-    public int stepsAtAll=0;
-    static  byte countt2=0;
-    public int Restarts=0;
-    public static int lastRestarts=0;
+    public static int lastRestarts=0;    
+    public long fpsMeter1=0;
+    public long fpsMeter2=0;
+    public static Network thisTopLifeTimeBrain;
+    public static Network topLifeTimeBrain=null;
+    public static Network topMultipliesBrain=null;
     ExecutorService pool=Executors.newFixedThreadPool(1);
     static FileOutputStream fileOutputStream ;
     static ObjectOutputStream objectOutputStream ;
+    LimitedArrayList<Network> bestLifeTimeBrains=new LimitedArrayList<>(50);
+    LimitedArrayList<Network> bestMultipliesBrains=new LimitedArrayList<>(50);
+    LimitedArrayList<Network> bestThisLifeTimeBrains=new LimitedArrayList<>(50);
+    boolean tested=false;
     @Override
     public void run() {
-        
+//**************************************************************************************************        
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width ; x++) {
                 cells[x][y]=new Cell();
@@ -154,33 +163,18 @@ public static Cell[][] getCells(){
             cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(relative));
         }
 
-
-        int countt=0;
-        boolean tested=false;
         ArrayList<Double[]> inputData=new ArrayList<Double[]>();
-        if(PAINT_MODE==1) {
-        	Runnable task = () -> {
-        		while(true) {
-        			Painter.ecoPaint(world.getGraphics(),inf);
-        			try {
-        				Thread.sleep(10);//20
-        			} catch (InterruptedException e) {
-        				e.printStackTrace();
-        			}	
-        		}
-    	};
-    	pool.execute(task);
-	}
+        multiThreadPaintInitial();
+//**************************************************************************************************
     while(true) {
     	boolean isStep=false;
-    	countt2++;
     	long startTime = System.currentTimeMillis();
     	if(!getPause()){
     		stepsAtAll++;
-    		if(PAINT_MODE==0) {
-    			Painter.ecoPaint(world.getGraphics(),inf);
-    	 	}
-      
+    		if(System.currentTimeMillis()>fpsMeter1+1000) {
+    			fpsMeter1=System.currentTimeMillis();
+    			stepsBuff=stepsAtAll;
+    		}
             /*step{*************************************************************************
             *******************************************************************************/
             int NULL_CELLS=0;
@@ -194,37 +188,52 @@ public static Cell[][] getCells(){
             }
             for (int i = 0; i < width; i++) {
             	for (int j = 0; j < height ; j++) {
-
-            		if(cells[i][j].secCell!=null){
-            			cells[i][j].secCell.setX(i);
-            			cells[i][j].secCell.setY(j);
-            			if(cells[i][j].secCell.lifeTime>bestLifeTime) {
-            				bestLifeTime=cells[i][j].secCell.lifeTime;
-            				topLifeTimeBrain=BrainCloneClass.networkClone(cells[i][j].secCell.brain);
-            			}
-            			if(cells[i][j].secCell.lifeTime>thisBestLifeTime){
-            				thisBestLifeTime=cells[i][j].secCell.lifeTime;
-            				if(cells[i][j].secCell.lifeTime>200) {
-            					thisTopLifeTimeBrain=BrainCloneClass.networkClone(cells[i][j].secCell.brain);
+            		Cell curCell=cells[i][j];
+            		if(curCell.secCell!=null){
+            			NormCell curNormCell=curCell.secCell;
+            			curNormCell.setX(i);
+            			curNormCell.setY(j);
+            			if(curNormCell.lifeTime>bestLifeTime) {
+            				bestLifeTime=curNormCell.lifeTime;
+            				if(topLifeTimeBrain!=null && curNormCell.brain.isDead) {
+            					topLifeTimeBrain.kill();
             				}
+            				topLifeTimeBrain=curNormCell.brain;
+            				bestLifeTimeBrains.add(curNormCell.brain);
+            				curNormCell.brain.dontDelete=true;
             			}
-            			if(cells[i][j].secCell.multiplies>bestMultiplies) {
-            				bestMultiplies=cells[i][j].secCell.multiplies;
-            				topMultipliesBrain=BrainCloneClass.networkClone(cells[i][j].secCell.brain);
+            			if(curNormCell.lifeTime>thisBestLifeTime){
+            				thisBestLifeTime=curNormCell.lifeTime;
+            				if(thisTopLifeTimeBrain!=null && curNormCell.brain.isDead) {
+            					thisTopLifeTimeBrain.kill();
+            				}
+            				thisTopLifeTimeBrain=curNormCell.brain;
+            				bestThisLifeTimeBrains.add(curNormCell.brain);
+            				curNormCell.brain.dontDelete=true;
             			}
-            			if(!cells[i][j].secCell.stepN){
-            				cells[i][j].secCell.stepN=true;
+            			if(curCell.secCell.multiplies>bestMultiplies) {
+            				bestMultiplies=curNormCell.multiplies;
+            				if(topMultipliesBrain!=null && curNormCell.brain.isDead) {
+            					thisTopLifeTimeBrain.kill();
+            				}
+            				topMultipliesBrain=curNormCell.brain;
+            				bestMultipliesBrains.add(curNormCell.brain);
+            				curNormCell.brain.dontDelete=true;
+            			}
+            			if(!curNormCell.stepN){
+            				curNormCell.stepN=true;
+            				curNormCell.step();//сделать ход если еще не ходил
+            				isStep=true;
             				//получение входной информации ,для диагностики клетки
-            				if(Restarts<4) {
-            					inputData.add(cells[i][j].secCell.myMethods.getInputData());
+            				if(Restarts<4 && DEBUG) {
+            					inputData.add(curNormCell.myMethods.getInputData());
             				} else {
             					inputData=null;
             				}
-            				cells[i][j].secCell.step();//сделать ход если еще не ходил
-            				isStep=true;
-
             			}
-
+            			if(System.currentTimeMillis()>fpsMeter1+1000) {
+                			fps=stepsAtAll-stepsBuff;
+                		}
             		}else {
             			NULL_CELLS++;//подсчет населения наоборот
             		}
@@ -234,7 +243,9 @@ public static Cell[][] getCells(){
             if(!isStep){
             	System.out.println("shit");
             }
-            
+            if(countt%13==0) {
+            	liveCells=width*height-NULL_CELLS;
+            }
             /*reset field organic*/
             if (NULL_CELLS==width*height){/*on restart*/
         	 	if(lastBestLifeTime==thisBestLifeTime&& thisBestLifeTime!=0 && !tested) {
@@ -253,8 +264,10 @@ public static Cell[][] getCells(){
                countt=0;
            }
            if(PAINT_MODE==0) {
-        	   Painter.ecoPaint(world.getGraphics(),inf);
-           }
+        	   painter.ecoPaint(world.getGraphics(),inf);
+           } else if(PAINT_MODE==-1) {//0
+   	 			paintComponent(world.getGraphics());
+   	 		}
         } else {
         	try {
 				Thread.sleep(200);
@@ -293,22 +306,23 @@ public static Cell[][] getCells(){
 			}
 	        
 	 	}
-	 	ArrayList<Network> checkGroup=new ArrayList();
+	 	ArrayList<Network> checkGroup=new ArrayList<>();
 	 	//Summon cells
 	 	for (int i = 0; i < GM2_CONFIG.CELLS_ON_START; i++) {
-	 		NormCell nBuf;
+	 		NormCell nBuf = null;
 	 		int buff=r.nextInt(3);
 	 		if(buff==1) {
-	 			nBuf=new NormCell(thisTopLifeTimeBrain);
-	 			cells[r.nextInt(width)][r.nextInt(height)].setSecCell(nBuf);
-	 			continue;
+	 				nBuf=new NormCell(bestThisLifeTimeBrains.get(r.nextInt(bestThisLifeTimeBrains.size())));
+	 				cells[r.nextInt(width)][r.nextInt(height)].setSecCell(nBuf);
+	 				continue;
 	 		}else if(buff==0) {
-	 			nBuf=new NormCell(topLifeTimeBrain);
+	 			nBuf=new NormCell(bestLifeTimeBrains.get(r.nextInt(bestLifeTimeBrains.size())));
 	 			cells[r.nextInt(width)][r.nextInt(height)].setSecCell(nBuf);
 	 		} else {
-	 			nBuf=new NormCell(topMultipliesBrain);
+	 			nBuf=new NormCell(bestMultipliesBrains.get(r.nextInt(bestMultipliesBrains.size())));
 	 			cells[r.nextInt(width)][r.nextInt(height)].setSecCell(nBuf);
 	 		}
+
 	 		checkGroup.add(nBuf.brain);
 	 	}
 	 	
@@ -345,28 +359,44 @@ public static Cell[][] getCells(){
 	 	thisBestLifeTime=0;
 	 	stepsAtAll=0;
     }
+
+    void multiThreadPaintInitial() {
+    	if(PAINT_MODE==1 || PAINT_MODE==3 || PAINT_MODE==4) {
+        	Runnable task = () -> {
+        		while(true) {
+        			if(PAINT_MODE==1 ) {
+        				painter.ecoPaint(world.getGraphics(),inf);
+        			}
+        			else if(PAINT_MODE==3 ) {
+        				painter.fullPaint(world.getGraphics(),inf);
+        			}
+        			else if(PAINT_MODE==4 ) {
+        				painter.combinedPaint(world.getGraphics(),inf);
+        			}
+        			try {
+        				Thread.sleep(10);//20
+        			} catch (InterruptedException e) {
+        				e.printStackTrace();
+        			}	
+        		}
+        };
+    	pool.execute(task);
+	}
+    }
+    
+    
     @Override
     public void paintComponent(Graphics g) {
-
+    	super.paintComponent(g);
+        // Отрисовка в буфер
         for (int i = 0; i < width; i++) {
-        	for (int j = 0; j < height; j++) {
-        	
-        		if (cells[i][j] != null) {
-        			if (cells[i][j].secCell == null && cells[i][j].partCell == null) {
-                        g.setColor(cells[i][j].getColor());
-                        g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-        			} else if (cells[i][j].secCell != null && cells[i][j].partCell == null) {
-                        g.setColor(cells[i][j].secCell.getColor());
-                        g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-        			}
-        			if (cells[i][j] != null && cells[i][j].partCell != null) {
-                        g.setColor(cells[i][j].partCell.getColor());
-                        g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-        			}
-        		}
-        	}
-        } 
-
+            for (int j = 0; j < height; j++) {
+                if (cells[i][j] != null) {
+                    g.setColor(cells[i][j].getColor());
+                    g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+                }
+            }
+        }
     }
     
     

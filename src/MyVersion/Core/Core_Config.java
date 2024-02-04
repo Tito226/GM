@@ -7,12 +7,12 @@ public class Core_Config {
     public static final int OUTPUTS=1;
     public static final int BIAS=1;//MUST BE 0 OR 1
     public static final double BIAS_VALUE=-6.5d;//Value of bias dots//-7 -6
-    public static final double LEARNING_RATE =0.00121d;//0.0009  0.002001
+    public static final double LEARNING_RATE =0.00151d;//0.0009  0.002001
     public static final int HIDDEN_DOTS_PER_ARRAY =25;//25
     public static final boolean USE_R_WHILE_LEARNING=false;
     
-    public static final double FADING=7/Math.pow(10,22);//0.00000000000000000000000000000007d
-    public static final int TEACH_ITERATIONS=500000;//800000
+    public static final double FADING=6/Math.pow(10,22);//0.00000000000000000000000000000007d
+    public static final int TEACH_ITERATIONS=800000;//800000
 
     //Realization parameters                                DON'T CHANGE IF YOU DON'T KNOW WHAT THEY DO
     public static final boolean BLOCK_USELESS_INPUTS=true;//TRUE

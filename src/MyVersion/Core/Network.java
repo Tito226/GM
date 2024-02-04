@@ -13,6 +13,9 @@ public class Network implements Serializable {
 /*сколько нейронов будет в скрытом слое - подбором. Если слишком много,  плохо - сеть начинает запоминать, зубрить примеры (нужно больше примеров чтобы этого избежать),
   если мало нейронов, то она не достаточно гибкая, не сможет ухватить закономерность
   Лучше мало нейронов но больше слоев чем больше нейронов но 1 слой*/
+	public boolean dontDelete=false;
+	public boolean isDead=false;
+	/*TODO НАПИСАТЬ КЛАСС ОБЕРТКУ */
 	private static final long serialVersionUID = 2L;
     ArrayList<ArrayList<Dot>> dotsArr =new ArrayList<>();
     
@@ -139,12 +142,12 @@ public class Network implements Serializable {
 		   }else {
 			   gettedNode.setWeight(gettedNode.getWeight()-r.nextFloat()*MUTATION_MULTIPLIER); 
 		   }
-		   if(r.nextInt(1)==0) {
+		   if(r.nextInt(2)==0) {
 			   //TODO сделать матацию анлока нод
 			   int rBuffer3=r.nextInt(dotsArr.get(0).size()-BIAS-HOW_MUCH_INPUTS_MUST_BE_USED);
 			   int rBuffer4=r.nextInt(dotsArr.get(0).get(rBuffer3+HOW_MUCH_INPUTS_MUST_BE_USED).nodesFromMe.size());
 			   dotsArr.get(0).get(rBuffer3+HOW_MUCH_INPUTS_MUST_BE_USED).nodesFromMe.get(rBuffer4).changeble=true;
-			   dotsArr.get(0).get(rBuffer3+HOW_MUCH_INPUTS_MUST_BE_USED).nodesFromMe.get(rBuffer4).setWeight(0.01);;
+			   dotsArr.get(0).get(rBuffer3+HOW_MUCH_INPUTS_MUST_BE_USED).nodesFromMe.get(rBuffer4).setWeight(0.02*r.nextDouble());;
 		   }
 		   
 	   }

@@ -16,7 +16,7 @@ public class FileSaveListener implements ActionListener {
         FileOutputStream outputStream ;
         ObjectOutputStream objectOutputStream;
         try {
-            World.pause=false;
+            World.setPause(false);
             outputStream = new FileOutputStream("D:\\savevvv.txt");
             objectOutputStream = new ObjectOutputStream(outputStream);
             objectOutputStream.writeObject("");
@@ -25,7 +25,7 @@ public class FileSaveListener implements ActionListener {
         }catch (IOException ex){
             ex.printStackTrace();
         }finally {
-            World.pause=true;
+            World.setPause(true);
         }
     }
 }

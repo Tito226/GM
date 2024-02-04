@@ -3,11 +3,11 @@ package MyVersion.Frame;
 public class GM2_CONFIG {
      //GENERAL
     public final static int CELL_SIZE=2;
-    public final static int PAINT_MODE=1; //1-one Thread 2-two Threads 0-one tread for all
+    public final static int PAINT_MODE=3; //1-one Thread 2-two Threads 0-one tread for all
     public static final boolean DEBUG=false;
-    public static final boolean TEST_RUN=true;
+    public static final boolean TEST_RUN=false;
     public static final boolean CREATE_SAVES=true;
-    public final static int CREATE_SAVE_ON_LIFETIME=3000;
+    public final static int CREATE_SAVE_ON_LIFETIME=5000;
      //NORMCELL SETTINGS
     public static final boolean MULTI_THREAD_EVALUTE_FITNESS_METHOD=false;
     public static final int NUMBER_OF_MUTATIONS=7;/*Сколько нод мутируют при делении клетки(в конструкторе)*/
