@@ -7,7 +7,7 @@ public class GM2_CONFIG {
     public static final boolean DEBUG=false;
     public static final boolean TEST_RUN=false;
     public static final boolean CREATE_SAVES=true;
-    public final static int CREATE_SAVE_ON_LIFETIME=5000;
+    public final static int CREATE_SAVE_ON_LIFETIME=6000;
      //NORMCELL SETTINGS
     public static final boolean MULTI_THREAD_EVALUTE_FITNESS_METHOD=false;
     public static final int NUMBER_OF_MUTATIONS=7;/*Сколько нод мутируют при делении клетки(в конструкторе)*/

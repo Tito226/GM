@@ -146,7 +146,7 @@ public class Network_Teacher extends JPanel {
     double learningRateBuffer=LEARNING_RATE;//TODO зделать по нормальному
     
     double teach(Network student,Data_Set data_set,int iteration){//Returns final dot error
-        Dot crutch=new Dot(Dot_Type.OUTPUT);
+        Dot crutch=new Dot(Dot_Type.OUTPUT,func);
         for(ArrayList<Dot> dotArr: student.dotsArr){//clear dots value 
             for(Dot dot:dotArr){
                 dot.clear();//сброс данных точки(значение,ошибка,дельта весов)
@@ -164,7 +164,7 @@ public class Network_Teacher extends JPanel {
             /*down :for more than one output, dont delete*/
             dot.error=dot.value -expected.get(yy);/*ФУНКЦИЯ ПОТЕРЬ */
             crutch=dot;
-            dot.weightsDelta=dot.error* Dot.activationFunctionDX(dot.value);
+            dot.weightsDelta=dot.error* Dot.activationFunctionDX(dot.value,dot.myFunc);
             yy++;
 
         }
@@ -177,7 +177,7 @@ public class Network_Teacher extends JPanel {
                 	counter++;
                 }
                 // dot.error=dot.error/counter;
-                dot.weightsDelta= dot.error* Dot.activationFunctionDX(dot.value);
+                dot.weightsDelta= dot.error* Dot.activationFunctionDX(dot.value,dot.myFunc);
 
             }
           
@@ -243,7 +243,7 @@ public class Network_Teacher extends JPanel {
         }
         System.out.println("Eat organic:"+weightBuffer+answer+"________________"+Arrays.toString(f));
         
-        f=Data_Set.getMoveRightOnUpWallTrainData()[0];
+        f=Data_Set.getMoveRightIfUpWallTrainData()[0];
         weightBuffer=student.evaluteFitness(new Double[]{0d,rnd(4,30),rnd(1,4),1d,0d,0d,0d},false);
         if(weightBuffer>Action_Boundaries.moveRightBoundaries[0] && weightBuffer<Action_Boundaries.moveRightBoundaries[1]){
             answer=" passed";
@@ -252,7 +252,7 @@ public class Network_Teacher extends JPanel {
         }
         System.out.println("move right on up wall:"+weightBuffer+answer+"________"+Arrays.toString(f));
         
-        f=Data_Set.getMoveDownIfRightWallTrainData()[0];
+        f=Data_Set.getMoveDownOnRightWallTrainData()[0];
         weightBuffer=student.evaluteFitness(new Double[]{0d,rnd(4,30),rnd(1,4),0d,0d,0d,1d},false);
         if(weightBuffer>Action_Boundaries.moveDownBoundaries[0] && weightBuffer<Action_Boundaries.moveDownBoundaries[1]){
             answer=" passed";

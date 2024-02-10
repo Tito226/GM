@@ -434,7 +434,7 @@ public class NormCell implements  Serializable {
 
      class DataMethods{
     	
-    	static float dil=1000f;
+    	static float dil=1000f;//1000
 		Double[] getInputData() {
     	    	Double[] inputs = {myMethods.isRaedyToMultiply(NormCell.this) , (double) myMethods.getEnergy(NormCell.this), (double) cells[x][y].getOrganic(), myMethods.getUptCell(NormCell.this), myMethods.getDownCell(NormCell.this), myMethods.getLeftCell(NormCell.this),
     	    			 

@@ -16,6 +16,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
@@ -104,7 +106,7 @@ public static Cell[][] getCells(){
         controls2.add(button);
         controls2.add(button2);
         controls2.add(world.inf);
-        world.inf.setPreferredSize(new Dimension(200,40));//метод для задания размера JPanel
+        world.inf.setPreferredSize(new Dimension(300,40));//метод для задания размера JPanel
 
         
         frame.add(controls2,BorderLayout.NORTH);
@@ -139,9 +141,9 @@ public static Cell[][] getCells(){
     ExecutorService pool=Executors.newFixedThreadPool(1);
     static FileOutputStream fileOutputStream ;
     static ObjectOutputStream objectOutputStream ;
-    LimitedArrayList<Network> bestLifeTimeBrains=new LimitedArrayList<>(50);
-    LimitedArrayList<Network> bestMultipliesBrains=new LimitedArrayList<>(50);
-    LimitedArrayList<Network> bestThisLifeTimeBrains=new LimitedArrayList<>(50);
+    LimitedArrayList<Network> bestLifeTimeBrains=new LimitedArrayList<>(20);
+    LimitedArrayList<Network> bestMultipliesBrains=new LimitedArrayList<>(20);
+    LimitedArrayList<Network> bestThisLifeTimeBrains=new LimitedArrayList<>(20);
     boolean tested=false;
     @Override
     public void run() {
@@ -269,6 +271,7 @@ public static Cell[][] getCells(){
    	 			paintComponent(world.getGraphics());
    	 		}
         } else {
+        	painter.fullPaint(world.getGraphics(),inf);
         	try {
 				Thread.sleep(200);
 			} catch (InterruptedException e) {
@@ -294,9 +297,9 @@ public static Cell[][] getCells(){
 	 			cells[j][i].organic=CELL_START_ORGANIC;
 	 		}
 	 	}
-	 	if(thisBestLifeTime>CREATE_SAVE_ON_LIFETIME) {/*TODO реализовать механизм проверки тот ли мозг копируется*/
+	 	if(thisBestLifeTime>CREATE_SAVE_ON_LIFETIME && thisBestLifeTime>lastBestLifeTime) {/*TODO реализовать механизм проверки тот ли мозг копируется*/
 	 		try {
-	 			fileOutputStream = new FileOutputStream("C:\\Users\\Timurs1\\Desktop\\BrainSave"+CREATE_SAVE_ON_LIFETIME+r.nextLong()+".network");
+	 			fileOutputStream = new FileOutputStream("C:\\Users\\Timurs1\\Desktop\\BrainSave"+thisBestLifeTime+r.nextLong()+".network");
 	 			objectOutputStream = new ObjectOutputStream(fileOutputStream);
 				objectOutputStream.writeObject(topLifeTimeBrain);
 				objectOutputStream.close();
@@ -364,20 +367,28 @@ public static Cell[][] getCells(){
     	if(PAINT_MODE==1 || PAINT_MODE==3 || PAINT_MODE==4) {
         	Runnable task = () -> {
         		while(true) {
-        			if(PAINT_MODE==1 ) {
-        				painter.ecoPaint(world.getGraphics(),inf);
+        			if(!world.getPause()) {
+        				if(PAINT_MODE==1 ) {
+        					painter.ecoPaint(world.getGraphics(),inf);
+        				}
+        				else if(PAINT_MODE==3 ) {
+        					painter.fullPaint(world.getGraphics(),inf);
+        				}
+        				else if(PAINT_MODE==4 ) {
+        					painter.combinedPaint(world.getGraphics(),inf);
+        				}
+        				try {
+        					Thread.sleep(10);//20
+        				} catch (InterruptedException e) {
+        					e.printStackTrace();
+        				}	
+        			}else {
+        				try {
+        					Thread.sleep(200);//20
+        				} catch (InterruptedException e) {
+        					e.printStackTrace();
+        				}
         			}
-        			else if(PAINT_MODE==3 ) {
-        				painter.fullPaint(world.getGraphics(),inf);
-        			}
-        			else if(PAINT_MODE==4 ) {
-        				painter.combinedPaint(world.getGraphics(),inf);
-        			}
-        			try {
-        				Thread.sleep(10);//20
-        			} catch (InterruptedException e) {
-        				e.printStackTrace();
-        			}	
         		}
         };
     	pool.execute(task);

@@ -8,35 +8,36 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import static MyVersion.Core.Core_Config.*;
-
-public class Network implements Serializable {
 /*сколько нейронов будет в скрытом слое - подбором. Если слишком много,  плохо - сеть начинает запоминать, зубрить примеры (нужно больше примеров чтобы этого избежать),
   если мало нейронов, то она не достаточно гибкая, не сможет ухватить закономерность
   Лучше мало нейронов но больше слоев чем больше нейронов но 1 слой*/
+
+public class Network implements Serializable {
+	ActivationFunctions myFunc;
 	public boolean dontDelete=false;
 	public boolean isDead=false;
 	/*TODO НАПИСАТЬ КЛАСС ОБЕРТКУ */
 	private static final long serialVersionUID = 2L;
     ArrayList<ArrayList<Dot>> dotsArr =new ArrayList<>();
-    
     public Network() {//создает пустую нейросеть(массив точек пустой) для клонирования 
     	
    	}
     
     public Network(int iii){
-       dotsArr.add(new ArrayList<>());//inputs (0)
+    	myFunc=func;
+    	dotsArr.add(new ArrayList<>());//inputs (0)
 
-       for (int i = 1; i <= HIDDEN_DOTS / HIDDEN_DOTS_PER_ARRAY; i++) {//hidden dots (1,2,3,...,HIDDEN_DOTS /HIDDEN_DOTS_PER_MASSIVE-1)
-           dotsArr.add(new ArrayList<>());
+    	for (int i = 1; i <= HIDDEN_DOTS / HIDDEN_DOTS_PER_ARRAY; i++) {//hidden dots (1,2,3,...,HIDDEN_DOTS /HIDDEN_DOTS_PER_MASSIVE-1)
+    		dotsArr.add(new ArrayList<>());
 
-       }
+    	}
 
        for (int i = 0; i < INPUTS; i++) {//adding input Dots to array,if bias,add dias Dot and add notes to it
-           dotsArr.get(0).add(new Dot(Dot_Type.INPUT));
+           dotsArr.get(0).add(new Dot(Dot_Type.INPUT,myFunc));
        }
        
        if(BIAS==1){
-           dotsArr.get(0).add(new Dot(Dot_Type.BIAS_TYPE));
+           dotsArr.get(0).add(new Dot(Dot_Type.BIAS_TYPE,myFunc));
            for (int j = 0; j < dotsArr.get(1).size() ; j++) {
                dotsArr.get(0).get(dotsArr.size()-1).addNode(dotsArr.get(1).get(j));
            }
@@ -47,11 +48,11 @@ public class Network implements Serializable {
 
        for (int i = 1; i <= HIDDEN_DOTS / HIDDEN_DOTS_PER_ARRAY ; i++) {
            for (int j = 0; j < HIDDEN_DOTS_PER_ARRAY; j++) {
-               dotsArr.get(i).add(new Dot(Dot_Type.HIDDEN));
+               dotsArr.get(i).add(new Dot(Dot_Type.HIDDEN,myFunc));
            }
 
            if (BIAS==1) {
-               dotsArr.get(i).add(new Dot(Dot_Type.BIAS_TYPE));
+               dotsArr.get(i).add(new Dot(Dot_Type.BIAS_TYPE,myFunc));
                for (int j = 0; j < dotsArr.get(i + 1).size(); j++) {
                    dotsArr.get(i).get(dotsArr.get(i).size() - 1).addNode(dotsArr.get(i+1).get(j));
                }
@@ -59,7 +60,7 @@ public class Network implements Serializable {
 
         }
         for (int i = 0; i < OUTPUTS; i++) {
-            dotsArr.get(dotsArr.size()-1).add(new Dot(Dot_Type.OUTPUT));
+            dotsArr.get(dotsArr.size()-1).add(new Dot(Dot_Type.OUTPUT,myFunc));
         }
         //
 
@@ -179,4 +180,7 @@ public class Network implements Serializable {
    }
    
 
+}
+interface FunctionChooseInterface {
+    double activationFunction(double a);
 }

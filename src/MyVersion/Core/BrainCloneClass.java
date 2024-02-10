@@ -25,10 +25,12 @@ public class BrainCloneClass {
 	
 	private static Dot dotClone(Dot dot) {//клонирует Dot
 		Dot result=new Dot();
+		result.myFunc=dot.myFunc;
 		result.error=dot.error;
 		result.myType=dot.myType;
 		result.weightsDelta=dot.weightsDelta;
 		result.value=dot.value;
+		result.chooseFunction(dot.myFunc);
 		return result;
 	}
 	
