@@ -1,4 +1,4 @@
-package MyVersion.Frame;
+package MyVersion.Cells;
 
 import static MyVersion.Frame.GM2_CONFIG.ENERGY_NEEDED_TO_MULTIPLY_PROTOPLAST;
 import static MyVersion.Frame.GM2_CONFIG.PROTOPLAST_START_ENERGY;
@@ -7,6 +7,8 @@ import static MyVersion.Frame.World.height;
 import static MyVersion.Frame.World.width;
 
 import java.awt.Color;
+
+import MyVersion.Frame.World;
 
 ///////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////

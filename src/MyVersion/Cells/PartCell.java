@@ -1,4 +1,4 @@
-package MyVersion.Frame;
+package MyVersion.Cells;
 
 import java.awt.Color;
 

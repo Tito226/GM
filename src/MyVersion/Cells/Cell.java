@@ -1,4 +1,4 @@
-package MyVersion.Frame;
+package MyVersion.Cells;
 
 import java.awt.*;
 import java.util.Random;
@@ -10,7 +10,7 @@ public  class Cell {
     int[] color;
     Color myColor ;
     //int energy=1;
-    NormCell secCell;
+    public NormCell secCell;
     PartCell partCell;
     private int x;
     private int y;
@@ -70,40 +70,32 @@ public  class Cell {
     		return false;
     	}
     }
-  void testCell(){
-      lastNCell=getSecCell();
-	  lastPCell=getPartCell();
-	  lastOrganic=organic;
-
-	  try{
-		  if(organic<255 && organic>0){
-			  color=new int[3];
-
-			  color[0]=255-organic;
-			  color[1]=255-organic;
-			  color[2]=255-organic;
-			  myColor=new Color(color[0],color[1],color[2]);
-		  }
-	  }catch (IllegalArgumentException e){
-		  System.out.println(color[0]);
-		  System.out.println(color[1]);
-		  System.out.println(color[2]);
-	  }
-	  if(secCell!=null  && secCell.myMethods.getEnergy(secCell)<=0  ){
-		  secCellKill();
-	  }
-	  if(secCell!=null  && secCell.myMethods.getEnergy(secCell)>=10000 ){
-          System.out.println("Cell with 10000 died");
-          organic+=secCell.myMethods.getEnergy(secCell);
-          secCell.brain.kill();
-          setSecCell(null);
-          cellls--;
-      }
-      if(partCell!=null){
-          partCell.test();
-      }
-      
-  }
+    public void testCell() {
+        lastNCell = getSecCell();
+        lastPCell = getPartCell();
+        lastOrganic = organic;
+        try {
+            if (organic < 255 && organic > 0) {
+                int colorValue = 255 - organic;
+                myColor = new Color(colorValue, colorValue, colorValue);
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println("Invalid color values");
+        }
+        if (secCell != null && secCell.myMethods.getEnergy(secCell) <= 0) {
+            secCellKill();
+        }
+        if (secCell != null && secCell.myMethods.getEnergy(secCell) >= 10000) {
+            System.out.println("Cell with 10000 died");
+            organic += secCell.myMethods.getEnergy(secCell);
+            secCell.brain.kill();
+            setSecCell(null);
+            cellls--;
+        }
+        if (partCell != null) {
+            partCell.test();
+        }
+    }
 
   	public Color getColor(){
   		if(secCell==null && partCell==null) {

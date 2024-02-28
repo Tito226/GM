@@ -82,7 +82,8 @@ public class Graphic_Builder {
                 	multiplier-=600;
                 	clear=true;	
                 });
-                while(true){
+                while(frame.isDisplayable()){
+                	
                 	builder.paint(errors,g);
                     try {
                         sleep(400);
@@ -137,11 +138,12 @@ public class Graphic_Builder {
         }
        
         //bufferGraphics.clearRect(0, di, di, di)
+        double realGraphicHeight=height-INDENT_Y;
         int x1=INDENT_X;
         int counter =0;
-        int y1=height/2;
+        int y1=(int) (realGraphicHeight-realValue.get(0));
         int yLineIndent=20;
-        double realGraphicHeight=height-INDENT_Y;
+        
         while(x1<width ){
         	
             int y2=(int) (realGraphicHeight-realValue.get(counter));

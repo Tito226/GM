@@ -6,8 +6,11 @@ import MyVersion.NEAT.Pool;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -51,10 +54,13 @@ public class Network_Teacher extends JPanel {
              frame.setSize(300, 100);
              frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
              frame.setVisible(true);
+             Graphics g=teacher.getGraphics();
+             RuntimeMXBean mxBean = ManagementFactory.getRuntimeMXBean();
              while(Network_Teacher.percent!=100) {
-            	teacher.getGraphics().clearRect(0, 0, 50, 20);
-            	teacher.getGraphics().setColor(Color.BLACK);
-            	teacher.getGraphics().drawString( Network_Teacher.percent+"%", 7, 9);
+            	g.clearRect(0, 0, 200, 20);
+            	g.drawString("| Uptime: " +mxBean.getUptime()/1000/60+":"+mxBean.getUptime()/1000%60+" |" , 107, 9);
+            	g.setColor(Color.BLACK);
+            	g.drawString( Network_Teacher.percent+"%", 7, 9);
             	try {
 					Thread.sleep(1000);
 				} catch (InterruptedException e) {
@@ -213,54 +219,26 @@ public class Network_Teacher extends JPanel {
     }
     
     /*TODO Тест не работает правильно */
-    public static void suitabilityTest(Network student) {//tests network,ввыводит что на входе и на выходе и подходит ли ответ 
-    	Double[] f =Data_Set.getMultiplyTrainData()[0];
-    	double weightBuffer=student.evaluteFitness(f,false);
-        String answer;
-        Random r = new Random();
-        if(weightBuffer>Action_Boundaries.multiplyBoundaries[0] && weightBuffer<Action_Boundaries.multiplyBoundaries[1] ){
-           answer=" passed";
-        }else{
-           answer=" failed";
-        }
-        System.out.println("Multiply:"+ weightBuffer+answer+"____________________"+Arrays.toString(f));//print evaluteFitness parametres
-        
-        f =new Double[]{0d,rnd(3,ENERGY_NEEDED_TO_MULTIPLY),rnd(0,3),0d,0d,0d,0d};
-        weightBuffer=student.evaluteFitness(f,false);
-        if( weightBuffer>Action_Boundaries.moveUpBoundaries[0] && weightBuffer<Action_Boundaries.moveUpBoundaries[1]){
-            answer=" passed";
-        }else{
-            answer=" failed";
-        }
-        System.out.println("Move up:"+weightBuffer+answer+"____________________"+Arrays.toString(f));
-        
-        f=Data_Set.getEatOrganicTrainData()[0];
-        weightBuffer=student.evaluteFitness(new Double[]{0d,rnd(1,4),rnd(7,100), (double) r.nextInt(2),(double) r.nextInt(2),(double) r.nextInt(2),(double) r.nextInt(2)},false);
-        if(weightBuffer>Action_Boundaries.eatOrganicBoundaries[0] && weightBuffer<Action_Boundaries.eatOrganicBoundaries[0]){
-            answer=" passed";
-        }else{
-            answer=" failed";
-        }
-        System.out.println("Eat organic:"+weightBuffer+answer+"________________"+Arrays.toString(f));
-        
-        f=Data_Set.getMoveRightIfUpWallTrainData()[0];
-        weightBuffer=student.evaluteFitness(new Double[]{0d,rnd(4,30),rnd(1,4),1d,0d,0d,0d},false);
-        if(weightBuffer>Action_Boundaries.moveRightBoundaries[0] && weightBuffer<Action_Boundaries.moveRightBoundaries[1]){
-            answer=" passed";
-        }else{
-            answer=" failed";
-        }
-        System.out.println("move right on up wall:"+weightBuffer+answer+"________"+Arrays.toString(f));
-        
-        f=Data_Set.getMoveDownOnRightWallTrainData()[0];
-        weightBuffer=student.evaluteFitness(new Double[]{0d,rnd(4,30),rnd(1,4),0d,0d,0d,1d},false);
-        if(weightBuffer>Action_Boundaries.moveDownBoundaries[0] && weightBuffer<Action_Boundaries.moveDownBoundaries[1]){
-            answer=" passed";
-        }else{
-            answer=" failed";
-        }
-        System.out.println("move down on right wall:"+weightBuffer+answer+"____"+Arrays.toString(f));
+    public static void suitabilityTest(Network student) {
+        testAndPrint("Multiply________________", Data_Set.getMultiplyTrainData()[0], Action_Boundaries.multiplyBoundaries, student);
+        testAndPrint("Move up_________________", Data_Set.getMoveUpTrainData()[0], Action_Boundaries.moveUpBoundaries, student);
+        testAndPrint("Eat organic0____________", Data_Set.getEatOrganicTrainData0()[0], Action_Boundaries.eatOrganicBoundaries, student);
+        testAndPrint("Eat organic_____________", Data_Set.getEatOrganicTrainData()[0], Action_Boundaries.eatOrganicBoundaries, student);
+        testAndPrint("Eat organic2____________", Data_Set.getEatOrganicTrainData2()[0], Action_Boundaries.eatOrganicBoundaries, student);
+        testAndPrint("Move right on up wall___", Data_Set.getMoveRightIfUpWallTrainData()[0], Action_Boundaries.moveRightBoundaries, student);
+        testAndPrint("Move down on right wall_", Data_Set.getMoveDownOnRightWallTrainData()[0], Action_Boundaries.moveDownBoundaries, student);
+        testAndPrint("Move Left If Down Wall__", Data_Set.getMoveLeftIfDownWallTrainData()[0], Action_Boundaries.moveLeftBoundaries, student);
+        testAndPrint("Move Left If Down Wall2_", Data_Set.getMoveLeftIfDownWallTrainData2()[0], Action_Boundaries.moveLeftBoundaries, student);
+        testAndPrint("Move Left If food_______", Data_Set.getMoveLeftIfFoodTrainData()[0], Action_Boundaries.moveLeftBoundaries, student);
+        testAndPrint("Move Right If food______", Data_Set.getMoveRightIfFoodTrainData()[0], Action_Boundaries.moveRightBoundaries, student);
+        testAndPrint("Move Up If food_________", Data_Set.getMoveUpIfFoodTrainData()[0], Action_Boundaries.moveUpBoundaries, student);
+        testAndPrint("Move Down If food_______", Data_Set.getMoveDownIfFoodTrainData()[0], Action_Boundaries.moveDownBoundaries, student);
+    }
 
+    private static void testAndPrint(String action, Double[] data, double[] boundaries, Network student) {
+        double weightBuffer = student.evaluteFitness(data, false);
+        String result = (weightBuffer > boundaries[0] && weightBuffer < boundaries[1]) ? "passed" : "failed";
+        System.out.println(action + ": " + result+ " " +weightBuffer +  " " + Arrays.toString(data));
     }
 
         void showResult(float[] errors){

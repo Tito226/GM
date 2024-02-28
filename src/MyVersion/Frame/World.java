@@ -3,12 +3,17 @@ package MyVersion.Frame;
 
 import static MyVersion.Frame.GM2_CONFIG.CELL_START_ORGANIC;
 
+import MyVersion.Cells.Cell;
+import MyVersion.Cells.NormCell;
 import MyVersion.Core.BrainCloneClass;
 import MyVersion.Core.Data_Set;
 import MyVersion.Core.Network;
 import MyVersion.Core.Network_Teacher;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
@@ -29,19 +34,20 @@ import static MyVersion.Frame.GM2_CONFIG.PAINT_MODE;
 import static MyVersion.Frame.World.*;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
-public class World extends JPanel implements Runnable  {
+public class World extends JPanel implements Runnable ,Scrollable {
 	Painter painter=new Painter(this);
 	InfoPanel inf=new InfoPanel(this);
     public Network relative;
     public static int cellls=0;
-    public static int cellSize=CELL_SIZE;
+    public volatile static int cellSize=CELL_SIZE;
     public static int width;
     public static int height;
     public static int sunny=1;
-    static Cell[][] cells;
+    public static Cell[][] cells;
     private static boolean pause=false;
-    static World world;
-    static Thread wor;
+    private static boolean windowClosed=false;
+    Thread wor;
+    JFrame frame;
     public World(int width,int height) throws IOException {
         Network_Teacher network_teacher=new Network_Teacher();
         if(!TEST_RUN) {
@@ -55,13 +61,15 @@ public class World extends JPanel implements Runnable  {
             	ByteArrayInputStream fis = new ByteArrayInputStream(buff);
             	ObjectInputStream ois = new ObjectInputStream(fis);
 				relative=(Network) ois.readObject();
-	ois.close();
+				ois.close();
 				fis.close();
 			} catch (ClassNotFoundException | IOException e) {	
 				e.printStackTrace();
 			}
         }
-    
+        if(!AUTO_SIZE) {
+        	cellSize=1;
+        }
         network_teacher=null;
         this.height=height;
         this.width=width;
@@ -79,45 +87,115 @@ public static Cell[][] getCells(){
     return cells;
 }
 
-	
-	
+	static JFrame createFrame(World world,int width,int height) {
+		JFrame frame=world.frame;
 
-    public static void main(String[] args) throws  IOException {
-        int width=1250;
-        int height=700;
-        JFrame frame = new JFrame("GM");
-        
-        JButton pauseButton = new JButton("Pause");
-        JButton dePauseButton = new JButton("Continue");
-        pauseButton.addActionListener(new PauseListener());
-        dePauseButton.addActionListener(new ContinueListener());
+		JPanel worldPanel = new JPanel();
         JPanel controls = new JPanel();
         JPanel controls2 = new JPanel();
-        controls.setLayout(new GridLayout(2, 1));
-        //controls2.setLayout(new GridLayout(1, 3));
+        JButton pauseButton = new JButton("Pause");
+        JButton dePauseButton = new JButton("Continue");
+        JScrollPane scroller = new JScrollPane(world);
+        if(!AUTO_SIZE) {
+        	cellSize=1;
+        }
+        /***************BUTTONS*******************/
+        pauseButton.addActionListener(new PauseListener());
+        dePauseButton.addActionListener(new ContinueListener());
         controls.add(pauseButton);
         controls.add(dePauseButton);
-        
-        world=new World(width/cellSize,height/cellSize-30);
+        controls.setLayout(new GridLayout(2, 1));
         JButton button = new JButton("save");
         JButton button2 = new JButton("load");
         button.addActionListener(new FileSaveListener());
         button2.addActionListener(new FileOpenListener());
         controls2.add(button);
         controls2.add(button2);
+        JButton plusButton = new JButton("+");
+        JButton minusButton = new JButton("-");
+        controls2.add(plusButton);
+        controls2.add(minusButton);
+        
+        plusButton.addActionListener((java.awt.event.ActionEvent e) -> {
+        	frame.paintAll(frame.getGraphics());
+        	cellSize++;
+        	System.out.println(cellSize);
+        });
+        minusButton.addActionListener((java.awt.event.ActionEvent e) -> {
+        	if(cellSize>1) {
+        		cellSize--;
+        	}
+        	frame.paintAll(frame.getGraphics());
+        	System.out.println(cellSize);
+        });
+        /*****************************************/
+         
         controls2.add(world.inf);
         world.inf.setPreferredSize(new Dimension(300,40));//метод для задания размера JPanel
-
+        world.setPreferredSize(new Dimension(width,height));//метод для задания размера JPanel
         
+        /***************SCROLLER******************/
+
+        scroller.setPreferredSize(new Dimension(width,height));
+        scroller.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        Runnable task = () -> {
+        	while(true) {
+        		if(AUTO_SIZE) {
+        			world.setPreferredSize(new Dimension(width*cellSize/CELL_SIZE+10,height*cellSize/CELL_SIZE+10));
+            		scroller.setPreferredSize(new Dimension(1200,700));
+                }else {
+                	world.setPreferredSize(new Dimension(width*cellSize+10,height*cellSize+10));
+        			scroller.setPreferredSize(new Dimension(1200,700));
+        		}
+        		scroller.revalidate();
+        		try {
+					Thread.sleep(200);
+				} catch (InterruptedException e1) {
+					// TODO Автоматически созданный блок catch
+					e1.printStackTrace();
+				}
+        	}
+    	};
+    	Thread thread = new Thread(task);
+    	thread.start();
+    	new FrameMover(world);
+        //scroller.
+        //scroller.setViewportView(world);
+        //frame.getContentPane().add(scroller, BorderLayout.SOUTH);
+        //scroller.setSize(1000, 1000);
+        /****************************************/
+        
+        
+        
+        //scroller.setViewportView(worldPanel);
+        
+        world.addWinListnerToFrame();
         frame.add(controls2,BorderLayout.NORTH);
         frame.add(controls, BorderLayout.EAST); // справа будет панель с управлением
-        frame.add(world, BorderLayout.CENTER);
-        
-        frame.setSize(width, height);
+        frame.add(scroller, BorderLayout.CENTER);
+        world.setSize(width, height);
+        frame.setSize(width, height);//TODO FIX PAIN BUG CAUSED BY THIS
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         frame.setVisible(true);
-        wor =new Thread(world);
-        wor.start();
+        return frame;
+	}
+	
+
+    public static void main(String[] args) throws  IOException {
+        int width=1250;
+        int height=700;
+        World world;
+        if(AUTO_SIZE) {
+        	 world=new World(width/CELL_SIZE-3,height/CELL_SIZE-3);
+        }else {
+        	 world=new World(width,height);
+        }
+        world.frame = new JFrame("GM");
+        
+        JFrame frame=createFrame(world,width,height);
+
+        world.wor =new Thread(world);
+        world.wor.start();
 
 
     }
@@ -141,9 +219,10 @@ public static Cell[][] getCells(){
     ExecutorService pool=Executors.newFixedThreadPool(1);
     static FileOutputStream fileOutputStream ;
     static ObjectOutputStream objectOutputStream ;
-    LimitedArrayList<Network> bestLifeTimeBrains=new LimitedArrayList<>(20);
-    LimitedArrayList<Network> bestMultipliesBrains=new LimitedArrayList<>(20);
-    LimitedArrayList<Network> bestThisLifeTimeBrains=new LimitedArrayList<>(20);
+    LimitedArrayList<Network> bestLifeTimeBrains=new LimitedArrayList<>(LIMITED_ARRAY_SIZE);
+    LimitedArrayList<Network> bestMultipliesBrains=new LimitedArrayList<>(LIMITED_ARRAY_SIZE);
+    LimitedArrayList<Network> bestThisLifeTimeBrains=new LimitedArrayList<>(LIMITED_ARRAY_SIZE);
+    Graphics worldGraphics=this.getGraphics();
     boolean tested=false;
     @Override
     public void run() {
@@ -158,7 +237,7 @@ public static Cell[][] getCells(){
 
             }
         }
-
+   
 
         for (int i = 0; i < CELLS_ON_START; i++) {
             Random r =new Random();
@@ -172,6 +251,7 @@ public static Cell[][] getCells(){
     	boolean isStep=false;
     	long startTime = System.currentTimeMillis();
     	if(!getPause()){
+    		Graphics worldGraphics=this.getGraphics();
     		stepsAtAll++;
     		if(System.currentTimeMillis()>fpsMeter1+1000) {
     			fpsMeter1=System.currentTimeMillis();
@@ -195,8 +275,8 @@ public static Cell[][] getCells(){
             			NormCell curNormCell=curCell.secCell;
             			curNormCell.setX(i);
             			curNormCell.setY(j);
-            			if(curNormCell.lifeTime>bestLifeTime) {
-            				bestLifeTime=curNormCell.lifeTime;
+            			if(curNormCell.getLifeTime()>bestLifeTime) {
+            				bestLifeTime=curNormCell.getLifeTime();
             				if(topLifeTimeBrain!=null && curNormCell.brain.isDead) {
             					topLifeTimeBrain.kill();
             				}
@@ -204,8 +284,8 @@ public static Cell[][] getCells(){
             				bestLifeTimeBrains.add(curNormCell.brain);
             				curNormCell.brain.dontDelete=true;
             			}
-            			if(curNormCell.lifeTime>thisBestLifeTime){
-            				thisBestLifeTime=curNormCell.lifeTime;
+            			if(curNormCell.getLifeTime()>thisBestLifeTime){
+            				thisBestLifeTime=curNormCell.getLifeTime();
             				if(thisTopLifeTimeBrain!=null && curNormCell.brain.isDead) {
             					thisTopLifeTimeBrain.kill();
             				}
@@ -260,20 +340,22 @@ public static Cell[][] getCells(){
 
           // long usedBytes = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
            // usedBytes/1048576>500
-           if (countt%1000==0){
+           if (countt%30000==0){
         	   System.out.println("Garbage collector started");
                System.gc();
                countt=0;
            }
            if(PAINT_MODE==0) {
-        	   painter.ecoPaint(world.getGraphics(),inf);
+        	   painter.ecoPaint(inf);
            } else if(PAINT_MODE==-1) {//0
-   	 			paintComponent(world.getGraphics());
+   	 			paintComponent(worldGraphics);
    	 		}
         } else {
-        	painter.fullPaint(world.getGraphics(),inf);
+        	if(PAINT_MODE==0) {
+        		painter.fullPaint(inf);
+        	}
         	try {
-				Thread.sleep(200);
+				Thread.sleep(400);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -290,6 +372,7 @@ public static Cell[][] getCells(){
     }
 
     private void onRestart() {
+    	Graphics worldGraphics=this.getGraphics();
     	Random r=new Random();
     	//установка начального состояния органики,если все умерли
 	 	for (int i = 0; i < height; i++) {
@@ -299,7 +382,7 @@ public static Cell[][] getCells(){
 	 	}
 	 	if(thisBestLifeTime>CREATE_SAVE_ON_LIFETIME && thisBestLifeTime>lastBestLifeTime) {/*TODO реализовать механизм проверки тот ли мозг копируется*/
 	 		try {
-	 			fileOutputStream = new FileOutputStream("C:\\Users\\Timurs1\\Desktop\\BrainSave"+thisBestLifeTime+r.nextLong()+".network");
+	 			fileOutputStream = new FileOutputStream("C:\\Users\\Timurs1\\Desktop\\brains\\BrainSave"+thisBestLifeTime+"---"+r.nextLong()+".network");
 	 			objectOutputStream = new ObjectOutputStream(fileOutputStream);
 				objectOutputStream.writeObject(topLifeTimeBrain);
 				objectOutputStream.close();
@@ -344,11 +427,11 @@ public static Cell[][] getCells(){
 	 	
 	 	//+++++++++++++++++++
 	 	if(PAINT_MODE!=0) {//0
-	 		paintComponent(world.getGraphics());
-	 		paintComponent(world.getGraphics());
+	 		paintComponent(worldGraphics);
+	 		paintComponent(worldGraphics);
 	 	}
 	 	else {
-	 		paintComponent(world.getGraphics());
+	 		paintComponent(worldGraphics);
 	 	}
 	 	
 	 	checkGroup=null;
@@ -358,7 +441,7 @@ public static Cell[][] getCells(){
 	 	System.out.println("best life time: "+ bestLifeTime);
 	 	System.out.println("this Best Life Time: " +thisBestLifeTime);
 	 	lastLastBestLifeTime=lastBestLifeTime;
-	 	lastBestLifeTime=thisBestLifeTime;
+	 	lastBestLifeTime=bestLifeTime;
 	 	thisBestLifeTime=0;
 	 	stepsAtAll=0;
     }
@@ -366,29 +449,39 @@ public static Cell[][] getCells(){
     void multiThreadPaintInitial() {
     	if(PAINT_MODE==1 || PAINT_MODE==3 || PAINT_MODE==4) {
         	Runnable task = () -> {
+        		Graphics worldGraphics=this.getGraphics();
         		while(true) {
-        			if(!world.getPause()) {
-        				if(PAINT_MODE==1 ) {
-        					painter.ecoPaint(world.getGraphics(),inf);
+        			while(!windowClosed) {
+        				if(!this.getPause()) {
+        					if(PAINT_MODE==1 ) {
+        						painter.ecoPaint(inf);
+        					}
+        					else if(PAINT_MODE==3 ) {
+        						painter.fullPaint(inf);
+        					}
+        					else if(PAINT_MODE==4 ) {
+        						painter.combinedPaint(inf);
+        					}
+        					try {
+        						Thread.sleep(10);//20
+        					} catch (InterruptedException e) {
+        						e.printStackTrace();
+        					}	
+        				}else {
+        					try {
+        						Thread.sleep(200);//20
+        					} catch (InterruptedException e) {
+        						e.printStackTrace();
+        					}
         				}
-        				else if(PAINT_MODE==3 ) {
-        					painter.fullPaint(world.getGraphics(),inf);
-        				}
-        				else if(PAINT_MODE==4 ) {
-        					painter.combinedPaint(world.getGraphics(),inf);
-        				}
-        				try {
-        					Thread.sleep(10);//20
-        				} catch (InterruptedException e) {
-        					e.printStackTrace();
-        				}	
-        			}else {
-        				try {
-        					Thread.sleep(200);//20
-        				} catch (InterruptedException e) {
-        					e.printStackTrace();
-        				}
+        				
         			}
+        			try {
+						Thread.sleep(300);
+					} catch (InterruptedException e) {
+						// TODO Автоматически созданный блок catch
+						e.printStackTrace();
+					}
         		}
         };
     	pool.execute(task);
@@ -399,15 +492,7 @@ public static Cell[][] getCells(){
     @Override
     public void paintComponent(Graphics g) {
     	super.paintComponent(g);
-        // Отрисовка в буфер
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                if (cells[i][j] != null) {
-                    g.setColor(cells[i][j].getColor());
-                    g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-                }
-            }
-        }
+    	painter.fullPaint(inf);
     }
     
     
@@ -458,6 +543,76 @@ public static Cell[][] getCells(){
     	}
     }
 
+    void addWinListnerToFrame() {
+    	frame.addWindowListener(new WindowListener() {
+			@Override
+			public void windowOpened(WindowEvent e) {
+				
+				windowClosed=false;
+			}
+			
+			@Override
+			public void windowIconified(WindowEvent e) {
+				windowClosed=true;
+			}
+			
+			@Override
+			public void windowDeiconified(WindowEvent e) {
+				windowClosed=false;
+			}
+			
+			
+			@Override
+			public void windowClosed(WindowEvent e) {
+				windowClosed=true;
+			}
 
+			@Override
+			public void windowClosing(WindowEvent e) {
+				windowClosed=true;
+			}
+
+			@Override
+			public void windowActivated(WindowEvent e) {
+				windowClosed=false;
+			}
+
+			@Override
+			public void windowDeactivated(WindowEvent e) {
+				windowClosed=true;
+			}
+			
+			
+		});
+    }
+
+	@Override
+	public Dimension getPreferredScrollableViewportSize() {
+		return new Dimension(cells.length * cellSize, cells[0].length * cellSize);
+	}
+
+	@Override
+	public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+		// TODO Автоматически созданная заглушка метода
+		return 0;
+	}
+
+	@Override
+	public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+		// TODO Автоматически созданная заглушка метода
+		return 0;
+	}
+
+	@Override
+	public boolean getScrollableTracksViewportWidth() {
+		// TODO Автоматически созданная заглушка метода
+		return false;
+	}
+
+	@Override
+	public boolean getScrollableTracksViewportHeight() {
+		// TODO Автоматически созданная заглушка метода
+		return false;
+	}
 
 }

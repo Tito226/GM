@@ -13,6 +13,8 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 
+import MyVersion.Cells.Cell;
+
 public class Painter implements ImageObserver {
 	World world;
 	byte paintCount=0;
@@ -24,19 +26,20 @@ public class Painter implements ImageObserver {
 	
 	public static void stringPaint(String[] strings) {}
 	
-	 public void ecoPaint(Graphics g,InfoPanel inf) {
+	 public void ecoPaint(InfoPanel inf) {
 		try {/*TODO FIX MULTI THREAD PAINT EROR(SEC CELL==NULL),иногда остается "тень" зеленой клетки */
-		inf.paint(inf.getGraphics());
-     	for (int i = 0; i < width; i++) {
-             for (int j = 0; j < height; j++) {
-            	 Cell curCell=cells[i][j];
-                 if (curCell != null && curCell.isChange()) { 
-                	 g.setColor(curCell.getColor());
-                	 g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-                	 curCell.setChange(false);
-                 }
-             }
-         }
+			 Graphics g=world.getGraphics();
+			 inf.paint(inf.getGraphics());
+			 for (int i = 0; i < width; i++) {
+				 for (int j = 0; j < height; j++) {
+					 Cell curCell=cells[i][j];
+					 if (curCell != null && curCell.isChange()) { 
+						 g.setColor(curCell.getColor());
+						 g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+						 curCell.setChange(false);
+					 }
+				 }
+        	}
      	
      	}catch(Exception e) {
      		System.err.println("paint eror");
@@ -45,7 +48,8 @@ public class Painter implements ImageObserver {
  	}
 	 BufferedImage buffer;
 	 
-	 public void fullPaint(Graphics g, InfoPanel inf) {
+	 public void fullPaint( InfoPanel inf) {
+		 Graphics g=world.getGraphics();
 		 inf.paint(inf.getGraphics());
 	        if (buffer == null || buffer.getWidth() != world.getWidth() || buffer.getHeight() != world.getHeight()) {
 	            // Пересоздайте буфер, если он не существует или его размер изменился
@@ -53,13 +57,17 @@ public class Painter implements ImageObserver {
 	        }
 	        Graphics bufferGraphics = buffer.getGraphics();
 	        // Отрисовка в буфер
-	        for (int i = 0; i < width; i++) {
-	            for (int j = 0; j < height; j++) {
-	                if (cells[i][j] != null) {
-	                    bufferGraphics.setColor(cells[i][j].getColor());
-	                    bufferGraphics.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
-	                }
-	            }
+	        try {
+	        	for (int i = 0; i < width; i++) {
+	            	for (int j = 0; j < height; j++) {
+	                	if (cells[i][j] != null) {
+	                    	bufferGraphics.setColor(cells[i][j].getColor());
+	                    	bufferGraphics.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+	                	}
+	            	}
+	        	}
+	        }catch(Exception e ) {
+	        	System.err.println("fullpaint error");
 	        }
 	        g.drawImage(buffer, 0, 0, this);
 	        bufferGraphics.dispose();
@@ -71,11 +79,11 @@ public class Painter implements ImageObserver {
 		return false;
 	}
 	
-	public void combinedPaint(Graphics g, InfoPanel inf) {
+	public void combinedPaint( InfoPanel inf) {
 		if(paintCount%2==0) {
-			fullPaint(g,inf);
+			fullPaint(inf);
 		}else {
-			ecoPaint(g,inf);
+			ecoPaint(inf);
 		}
 		paintCount++;
 	}

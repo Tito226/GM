@@ -148,7 +148,7 @@ public class Network implements Serializable {
 			   int rBuffer3=r.nextInt(dotsArr.get(0).size()-BIAS-HOW_MUCH_INPUTS_MUST_BE_USED);
 			   int rBuffer4=r.nextInt(dotsArr.get(0).get(rBuffer3+HOW_MUCH_INPUTS_MUST_BE_USED).nodesFromMe.size());
 			   dotsArr.get(0).get(rBuffer3+HOW_MUCH_INPUTS_MUST_BE_USED).nodesFromMe.get(rBuffer4).changeble=true;
-			   dotsArr.get(0).get(rBuffer3+HOW_MUCH_INPUTS_MUST_BE_USED).nodesFromMe.get(rBuffer4).setWeight(0.02*r.nextDouble());;
+			   dotsArr.get(0).get(rBuffer3+HOW_MUCH_INPUTS_MUST_BE_USED).nodesFromMe.get(rBuffer4).setWeight(0.09*r.nextDouble());;
 		   }
 		   
 	   }

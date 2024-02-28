@@ -46,28 +46,24 @@ public class Dot implements Serializable {
          weightsDelta=0f;
     }
     
-	void evalute(){
-        if(myType == Dot_Type.HIDDEN || myType == Dot_Type.INPUT){
-            value = choose.activationFunction(value);
-            if (nodesFromMe.size() > 0) {
-                for (int i = 0; i < nodesFromMe.size(); i++) {
-                    nodesFromMe.get(i).evalute();
-                }
-            }
-            return;
-        }
-        
-        else if(myType==Dot_Type.BIAS_TYPE) {
-        	if (nodesFromMe.size() > 0) {
-                for (int i = 0; i < nodesFromMe.size(); i++) {
-                    nodesFromMe.get(i).evalute();
-                }
-            }	
-        }
-        else if(myType==Dot_Type.OUTPUT){
-            value=sigmoidActivaionFunction(value);
-        }
-    }
+	void evalute() {
+	    if (myType == Dot_Type.HIDDEN || myType == Dot_Type.INPUT) {
+	        value = choose.activationFunction(value);
+	        evaluateNodesFromMe();
+	    } else if (myType == Dot_Type.BIAS_TYPE) {
+	        evaluateNodesFromMe();
+	    } else if (myType == Dot_Type.OUTPUT) {
+	    	value = choose.activationFunction(value);
+	    }
+	}
+
+	private void evaluateNodesFromMe() {
+	    if (nodesFromMe.size() > 0) {
+	        for (Node node : nodesFromMe) {
+	            node.evalute();
+	        }
+	    }
+	}
     
 	double getOutpup(){
       return value;
