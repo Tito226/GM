@@ -14,7 +14,7 @@ import MyVersion.Core.Node;
 public class NetworkWrapper extends Network {
 
 	private static final long serialVersionUID = -9082519085580679388l;
-	ArrayList<Node> blockedNodes=new ArrayList();
+	ArrayList<Node> blockedNodes;
 	public boolean dontDelete=false;
 	public boolean isDead=false;
 	
@@ -24,12 +24,14 @@ public class NetworkWrapper extends Network {
 	public NetworkWrapper(Network network) {
 		this.dotsArr=network.dotsArr;
 		this.myFunc=network.myFunc;
+		blockedNodes=new ArrayList<Node>();
 		for (int i = HOW_MUCH_INPUTS_MUST_BE_USED; i < dotsArr.get(0).size()-BIAS; i++) {
 			Dot curDot=dotsArr.get(0).get(i);
 			for (int j = 0; j < curDot.nodesFromMe.size(); j++) {
 				blockedNodes.add(curDot.nodesFromMe.get(j));
 			}
 		}
+		
 	}
 	 public void mutate(int numberOfMutations) {
 		 Random r =new Random();
@@ -77,7 +79,11 @@ public class NetworkWrapper extends Network {
 		 //Удалить разблокированную Node из списка 
 		 blockedNodes.remove(rBuff);
 	 }
-	 
+	 @Override
+	 public void kill() {
+		 super.kill();
+		 blockedNodes=null;
+	 }
 	 public static double rnd(double min, double max){
 			max -= min;
 			return (Math.random() * ++max) + min;

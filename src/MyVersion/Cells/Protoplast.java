@@ -12,7 +12,7 @@ import MyVersion.Frame.World;
 
 ///////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
-public class Protoplast implements PartCell{
+public class Protoplast implements LiveCell{
 	private NormCell normCell;
 	int x;
 	int y;
@@ -30,19 +30,20 @@ public class Protoplast implements PartCell{
 	}
 
 	@Override
-	public void step(double output) {
+	public void step() {
 		eatSunE();
 		if(countb%2==0){
 			energy--;
 		}
 		countb++;
+		//normCell.multiCellbrain.evaluteFitness(null, false);
 	}
 
 	@Override
 	public void test() {
 		try {
-			if( cells[normCell.getX()][normCell.getY()].secCell==null ){
-				cells[x][y].partCell=null;
+			if( cells[normCell.getX()][normCell.getY()].liveCell==null ){
+				cells[x][y].liveCell=null;
 				cells[x][y].organic+=energy;
 				if(this.normCell.myParts!=null){
 					this.normCell.myParts.remove(this);
@@ -79,10 +80,10 @@ public class Protoplast implements PartCell{
 	}
 	
 	private void spawn(Cell nextCell) {
-		if ( nextCell.secCell==null && nextCell.partCell==null) {
+		if ( nextCell.liveCell==null ) {
 			myName = this.normCell.partName + this.normCell.partNum;
 			this.normCell.partNum++;
-			nextCell.partCell = this;
+			nextCell.liveCell = this;
 			this.x=nextCell.getX();
 			this.y=nextCell.getY();
 			this.normCell.myParts.add(this);
@@ -104,12 +105,17 @@ public class Protoplast implements PartCell{
 	@Override
 	public void setY(int y) {
 		this.y=y;
-		
 	}
 
 	@Override
 	public void setX(int x) {
 		this.x=x;
+	}
+
+	@Override
+	public void kill() {
+		cells[x][y].liveCell=null;
+		normCell.myParts.remove(this);
 	}
 
 	

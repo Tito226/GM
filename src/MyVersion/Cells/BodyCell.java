@@ -2,13 +2,8 @@ package MyVersion.Cells;
 
 import java.awt.Color;
 
-public class BodyCell implements PartCell{
+public class BodyCell implements LiveCell{
 
-	@Override
-	public void step(double output) {
-		// TODO Автоматически созданная заглушка метода
-		
-	}
 
 	@Override
 	public void test() {
@@ -36,6 +31,18 @@ public class BodyCell implements PartCell{
 
 	@Override
 	public void setX(int x) {
+		// TODO Автоматически созданная заглушка метода
+		
+	}
+
+	@Override
+	public void step() {
+		// TODO Автоматически созданная заглушка метода
+		
+	}
+
+	@Override
+	public void kill() {
 		// TODO Автоматически созданная заглушка метода
 		
 	}

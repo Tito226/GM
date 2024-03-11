@@ -9,8 +9,7 @@ public  class Cell {
     int[] color=new int[3];
     //Color myColor ;
     //int energy=1;
-    public NormCell secCell;
-    PartCell partCell;
+    public LiveCell liveCell;
     private int x;
     private int y;
     public int organic=CELL_START_ORGANIC;
@@ -21,13 +20,9 @@ public  class Cell {
     public int getY() {
         return y;
     }
-    public void setSecCell(NormCell secCell){
-    	this.secCell=secCell;
-    	setChange(true);
-    }
-    
-    public void setPartCell(PartCell partCell) {
-        this.partCell = partCell;
+
+    public void setLiveCell(LiveCell liveCell) {
+        this.liveCell = liveCell;
         setChange(true);
     }
 
@@ -40,26 +35,20 @@ public  class Cell {
     }
 
     void step(){
-    	if( secCell!=null){
-    		secCell.step();
+    	if( liveCell!=null){
+    		liveCell.step();
     	}
     	else{} //System.out.println(" ");
     }
-    boolean getSecCell(){
-        if(secCell!=null){
-            return true;
-        }else
-        	return false;
-    }
-    boolean getPartCell(){
-        if(partCell!=null){
+
+    boolean getLiveCell(){
+        if(liveCell!=null){
             return true;
         }else return false;
     }
     private boolean change=false;
-    
-    boolean lastNCell=false;
-    boolean lastPCell=false;
+
+    boolean lastLCell=false;
     int lastOrganic=0;
     private synchronized boolean getOrSetChange(boolean get,boolean value) {
     	if(get) {
@@ -70,8 +59,7 @@ public  class Cell {
     	}
     }
     public void testCell() {
-        lastNCell = getSecCell();
-        lastPCell = getPartCell();
+        lastLCell = getLiveCell();
         lastOrganic = organic;
         try {
             if (organic < 255 && organic > 0) {
@@ -83,48 +71,17 @@ public  class Cell {
         } catch (IllegalArgumentException e) {
             System.out.println("Invalid color values");
         }
-        if (secCell != null && secCell.myMethods.getEnergy(secCell) <= 0) {
-            secCellKill();
-        }
-        if (secCell != null && secCell.myMethods.getEnergy(secCell) >= 10000) {
-            System.out.println("Cell with 10000 died");
-            organic += secCell.myMethods.getEnergy(secCell);
-            secCell.brain.kill();
-            setSecCell(null);
-
-        }
-        if (partCell != null) {
-            partCell.test();
+        if (liveCell != null ) {
+           liveCell.test();
         }
     }
 
   	public Color getColor(){
-  		if(secCell==null && partCell==null) {
+  		if(liveCell==null) {
   			return new Color(color[0],color[1],color[2]);
-        }else if(secCell!=null) {
-        	return secCell.getColor();
         }else {
-        	return partCell.getColor();
+        	return liveCell.getColor();
         }  	
-  	}
-
-  	void secCellKill(){
-  		organic+=secCell.myMethods.getEnergy(secCell)+10;
-  		for (int i = -1; i < 2; i++) {
-  			for (int j = -1; j < 2; j++) {
-  				if(x+i<cells.length && x+i>0 && y+j>0 && y+j<cells[1].length) {
-  					cells[x+i][y+j].organic+=secCell.myMethods.getEnergy(secCell)+ORGANIC_PER_CELL_ON_NORMCELL_DEATH;
-  					cells[x+i][y+j].change=true;
-  				}
-  			}
-		}
-  		if(!secCell.brain.dontDelete) {
-  			secCell.brain.kill();
-  		}else {
-  			secCell.brain.isDead=true;
-  		}
-  		
-  		setSecCell(null);
   	}
   	
     public void setOrganic(int organic) {

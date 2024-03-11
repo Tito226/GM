@@ -243,7 +243,7 @@ public static Cell[][] getCells(){
 
         for (int i = 0; i < CELLS_ON_START; i++) {
             Random r =new Random();
-            cells[r.nextInt(width)][r.nextInt(height)].setSecCell(new NormCell(relative));
+            cells[r.nextInt(width)][r.nextInt(height)].setLiveCell(new NormCell(relative));
         }
 
         ArrayList<Double[]> inputData=new ArrayList<Double[]>();
@@ -264,17 +264,19 @@ public static Cell[][] getCells(){
             int NULL_CELLS=0;
             for (int i = 0; i < width; i++) {//очистка состояния(сделал ход)
                 for (int j = 0; j < height ; j++) {
-                    if( cells[i][j].secCell!=null){
-                    cells[i][j].secCell.stepN=false;
-                    }/*TODO реализовать мезонизм восстановления органики*/
+                	Cell curCell=cells[i][j];
+                    if(curCell.liveCell!=null && curCell.liveCell instanceof NormCell){
+                    	NormCell curNormCell=(NormCell) curCell.liveCell;
+                    	curNormCell.stepN=false;
+                    }/*TODO реализовать механизм восстановления органики*/
                     cells[i][j].testCell();//проверяет на ошибки, убивает клетку ,если кончилась енергия, назначает цвет
                 }
             }
             for (int i = 0; i < width; i++) {
             	for (int j = 0; j < height ; j++) {
             		Cell curCell=cells[i][j];
-            		if(curCell.secCell!=null){
-            			NormCell curNormCell=curCell.secCell;
+            		if(curCell.liveCell!=null && curCell.liveCell instanceof NormCell){
+            			NormCell curNormCell=(NormCell) curCell.liveCell;
             			curNormCell.setX(i);
             			curNormCell.setY(j);
             			if(curNormCell.getLifeTime()>bestLifeTime) {
@@ -295,7 +297,7 @@ public static Cell[][] getCells(){
             				bestThisLifeTimeBrains.add(curNormCell.brain);
             				curNormCell.brain.dontDelete=true;
             			}
-            			if(curCell.secCell.multiplies>bestMultiplies) {
+            			if(curNormCell.multiplies>bestMultiplies) {
             				bestMultiplies=curNormCell.multiplies;
             				if(topMultipliesBrain!=null && curNormCell.brain.isDead) {
             					thisTopLifeTimeBrain.kill();
@@ -401,14 +403,14 @@ public static Cell[][] getCells(){
 	 		int buff=r.nextInt(3);
 	 		if(buff==1) {
 	 				nBuf=new NormCell(bestThisLifeTimeBrains.get(r.nextInt(bestThisLifeTimeBrains.size())));
-	 				cells[r.nextInt(width)][r.nextInt(height)].setSecCell(nBuf);
+	 				cells[r.nextInt(width)][r.nextInt(height)].setLiveCell(nBuf);
 	 				continue;
 	 		}else if(buff==0) {
 	 			nBuf=new NormCell(bestLifeTimeBrains.get(r.nextInt(bestLifeTimeBrains.size())));
-	 			cells[r.nextInt(width)][r.nextInt(height)].setSecCell(nBuf);
+	 			cells[r.nextInt(width)][r.nextInt(height)].setLiveCell(nBuf);
 	 		} else {
 	 			nBuf=new NormCell(bestMultipliesBrains.get(r.nextInt(bestMultipliesBrains.size())));
-	 			cells[r.nextInt(width)][r.nextInt(height)].setSecCell(nBuf);
+	 			cells[r.nextInt(width)][r.nextInt(height)].setLiveCell(nBuf);
 	 		}
 
 	 		checkGroup.add(nBuf.brain);
