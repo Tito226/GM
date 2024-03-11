@@ -83,6 +83,9 @@ public class Network_Teacher extends JPanel {
 
         	errors[i]=(float) teacher.teach(student,data_set,i);
         }
+        teacher.keys.clear();
+        teacher.keys=null;
+        data_set.remove();
         data_set=null;
         return errors;
     }
@@ -218,27 +221,29 @@ public class Network_Teacher extends JPanel {
     	return prevRate/1+FADING*iteration;
     }
     
-    /*TODO Тест не работает правильно */
     public static void suitabilityTest(Network student) {
-        testAndPrint("Multiply________________", Data_Set.getMultiplyTrainData()[0], Action_Boundaries.multiplyBoundaries, student);
-        testAndPrint("Move up_________________", Data_Set.getMoveUpTrainData()[0], Action_Boundaries.moveUpBoundaries, student);
-        testAndPrint("Eat organic0____________", Data_Set.getEatOrganicTrainData0()[0], Action_Boundaries.eatOrganicBoundaries, student);
-        testAndPrint("Eat organic_____________", Data_Set.getEatOrganicTrainData()[0], Action_Boundaries.eatOrganicBoundaries, student);
-        testAndPrint("Eat organic2____________", Data_Set.getEatOrganicTrainData2()[0], Action_Boundaries.eatOrganicBoundaries, student);
-        testAndPrint("Move right on up wall___", Data_Set.getMoveRightIfUpWallTrainData()[0], Action_Boundaries.moveRightBoundaries, student);
-        testAndPrint("Move down on right wall_", Data_Set.getMoveDownOnRightWallTrainData()[0], Action_Boundaries.moveDownBoundaries, student);
-        testAndPrint("Move Left If Down Wall__", Data_Set.getMoveLeftIfDownWallTrainData()[0], Action_Boundaries.moveLeftBoundaries, student);
-        testAndPrint("Move Left If Down Wall2_", Data_Set.getMoveLeftIfDownWallTrainData2()[0], Action_Boundaries.moveLeftBoundaries, student);
-        testAndPrint("Move Left If food_______", Data_Set.getMoveLeftIfFoodTrainData()[0], Action_Boundaries.moveLeftBoundaries, student);
-        testAndPrint("Move Right If food______", Data_Set.getMoveRightIfFoodTrainData()[0], Action_Boundaries.moveRightBoundaries, student);
-        testAndPrint("Move Up If food_________", Data_Set.getMoveUpIfFoodTrainData()[0], Action_Boundaries.moveUpBoundaries, student);
-        testAndPrint("Move Down If food_______", Data_Set.getMoveDownIfFoodTrainData()[0], Action_Boundaries.moveDownBoundaries, student);
+        testAndPrint("Multiply__________________", Data_Set.getMultiplyTrainData()[0], Action_Boundaries.multiplyBoundaries, student);
+        testAndPrint("Move up___________________", Data_Set.getMoveUpTrainData()[0], Action_Boundaries.moveUpBoundaries, student);
+        testAndPrint("Eat organic0______________", Data_Set.getEatOrganicTrainData0()[0], Action_Boundaries.eatOrganicBoundaries, student);
+        testAndPrint("Eat organic_______________", Data_Set.getEatOrganicTrainData()[0], Action_Boundaries.eatOrganicBoundaries, student);
+        testAndPrint("Eat organic2______________", Data_Set.getEatOrganicTrainData2()[0], Action_Boundaries.eatOrganicBoundaries, student);
+        testAndPrint("Move right on up wall_____", Data_Set.getMoveRightIfUpWallTrainData()[0], Action_Boundaries.moveRightBoundaries, student);
+        testAndPrint("Move down on right wall___", Data_Set.getMoveDownOnRightWallTrainData()[0], Action_Boundaries.moveDownBoundaries, student);
+        testAndPrint("Move Left If Down Wall____", Data_Set.getMoveLeftIfDownWallTrainData()[0], Action_Boundaries.moveLeftBoundaries, student);
+        testAndPrint("Move Left If Down Wall2___", Data_Set.getMoveLeftIfDownWallTrainData2()[0], Action_Boundaries.moveLeftBoundaries, student);
+        testAndPrint("Move Left If food_________", Data_Set.getMoveLeftIfFoodTrainData()[0], Action_Boundaries.moveLeftBoundaries, student);
+        testAndPrint("Move Right If food________", Data_Set.getMoveRightIfFoodTrainData()[0], Action_Boundaries.moveRightBoundaries, student);
+        testAndPrint("Move Up If food___________", Data_Set.getMoveUpIfFoodTrainData()[0], Action_Boundaries.moveUpBoundaries, student);
+        testAndPrint("Move Down If food_________", Data_Set.getMoveDownIfFoodTrainData()[0], Action_Boundaries.moveDownBoundaries, student);
+        testAndPrint("Move Up If food everywhere", Data_Set.getMoveUpIfFoodEverywhereTrainData()[0], Action_Boundaries.moveUpBoundaries, student);
     }
 
     private static void testAndPrint(String action, Double[] data, double[] boundaries, Network student) {
         double weightBuffer = student.evaluteFitness(data, false);
         String result = (weightBuffer > boundaries[0] && weightBuffer < boundaries[1]) ? "passed" : "failed";
-        System.out.println(action + ": " + result+ " " +weightBuffer +  " " + Arrays.toString(data));
+        String toPrint=String.format("%s : %s %.6f (%.6f - %.6f) %s",action,result,weightBuffer,boundaries[0],boundaries[1] ,Arrays.toString(data));
+        System.out.println(toPrint);
+        //System.out.println(action + ": " + result+ " " +weightBuffer +" "+  +  " " + Arrays.toString(data));
     }
 
         void showResult(float[] errors){

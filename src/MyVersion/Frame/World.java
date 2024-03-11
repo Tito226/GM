@@ -36,9 +36,10 @@ import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 public class World extends JPanel implements Runnable ,Scrollable {
 	Painter painter=new Painter(this);
+	JScrollPane scroller;
 	InfoPanel inf=new InfoPanel(this);
     public Network relative;
-    public static int cellls=0;
+    //public static int cellls=0;
     public volatile static int cellSize=CELL_SIZE;
     public static int width;
     public static int height;
@@ -50,7 +51,7 @@ public class World extends JPanel implements Runnable ,Scrollable {
     JFrame frame;
     public World(int width,int height) throws IOException {
         Network_Teacher network_teacher=new Network_Teacher();
-        if(!TEST_RUN) {
+        if(!LOAD_SAVE) {
         	relative=network_teacher.createAndTeachNetwork();
         }else {
         	
@@ -95,7 +96,8 @@ public static Cell[][] getCells(){
         JPanel controls2 = new JPanel();
         JButton pauseButton = new JButton("Pause");
         JButton dePauseButton = new JButton("Continue");
-        JScrollPane scroller = new JScrollPane(world);
+        world.scroller = new JScrollPane(world);
+        JScrollPane scroller=world.scroller;
         if(!AUTO_SIZE) {
         	cellSize=1;
         }
@@ -174,7 +176,7 @@ public static Cell[][] getCells(){
         frame.add(controls, BorderLayout.EAST); // справа будет панель с управлением
         frame.add(scroller, BorderLayout.CENTER);
         world.setSize(width, height);
-        frame.setSize(width, height);//TODO FIX PAIN BUG CAUSED BY THIS
+        frame.setSize(width, height);
         frame.setDefaultCloseOperation(EXIT_ON_CLOSE);
         frame.setVisible(true);
         return frame;
@@ -380,7 +382,7 @@ public static Cell[][] getCells(){
 	 			cells[j][i].organic=CELL_START_ORGANIC;
 	 		}
 	 	}
-	 	if(thisBestLifeTime>CREATE_SAVE_ON_LIFETIME && thisBestLifeTime>lastBestLifeTime) {/*TODO реализовать механизм проверки тот ли мозг копируется*/
+	 	if(thisBestLifeTime>CREATE_SAVE_ON_LIFETIME && thisBestLifeTime>lastBestLifeTime) {
 	 		try {
 	 			fileOutputStream = new FileOutputStream("C:\\Users\\Timurs1\\Desktop\\brains\\BrainSave"+thisBestLifeTime+"---"+r.nextLong()+".network");
 	 			objectOutputStream = new ObjectOutputStream(fileOutputStream);
@@ -497,8 +499,8 @@ public static Cell[][] getCells(){
     
     
     
-    void cellDiagnostic(NormCell norm,ArrayList<Double[]> inputData) {//TODO FIX IT
-    	System.out.println("Run Cell diag.");//TODO НАЙТИ ОТЛИЧИЯ МЕЖДУ ВХОДНЫМИ ДАННЫМИ ,СЕЙЧАС ТУТ ЧЕРНАЯ МАГИЯ ВХОДНЫЕ ДАННЫЕ ОДИНАКОВЫЕ,МЕТОД ТОЖЕ,А РЕЗУЛЬТАТЫ РАЗНЫЕ
+    void cellDiagnostic(NormCell norm,ArrayList<Double[]> inputData) {
+    	System.out.println("Run Cell diag.");
     	System.out.print(":::: "+
         		norm.evaluateFitness(new Double[]{0d,15d,6d,0d,0d,0d,0d})+"тест 1     ");
     	System.out.print(":::: "+														// тесты 1 должны быть одинаковыми

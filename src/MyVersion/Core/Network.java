@@ -13,12 +13,10 @@ import static MyVersion.Core.Core_Config.*;
   Лучше мало нейронов но больше слоев чем больше нейронов но 1 слой*/
 
 public class Network implements Serializable {
-	ActivationFunctions myFunc;
-	public boolean dontDelete=false;
-	public boolean isDead=false;
-	/*TODO НАПИСАТЬ КЛАСС ОБЕРТКУ */
+	public ActivationFunctions myFunc;
+	
 	private static final long serialVersionUID = 2L;
-    ArrayList<ArrayList<Dot>> dotsArr =new ArrayList<>();
+    public ArrayList<ArrayList<Dot>> dotsArr =new ArrayList<>();
     public Network() {//создает пустую нейросеть(массив точек пустой) для клонирования 
     	
    	}
@@ -129,30 +127,7 @@ public class Network implements Serializable {
    return outputs.get(0);
    }
   
-   public void mutate(int numberOfMutations) {
-	   Random r =new Random();
-	   for(int i=0;i<numberOfMutations;i++) {
-		   
-		   int rBuffer1=r.nextInt(dotsArr.size()-1);
-		   int rBuffer2=r.nextInt( dotsArr.get(rBuffer1).size());
-		   Dot gettedDot=dotsArr.get(rBuffer1).get(rBuffer2);
-		   Node gettedNode= gettedDot.nodesFromMe.get(r.nextInt(
-				   gettedDot.nodesFromMe.size()));//выбор случайной ноды
-		   if(r.nextInt(2)==1) {
-			   gettedNode.setWeight(gettedNode.getWeight()+r.nextFloat()*MUTATION_MULTIPLIER); 
-		   }else {
-			   gettedNode.setWeight(gettedNode.getWeight()-r.nextFloat()*MUTATION_MULTIPLIER); 
-		   }
-		   if(r.nextInt(2)==0) {
-			   //TODO сделать матацию анлока нод
-			   int rBuffer3=r.nextInt(dotsArr.get(0).size()-BIAS-HOW_MUCH_INPUTS_MUST_BE_USED);
-			   int rBuffer4=r.nextInt(dotsArr.get(0).get(rBuffer3+HOW_MUCH_INPUTS_MUST_BE_USED).nodesFromMe.size());
-			   dotsArr.get(0).get(rBuffer3+HOW_MUCH_INPUTS_MUST_BE_USED).nodesFromMe.get(rBuffer4).changeble=true;
-			   dotsArr.get(0).get(rBuffer3+HOW_MUCH_INPUTS_MUST_BE_USED).nodesFromMe.get(rBuffer4).setWeight(0.09*r.nextDouble());;
-		   }
-		   
-	   }
-   }
+  
 
    public void kill() {
 	   for(ArrayList<Dot> dots : dotsArr) {

@@ -12,138 +12,105 @@ import MyVersion.Frame.World;
 
 ///////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
-        public class Protoplast implements PartCell{
-			private NormCell normCell;
-			Integer[] myCoords=new Integer[2];
-         Color color=Color.CYAN;
-         String myName;
-         int energy1 =PROTOPLAST_START_ENERGY;
+public class Protoplast implements PartCell{
+	private NormCell normCell;
+	int x;
+	int y;
+	Color color=Color.CYAN;
+	String myName;
+	int energy =PROTOPLAST_START_ENERGY;
 
-         void transferEnergy(){
-         if(energy1>=4){
-         cells[this.normCell.getX()][this.normCell.getY()].secCell.energy+=energy1/2;
-         energy1-=energy1/2;
-         }
-         }
-         byte countb=0;
+	void transferEnergy(){
+		
+	}
+	byte countb=0;
 
-         public int getEnergy() {
-            return energy1;
-        }
+	public int getEnergy() {
+		return energy;
+	}
 
-          @Override
-          public void step(float output) {
-            eatSunE();
-            if(output>0.0 && output<0.2){
-            transferEnergy();
-            }else if(output>0.64 && output<0.68) {
-            new Protoplast(this.normCell, output,xxx,yyy);
-            }
+	@Override
+	public void step(double output) {
+		eatSunE();
+		if(countb%2==0){
+			energy--;
+		}
+		countb++;
+	}
 
+	@Override
+	public void test() {
+		try {
+			if( cells[normCell.getX()][normCell.getY()].secCell==null ){
+				cells[x][y].partCell=null;
+				cells[x][y].organic+=energy;
+				if(this.normCell.myParts!=null){
+					this.normCell.myParts.remove(this);
+				}
+			}
+		}catch (Exception e){
+			e.printStackTrace();
+			System.out.println("proto: "+x+" "+y);
+			System.out.println("nomCell: "+this.normCell.getX()+" "+this.normCell.getY());
+		}
+	}
 
-            if(countb%2==0){
-                energy1--;
-            }
-            countb++;
-          }
-
-        @Override
-        public void test() {
-
-            try {
-
-            if( cells[this.normCell.getX()][this.normCell.getY()].secCell==null ){
-              cells[xxx][yyy].partCell=null;
-              cells[xxx][yyy].organic+=energy1;
-              if(this.normCell.myParts!=null){
-                 this.normCell.myParts.remove(myCoords);
-              }
-            }
-            }catch (Exception e){
-                e.printStackTrace();
-               System.out.println("proto: "+getXx()+" "+getYy());
-                System.out.println("nomCell: "+this.normCell.getX()+" "+this.normCell.getY());
-            }
-        }
-
-        public Protoplast(NormCell normCell, double nOutput,int x,int y){
-
-            this.normCell = normCell;
-			boolean done=false;
-          if(nOutput>0.64 && nOutput<0.65){
-              if (y>0 && cells[x][y-1].secCell==null && cells[x][y-1].partCell==null) {
-                  myName = this.normCell.partName + this.normCell.partNum;
-                  this.normCell.partNum++;
-                  cells[x][y - 1].partCell = this;
-                  myCoords[0]=x;
-                  myCoords[1]=y-1;
-                  this.normCell.myParts.add(myCoords);
-                  done=true;
-              }
-          }  if(nOutput>0.65 && nOutput<0.66){
-                  if (y<height-1 && cells[x][y+1].secCell==null && cells[x][y+1].partCell==null) {
-                      myName=this.normCell.partName+this.normCell.partNum;
-                      this.normCell.partNum++;
-                      cells[x][y+1].partCell=this;
-                      myCoords[0]=x;
-                      myCoords[1]=y+1;
-                      this.normCell.myParts.add(myCoords);
-                      done=true;
-                  }
-              } if(nOutput>0.66 && nOutput<0.67){
-                  if (x<width-1 && cells[x+1][y].secCell==null && cells[x+1][y].partCell==null) {
-                      myName=this.normCell.partName+this.normCell.partNum;
-                      this.normCell.partNum++;
-                      cells[x+1][y].partCell=this;
-                      myCoords[0]=x+1;
-                      myCoords[1]=y;
-                      this.normCell.myParts.add(myCoords);
-                      done=true;
-                  }
-              }   if(nOutput>0.67 && nOutput<0.68){
-                  if (x>0 && cells[x-1][y].secCell==null && cells[x-1][y].partCell==null) {
-                      myName=this.normCell.partName+this.normCell.partNum;
-                      this.normCell.partNum++;
-                      cells[x-1][y].partCell=this;
-                      myCoords[0]=x-1;
-                      myCoords[1]=y;
-                      this.normCell.myParts.add(myCoords);
-                      done=true;
-                  }
-              }
-          if (done){
-              this.normCell.energy-=ENERGY_NEEDED_TO_MULTIPLY_PROTOPLAST;
-              xxx=myCoords[0];
-              yyy=myCoords[1];
-          }
-        }
-       private    int xxx;
-       private int yyy;
-
-        void eatSunE(){
-            energy1=energy1+ World.sunny;
-
-        }
+	public Protoplast(NormCell normCell, double nOutput){
+		this.normCell = normCell;
+		int x=normCell.getX();
+		int y=normCell.getY();
+		if(nOutput>0.64 && nOutput<0.65){
+			if (y>0) {
+				spawn(cells[x][y-1]);
+			}
+		} else if(nOutput>0.65 && nOutput<0.66){
+			if (y<height-1) {
+				spawn(cells[x][y+1]);
+			}
+		} else if(nOutput>0.66 && nOutput<0.67){
+			if (x<width-1) {
+				spawn(cells[x+1][y]);
+			}
+		} else if(nOutput>0.67 && nOutput<0.68){
+			if (x>0) {
+				spawn(cells[x-1][y]);
+			}
+		}
+	}
+	
+	private void spawn(Cell nextCell) {
+		if ( nextCell.secCell==null && nextCell.partCell==null) {
+			myName = this.normCell.partName + this.normCell.partNum;
+			this.normCell.partNum++;
+			nextCell.partCell = this;
+			this.x=nextCell.getX();
+			this.y=nextCell.getY();
+			this.normCell.myParts.add(this);
+			this.normCell.energy-=ENERGY_NEEDED_TO_MULTIPLY_PROTOPLAST;
+		}
+	}
 
 
-        public int getYy() {
-            return yyy;
-        }
+	void eatSunE(){
+		energy+= World.sunny;
+	}
 
-        public int getXx() {
-            return xxx;
-        }
 
-        public void setY(int y) {
-            yyy = y;
-        }
+	@Override
+	public Color getColor() {
+		return color;
+	}
 
-        public void setX(int x) {
-            xxx = x;
-        }
+	@Override
+	public void setY(int y) {
+		this.y=y;
+		
+	}
 
-        @Override
-        public Color getColor() {
-            return color;
-        }
-    }
+	@Override
+	public void setX(int x) {
+		this.x=x;
+	}
+
+	
+}

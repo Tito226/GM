@@ -1,7 +1,11 @@
 applyBackground=false
-configurationInstallLocation=/C\:/Users/Timurs1/eclipse/java-2023-09/eclipse/
+approved.defs.file.last.changed.time=1693315978000
+configurationInstallLocation=/C\:/Users/Timurs1/eclipse/java-2023-062/eclipse/
+ct.upsell.display.after=1709577399270
 eclipse.preferences.version=1
 iconcolormode=primary
-lastConfiguration=1705183604622
-newinstall=true
+last.download.attempt.time=1709231802099
+lastConfiguration=1705186147804
+newinstall=false
+showWelcomeDialog=false
 workbench.theme=Dark Gray

@@ -6,9 +6,8 @@ import static MyVersion.Frame.GM2_CONFIG.*;
 import static MyVersion.Frame.World.*;
 
 public  class Cell {
-
-    int[] color;
-    Color myColor ;
+    int[] color=new int[3];
+    //Color myColor ;
     //int energy=1;
     public NormCell secCell;
     PartCell partCell;
@@ -77,7 +76,9 @@ public  class Cell {
         try {
             if (organic < 255 && organic > 0) {
                 int colorValue = 255 - organic;
-                myColor = new Color(colorValue, colorValue, colorValue);
+                for (int i = 0; i < color.length; i++) {
+					color[i]=colorValue;
+				}
             }
         } catch (IllegalArgumentException e) {
             System.out.println("Invalid color values");
@@ -90,7 +91,7 @@ public  class Cell {
             organic += secCell.myMethods.getEnergy(secCell);
             secCell.brain.kill();
             setSecCell(null);
-            cellls--;
+
         }
         if (partCell != null) {
             partCell.test();
@@ -99,7 +100,7 @@ public  class Cell {
 
   	public Color getColor(){
   		if(secCell==null && partCell==null) {
-  			return myColor;
+  			return new Color(color[0],color[1],color[2]);
         }else if(secCell!=null) {
         	return secCell.getColor();
         }else {
@@ -124,7 +125,6 @@ public  class Cell {
   		}
   		
   		setSecCell(null);
-  		cellls--;
   	}
   	
     public void setOrganic(int organic) {

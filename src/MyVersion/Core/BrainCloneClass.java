@@ -46,7 +46,7 @@ public class BrainCloneClass {
         }
 		
 		for(int i=0;i<brain.dotsArr.get(brain.dotsArr.size()-2).size();i++) {//копирование нод которые ведут к выходам
-			for (int j= 0; j < brain.dotsArr.get(brain.dotsArr.size()-1).size(); j++) {//TODO  сверить ноды клона и родителя
+			for (int j= 0; j < brain.dotsArr.get(brain.dotsArr.size()-1).size(); j++) {
 				clone.dotsArr.get(brain.dotsArr.size()-2).get(i).addNodeClone(clone.dotsArr.get(brain.dotsArr.size()-1).get(j),
 						brain.dotsArr.get(brain.dotsArr.size()-2).get(i)
                 			.nodesFromMe.get(j));

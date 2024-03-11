@@ -9,37 +9,34 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 import MyVersion.Frame.Action_Boundaries;
+import MyVersion.Frame.NetworkWrapper;
+
 import static MyVersion.Core.Core_Config.*;
 import static MyVersion.Frame.GM2_CONFIG.*;
 import static MyVersion.Frame.World.*;
 
 public class NormCell implements  Serializable {
-	/*TODO РЕАЛИЗОВАТЬ МЕХАНИЗМ СОХРАНЕНИЯ МОЗГА*/
     //*****************************************
-    public Network brain;
+    public NetworkWrapper brain;
+    public NetworkWrapper multiCellbrain;
     Random r=new Random();
     //*****************************************
-    int energy;
-    int lifeTime=0;
-    int partNum=0;
     public int multiplies=0;
-    private int x;
-    private int y;
-    byte counter=0;
-    byte idleEnergyDecreseCounter=0;
+    int energy,lifeTime=0,partNum=0;
+    private int x,y;
+    byte counter=0,idleEnergyDecreseCounter=0;
     float readyToMultiply=0.0f;
     float[] outputs;
-    long myParentNum;
-    long myChildNum=r.nextLong();
+    long myParentNum,myChildNum=r.nextLong();
     static long num = 0L;
     private final long myNum;
     public boolean stepN=false;
-    double lastOutput=0d;
-    double preLastOutput=0d;
-    ArrayList< Integer[]> myParts=new ArrayList<>();
+    double lastOutput=0d,preLastOutput=0d;
+    public String partName="part";
+    //*****************************************
+    ArrayList<PartCell> myParts=new ArrayList<>();
     public DataMethods myMethods=new DataMethods();
     NormCellType normCellType=NormCellType.MOVABLE;
-    public String partName="part";
     Color myColor=Color.green;
     
     public int getX() {
@@ -54,14 +51,13 @@ public class NormCell implements  Serializable {
    
     public NormCell(Network brain){
     	Random r=new Random();
-        this.brain=BrainCloneClass.networkClone(brain);
+    	this.brain=new NetworkWrapper(BrainCloneClass.networkClone(brain));
         myNum=num;
         num++;
         energy=NORM_CELL_START_ENERGY;
-        cellls++;
         if(!DEBUG) {
         	if(r.nextInt(MUTATION_CHANCE)==0) {
-        		brain.mutate(NUMBER_OF_MUTATIONS);
+        		this.brain.mutate(NUMBER_OF_MUTATIONS);
         	}
         }
     }
@@ -74,52 +70,37 @@ public class NormCell implements  Serializable {
         Random random=new Random();
         int i5 = random.nextInt(2);
         switch (d){/*TODO THINK ABOUT*/
-            case DOWN ->{
-                y++;
-                if (  y<height && cells[x][y].secCell==null && cells[x][y].partCell==null  && myParts.size()==0){
-                cells[x][y].setSecCell(this);
-                cells[x][y-1].setSecCell(null);
-                }
-                else {
-                    y--;
-
+            case DOWN ->{              
+                if (y<height-1){
+                	move(cells[x][y+1]);
                 }
             }
             case UP -> {
-                y--;
-                if (y>-1 &&  y<height-1 && cells[x][y].secCell==null && cells[x][y].partCell==null  && myParts.size()==0){
-                cells[x][y].setSecCell(this);
-                cells[x][y+1].setSecCell(null);}
-                else{
-                    y++;
-
-                }
-
+                if (y>0){
+                	move(cells[x][y-1]);
+                } 
             }
             case LEFT ->{
-                x--;
-                if (x>-1 && cells[x][y].secCell==null && cells[x][y].partCell==null && myParts.size()==0){
-                cells[x][y].setSecCell(this);
-                cells[x+1][y].setSecCell(null);
-                }
-                else {
-                    x++;
-
-                }
+                if (x>0){
+                	move(cells[x-1][y]);
+                }   
             }
-            case RIGHT ->{ x++;
-                if(x<width && cells[x][y].secCell==null && cells[x][y].partCell==null  && myParts.size()==0){
-                cells[x][y].setSecCell(this);
-                cells[x-1][y].setSecCell(null);
-                }
-                else {
-                    x--;
-
-                }
-             }
+            case RIGHT ->{ 
+                if(x<width-1){
+                	move(cells[x+1][y]);
+                }            
+            }
         }
         energy-=1; /*TODO ПЕРЕСМОТРЕТЬ*/
         
+    }
+    private void move(Cell nextCell) {
+    	if (nextCell.secCell==null && nextCell.partCell==null  && myParts.size()==0){
+    		nextCell.setSecCell(this);
+            cells[x][y].setSecCell(null);
+            this.setX(nextCell.getX());
+    		this.setY(nextCell.getY());
+        }
     }
     
     public int getY() {
@@ -141,7 +122,7 @@ public class NormCell implements  Serializable {
 
         }
         if(outputs[0]>0.64 && outputs[0]<0.68){
-        	new  Protoplast(this, outputs[0],x,y);
+        	new  Protoplast(this, outputs[0]);
        //   System.out.println("WRYYYYY");
         }
         if (outputs[0]>0.3 && outputs[0]<0.35){
@@ -181,7 +162,7 @@ public class NormCell implements  Serializable {
     		   inputBuff[i]=myMethods.getInputData()[i];
     	   }
     	   System.out.println(Arrays.toString(inputBuff)+"  ");
-    	   System.out.println("output: "+output+"output with act function: "+(1/(1+ Math.pow(Math.E,-output))));
+    	   System.out.println("output: "+output);
     	   System.out.println("--------------------------------------------------");
     	   try {
 			Thread.sleep(1000);
@@ -217,7 +198,7 @@ public class NormCell implements  Serializable {
       	 if (!eatCell(Directions.DOWN)){energy--;}
 
        }else if(output>0.64 && output<0.68){
-    	   protoplast=new Protoplast(this, output,x,y);
+    	   protoplast=new Protoplast(this, output);
        }else if(output>0.68 && output<0.8){
 
 
@@ -252,7 +233,7 @@ public class NormCell implements  Serializable {
         }
     }
 
-    void transferEnergy(float output){/*TODO ЗАГЛУШКА*/
+    void transferEnergy(double output){/*TODO ЗАГЛУШКА*/
     	if (output>0.7 && output>0.72) {
     		
     	}else if(output>0.72 && output>0.74){
@@ -266,49 +247,47 @@ public class NormCell implements  Serializable {
         switch (dirs){
 
             case UP -> {
-                if( y>0 && cells[x][y-1].secCell!=null ){
-                    energy+= cells[x][y-1].secCell.energy;
-                    cells[x][y-1].secCell= cells[x][y].secCell;
-                    cells[x][y].secCell=null;
-                    done= true;
-                }else done= false;
+                if( y>0){
+                	eatCell(cells[x][y-1]);
+                }
             }
 
             case DOWN -> {
-                if(y<height-1 && cells[x][y+1].secCell!=null){
-                    energy+= cells[x][y+1].secCell.energy;
-                    cells[x][y+1].secCell= cells[x][y].secCell;
-                    cells[x][y].secCell=null;
-                    done= true;
-                }else done= false;
+                if(y<height-1 ){
+                	eatCell(cells[x][y+1]); 
+                }
             }
 
             case RIGHT -> {
-                if( x<width-1 &&  cells[x+1][y].secCell!=null ){
-                    energy+= cells[x+1][y].secCell.energy;
-                    cells[x+1][y].secCell= cells[x][y].secCell;
-                    cells[x][y].secCell=null;
-                    done= true;
-                }else done = false;
+                if( x<width-1 ){
+                	eatCell(cells[x+1][y]);
+                }
             }
 
             case LEFT -> {
-                if(  x>0 && cells[x-1][y].secCell!=null){
-                    energy+= cells[x-1][y].secCell.energy;
-                    cells[x-1][y].secCell= cells[x][y].secCell;
-                    cells[x][y].secCell=null;
-                    done= true;
-                }else done= false;
+                if(  x>0 ){
+                	eatCell(cells[x-1][y]);
+                }
             }
 
             }
 
-    if(done){cellls--;
-    }
+    
       //  System.out.println(done);
         return done;
     }
 
+    private boolean eatCell(Cell nextCell) {//TODO доработать
+    	if(nextCell.secCell!=null ){
+            energy+= nextCell.secCell.energy;
+            nextCell.secCell=null;
+            move(nextCell);
+            return true;
+        }else { 
+        	return false;
+        }
+    }
+    
     void multiply(){
         /*TODO ПЕРЕДЕЛАТЬ*/
        if(myMethods.isSpaceAvailable(this)==1.00f && energy>ENERGY_NEEDED_TO_MULTIPLY){
@@ -455,8 +434,9 @@ public class NormCell implements  Serializable {
 
 	public class DataMethods{
     	
-    	static double distanceDil=1000f;//1000
-    	static double organicDil=200f;
+    	static double distanceDill=1000f;//1000
+    	static int maxDistance=50;
+    	public static double organicDil=200f;
     	//--------------------get...Cell()-----------------
     	public static double relativesValue=3.4d;//2.5
     	public static double normCellValue=2.0d;//2
@@ -464,7 +444,7 @@ public class NormCell implements  Serializable {
     	public static double wallValue=1d;//1
     	//-------------------------------------------------
 		public Double[] getInputData() {
-    	    	Double[] inputs = {myMethods.isRaedyToMultiply(NormCell.this) , (double) myMethods.getEnergy(NormCell.this), (double) cells[x][y].getOrganic(), myMethods.getUpCell(NormCell.this), myMethods.getDownCell(NormCell.this), myMethods.getLeftCell(NormCell.this),
+    	    	Double[] inputs = {myMethods.isRaedyToMultiply(NormCell.this) , (double) myMethods.getEnergy(NormCell.this), (double) cells[x][y].getOrganic()/organicDil, myMethods.getUpCell(NormCell.this), myMethods.getDownCell(NormCell.this), myMethods.getLeftCell(NormCell.this),
     	    			 
     	    			 (double) myMethods.getRightCell(NormCell.this),lastOutput,preLastOutput,(double) myMethods.getRightDownCell(NormCell.this),myMethods.getRightUpCell(NormCell.this),myMethods.getLeftUpCell(NormCell.this),myMethods.getLeftDownCell(NormCell.this), myMethods.isSpaceAvailable(NormCell.this), isController(),
     	    			 
@@ -495,159 +475,102 @@ public class NormCell implements  Serializable {
 		}
 
 		double getDownDistance(NormCell normCell){
-		    int iy=normCell.y;
-		    int i=1;
-		    while (true){
-		        if(iy>=height-10){ 
-		        		break;
-		        }else {
-		        	if (cells[normCell.x][iy+1].secCell!=null || cells[normCell.x][iy+1].partCell!=null){
-		        		break;
-		        	}
-		        }
-		        i+=1;
-		        iy++;
+			if(SIMPLE_DISTANCE) {
+				return Math.max(maxDistance,normCell.y)/distanceDill;
+		    }else {
+		    	for (int curY =normCell.y ; curY > 0; curY--) {
+					Cell curCell=cells[normCell.x][curY];
+					if(curCell.secCell!=null || curCell.partCell!=null || curY>maxDistance){
+						return curY/distanceDill;
+					}
+				}
+		    	return Math.max(maxDistance, normCell.y)/distanceDill;
 		    }
-		    float ii=i;
-		    return ii/distanceDil;
 		}
 
 		double getUpDistance(NormCell normCell){
-		    int iy=normCell.y;
-		    int i=1;
-		    while (true){
-		        if(iy<1){ 
-		        	break;
-		        }else {
-		        	if (cells[normCell.x][iy-1].secCell!=null || cells[normCell.x][iy-1].partCell!=null){
-		            	break;
-		        	}
-		        }
-		        i++;
-		        iy--;
+			if(SIMPLE_DISTANCE) {
+				return Math.max( maxDistance, cells[0].length-normCell.y)/distanceDill;
+			}else {
+				for (int curY =normCell.y ; curY < cells[0].length; curY++) {
+					Cell curCell=cells[normCell.x][curY];
+					if(curCell.secCell!=null || curCell.partCell!=null || cells[0].length-curY>maxDistance){
+						return (cells[0].length-curY)/distanceDill;
+					}
+				}
+				return Math.max( maxDistance, cells[0].length-normCell.y)/distanceDill;
 		    }
-		    float ii=i;
-		    return ii/distanceDil;
 		}
 
 		double getRightDistance(NormCell normCell){
-		    int ix=normCell.x;
-		
-		    int i=1;
-		while (true){
-		    if(ix>=width-5){ 
-		    	break;
-		    }else {
-		    	if (cells[ix+1][normCell.y].secCell!=null || cells[ix+1][normCell.y].partCell!=null){
-		    		break;
-		    	}
+			if(SIMPLE_DISTANCE) {
+				return Math.max(maxDistance, cells.length-normCell.x)/distanceDill;
+			}else {
+				for (int curX =normCell.x ; curX < cells.length; curX++) {
+					Cell curCell=cells[curX][normCell.y];
+					if(curCell.secCell!=null || curCell.partCell!=null || cells.length-curX>maxDistance){
+						return (cells.length-curX)/distanceDill;
+					}
+				}
+		    	return Math.max(maxDistance, cells.length-normCell.x)/distanceDill;
 		    }
-		    i+=1;
-		    ix++;
-		}
-		 float ii=i;
-		 return ii/distanceDil;
 		}
 
-		double getLeftDistance(NormCell normCell){//TODO MAY FIX FOR DOUBLE
-		    int ix=normCell.x;
-		
-		    int i=1;
-		    while (true){
-		        if(ix<1){
-		        	break;
-		        }else {
-		        	if (cells[ix-1][normCell.y].secCell!=null || cells[ix-1][normCell.y].partCell!=null){
-		            	break;
-		        	}
-		        }
-		        i+=1;
-		        ix--;
+		double getLeftDistance(NormCell normCell){
+			if(SIMPLE_DISTANCE) {
+				return Math.max(maxDistance, normCell.x)/distanceDill;
+			}else {
+				for (int curX =normCell.x ; curX > 0; curX--) {
+					Cell curCell=cells[curX][normCell.y];
+					if(curCell.secCell!=null || curCell.partCell!=null || curX>maxDistance){
+						return curX/distanceDill;
+					}
+				}
+		    	return Math.max(maxDistance, cells.length-normCell.x)/distanceDill;
 		    }
-		    float ii=i;
-		    return ii/distanceDil;
 		}
 
 		public double getLeftDownCell(NormCell normCell){
-		    if(  normCell.y<height-1&& normCell.x>0 && cells[normCell.x-1][normCell.y+1].secCell!=null ){
-		        if(isRelatives( normCell, cells[normCell.x-1][normCell.y+1].secCell)){return 2.5f;}else
-		        return 1.00f;
-		    }else if(normCell.y<height-1 && normCell.x>0&& cells[normCell.x-1][normCell.y+1].partCell!=null && normCell.myMethods.isMyPart(normCell, cells[normCell.x-1][normCell.y+1].partCell)){
-		        return 1.5f;
-		    } else if( normCell.y<height-1 && normCell.x>0&& cells[normCell.x-1][normCell.y+1].partCell!=null){return 2.00f;}
-		    else{
-		        return 0.00f;}
-		}
-
-		public double getLeftUpCell(NormCell normCell){
-		    if(  normCell.y>0&& normCell.x>0 && cells[normCell.x-1][normCell.y-1].secCell!=null ){
-		        if(isRelatives( normCell, cells[normCell.x-1][normCell.y-1].secCell)){return 2.5f;}else
-		        return 1.00f;
-		    }else if(normCell.y>0 &&normCell.x>0&& cells[normCell.x-1][normCell.y-1].partCell!=null && normCell.myMethods.isMyPart(normCell, cells[normCell.x-1][normCell.y-1].partCell)){
-		        return 1.5f;
-		    } else if( normCell.y>0 && normCell.x>0&& cells[normCell.x-1][normCell.y-1].partCell!=null){return 2.00f;}
-		    else{
-		        return 0.00f;}
-		}
-
-		public double getRightUpCell(NormCell normCell){
-		    if(  normCell.y>0&& normCell.x<width-1 && cells[normCell.x+1][normCell.y-1].secCell!=null ){
-		        if(isRelatives(normCell, cells[normCell.x+1][normCell.y-1].secCell)){return 2.5f;}else
-		        return 1.00f;
-		    }else if(normCell.y>0 && normCell.x<width-1&& cells[normCell.x+1][normCell.y-1].partCell!=null && normCell.myMethods.isMyPart(normCell, cells[normCell.x+1][normCell.y-1].partCell)){
-		        return 1.5f;
-		    } else if( normCell.y>0 && normCell.x<width-1&& cells[normCell.x+1][normCell.y-1].partCell!=null){return 2.00f;}
-		    else{
-		        return 0.00f;}
-		
-		}
-		/*TODO REMAKE THIS SHIT!!!!!!	*/
-		public double getRightDownCell(NormCell normCell){
-		    if(  normCell.y<height-1&& normCell.x<width-1 && cells[normCell.x+1][normCell.y+1].secCell!=null ){
-		        if(isRelatives( normCell, cells[normCell.x+1][normCell.y+1].secCell)){return 2.5f;}else
-		            return 1.00f;
-		    }else if(normCell.y<height-1 && normCell.x<width-1&& cells[normCell.x+1][normCell.y+1].partCell!=null && normCell.myMethods.isMyPart(normCell, cells[normCell.x+1][normCell.y+1].partCell)){
-		        return 1.5f;
-		    } else if( normCell.y<height-1 && normCell.x<width-1&& cells[normCell.x+1][normCell.y+1].partCell!=null){return 2.00f;}
-		    else{
-		        return 0.00f;}
-		}
-		//
-		/*
-		public double getVerticalOrganic(NormCell normCell){
-			if( normCell.y<height-1 && normCell.y>1) {
-				Cell nextUpCell=cells[normCell.x][normCell.y-1];
-				Cell nextDownCell=cells[normCell.x][normCell.y+1];
-				if(nextCell.organic>1) {
-					return Math.min(nextCell.organic/organicDil, nextOrganicValue);
-				}
-					
-				}
-			else {
+			if(  normCell.y<height-1 && normCell.x>1) {
+				Cell nextCell=cells[normCell.x-1][normCell.y+1];
+				return getNextCell(nextCell,normCell);
+			}else {
 				return wallValue;
 			}
 		}
-		
-		public double getHorizontalOrganic(NormCell normCell){
-			return 0;
+
+		public double getLeftUpCell(NormCell normCell){
+			if(  normCell.y>1 && normCell.x>1) {
+				Cell nextCell=cells[normCell.x-1][normCell.y-1];
+				return getNextCell(nextCell,normCell);
+			}else {
+				return wallValue;
+			}
 		}
-		*/
+
+		public double getRightUpCell(NormCell normCell){
+			if(  normCell.y>1 && normCell.x<width-1) {
+				Cell nextCell=cells[normCell.x+1][normCell.y-1];
+				return getNextCell(nextCell,normCell);
+			}else {
+				return wallValue;
+			}
+		}
+
+		public double getRightDownCell(NormCell normCell){
+			if( normCell.y<height-1 && normCell.x<width-1) {
+				Cell nextCell=cells[normCell.x+1][normCell.y+1];
+				return getNextCell(nextCell,normCell);
+			}else {
+				return wallValue;
+			}
+		}
+		//
+
 		public double getDownCell(NormCell normCell){
 			if( normCell.y<height-1) {
 				Cell nextCell=cells[normCell.x][normCell.y+1];
-				NormCell nextNormCell =cells[normCell.x][normCell.y+1].secCell;
-				PartCell nextPartCell=cells[normCell.x][normCell.y+1].partCell;
-				if(nextNormCell!=null || nextPartCell!=null){
-					if(isRelatives( normCell, nextNormCell) ||  normCell.myMethods.isMyPart(normCell, nextPartCell)){
-						return relativesValue;
-					}else
-						return normCellValue;
-				}else{
-					if(nextCell.organic>1) {
-						return Math.min(nextCell.organic/organicDil, nextOrganicValue);
-					}
-					return 0d;
-				}
+				return getNextCell(nextCell,normCell);
 			}else {
 				return wallValue;
 			}
@@ -656,21 +579,7 @@ public class NormCell implements  Serializable {
 		public double getUpCell(NormCell normCell){
 			if( normCell.y>1) {
 				Cell nextCell=cells[normCell.x][normCell.y-1];
-				NormCell nextNormCell =cells[normCell.x][normCell.y-1].secCell;
-				PartCell nextPartCell=cells[normCell.x][normCell.y-1].partCell;
-				if(nextNormCell!=null || nextPartCell!=null){
-					if(isRelatives( normCell, nextNormCell) || normCell.myMethods.isMyPart(normCell, nextPartCell)){
-						return relativesValue;
-					}else {
-						return normCellValue;
-					}
-				} 
-				else{
-					if(nextCell.organic>1) {
-						return Math.min(nextCell.organic/organicDil, nextOrganicValue);
-					}
-					return 0d;
-				}
+				return getNextCell(nextCell,normCell);
 			}else {
 				return wallValue;
 			}
@@ -680,21 +589,7 @@ public class NormCell implements  Serializable {
 			
 			if( normCell.x<width-1) {
 				Cell nextCell=cells[normCell.x+1][normCell.y];
-				NormCell nextNormCell =cells[normCell.x+1][normCell.y].secCell;
-				PartCell nextPartCell=cells[normCell.x+1][normCell.y].partCell;
-				if(nextNormCell!=null || nextPartCell!=null){
-		        	if(isRelatives( normCell, nextNormCell) || normCell.myMethods.isMyPart(normCell, nextPartCell)){
-		        		return relativesValue;
-		        	}else {
-		        		return normCellValue;
-		        	}
-		    	}
-		    	else{
-		    		if(nextCell.organic>1) {
-						return Math.min(nextCell.organic/organicDil, nextOrganicValue);
-					}
-		    		return 0d;
-		    	}
+				return getNextCell(nextCell,normCell);
 			}else {
 				return wallValue;
 			}
@@ -703,27 +598,31 @@ public class NormCell implements  Serializable {
 		public double getLeftCell(NormCell normCell){
 			if( normCell.x>1) {
 				Cell nextCell=cells[normCell.x-1][normCell.y];
-				NormCell nextNormCell =cells[normCell.x-1][normCell.y].secCell;
-				PartCell nextPartCell=cells[normCell.x-1][normCell.y].partCell;
-		       if(nextNormCell!=null || nextPartCell!=null){
-		           if(isRelatives(  normCell, nextNormCell) || normCell.myMethods.isMyPart(normCell, nextPartCell) ){
-		        	   return relativesValue;
-		           }else {
-		        	   return normCellValue;
-		           }
-		       } 
-		       else{
-		    	   if(nextCell.organic>1) {
-						return Math.min(nextCell.organic/organicDil, nextOrganicValue);
-					}
-		    	   return 0d;
-		       }
+				return getNextCell(nextCell,normCell);
 			}
 			else {
 				return wallValue;
 			}
-		  }
-
+		}
+			
+		public double getNextCell(Cell nextCell,NormCell normCell) {
+			NormCell nextNormCell =nextCell.secCell;
+			PartCell nextPartCell=nextCell.partCell;
+			if(nextNormCell!=null || nextPartCell!=null){
+	          	if(isRelatives(  normCell, nextNormCell) || normCell.myMethods.isMyPart(normCell, nextPartCell) ){
+	          		return relativesValue;
+	          	}else {
+	          		return normCellValue;
+	          	}
+			} 
+			else{
+	    	   if(nextCell.organic>1) {
+					return Math.min(nextCell.organic/organicDil, nextOrganicValue);
+				}
+	    	   return 0d;
+	       }
+		}
+		
 		double isRaedyToMultiply(NormCell normCell){
 		    if(normCell.energy>ENERGY_NEEDED_TO_MULTIPLY+2){
 		        return 1d;
@@ -732,7 +631,7 @@ public class NormCell implements  Serializable {
 		}
 
 		boolean isMyPart(NormCell normCell, PartCell partCell){
-		   if (normCell.myParts.contains(partCell.myCoords)){
+		   if (normCell.myParts.contains(partCell)){
 		       System.out.println("WOOOOOOOOOOOOOOOOOOOOOOOOOOORK");
 		
 		       return true;

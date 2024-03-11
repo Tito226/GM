@@ -27,7 +27,7 @@ public class Painter implements ImageObserver {
 	public static void stringPaint(String[] strings) {}
 	
 	 public void ecoPaint(InfoPanel inf) {
-		try {/*TODO FIX MULTI THREAD PAINT EROR(SEC CELL==NULL),иногда остается "тень" зеленой клетки */
+		try {
 			 Graphics g=world.getGraphics();
 			 inf.paint(inf.getGraphics());
 			 for (int i = 0; i < width; i++) {
@@ -52,8 +52,12 @@ public class Painter implements ImageObserver {
 		 Graphics g=world.getGraphics();
 		 inf.paint(inf.getGraphics());
 	        if (buffer == null || buffer.getWidth() != world.getWidth() || buffer.getHeight() != world.getHeight()) {
-	            // Пересоздайте буфер, если он не существует или его размер изменился
-	            buffer = new BufferedImage(world.getWidth(), world.getHeight(), BufferedImage.TYPE_INT_RGB);
+	        	try {
+	        		// Пересоздайте буфер, если он не существует или его размер изменился
+	        		buffer = new BufferedImage(world.getWidth(), world.getHeight(), BufferedImage.TYPE_INT_RGB);
+	            }catch(Exception e) {
+	            	
+	            }
 	        }
 	        Graphics bufferGraphics = buffer.getGraphics();
 	        // Отрисовка в буфер

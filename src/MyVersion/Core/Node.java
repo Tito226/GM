@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class Node implements Serializable {
 	private static final long serialVersionUID = 4L;
-    boolean changeble=true; //IF IT BECOME TRUE(IN RUNTIME) ,DONT CHANGE IT
+    public boolean changeble=true; //IF IT BECOME TRUE(IN RUNTIME) ,DONT CHANGE IT
     private double weight =0.0d;
     Dot from;
     Dot to;
