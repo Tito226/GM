@@ -29,7 +29,7 @@ public class Node implements Serializable {
 		// TODO Автоматически созданная заглушка конструктора
 	}
 
-	 void evalute(){
+	 public void evalute(){
     	if(changeble) {
     		to.value+= from.value* weight;
         }

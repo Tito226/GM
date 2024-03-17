@@ -69,11 +69,25 @@ public  class Cell {
 				}
             }
         } catch (IllegalArgumentException e) {
-            System.out.println("Invalid color values");
+            System.err.println("Invalid color values");
         }
         if (liveCell != null ) {
            liveCell.test();
         }
+    }
+    
+    public static void organicSpreadOnDeath(LiveCell dyingCell){
+    	int range=(ORGANIC_ON_DAETH_RANGE-1)/2;
+    	int x=dyingCell.getX();
+    	int y=dyingCell.getY();
+		for (int i = -range; i <=range ; i++) {
+  			for (int j = -range; j < range; j++) {
+  				if(x+i<cells.length && x+i>0 && y+j>0 && y+j<cells[x+i].length) {
+  					cells[x+i][y+j].organic+=dyingCell.getEnergy()+ORGANIC_PER_CELL_ON_NORMCELL_DEATH;
+  					cells[x+i][y+j].setChange(true);
+  				}
+  			}
+		}
     }
 
   	public Color getColor(){

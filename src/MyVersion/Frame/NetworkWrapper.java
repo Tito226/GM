@@ -22,13 +22,16 @@ public class NetworkWrapper extends Network {
 		
 	}
 	public NetworkWrapper(Network network) {
-		this.dotsArr=network.dotsArr;
+		this.dotsArr1=network.dotsArr1;
 		this.myFunc=network.myFunc;
 		blockedNodes=new ArrayList<Node>();
-		for (int i = HOW_MUCH_INPUTS_MUST_BE_USED; i < dotsArr.get(0).size()-BIAS; i++) {
-			Dot curDot=dotsArr.get(0).get(i);
-			for (int j = 0; j < curDot.nodesFromMe.size(); j++) {
-				blockedNodes.add(curDot.nodesFromMe.get(j));
+		for(Dot[] curDots : network.dotsArr1) {
+			for (Dot curDot : curDots) {
+				for (Node curNode : curDot.nodesFromMe) {
+					if(!curNode.changeble) {
+						blockedNodes.add(curNode);
+					}
+				}
 			}
 		}
 		
@@ -46,10 +49,10 @@ public class NetworkWrapper extends Network {
 	 }
 	 private void nodeDeacticate(Random r) {
 		 //выбрать случайный столбец dotsArr
-		 int rBuffer1=r.nextInt(dotsArr.size()-1);
+		 int rBuffer1=r.nextInt(dotsArr1.length-1);
 		 //выбрать случайный елемент dotsArr[rBuffer1]
-		 int rBuffer2=r.nextInt( dotsArr.get(rBuffer1).size());
-		 Dot buffDot=dotsArr.get(rBuffer1).get(rBuffer2);
+		 int rBuffer2=r.nextInt( dotsArr1[rBuffer1].length);
+		 Dot buffDot=dotsArr1[rBuffer1][rBuffer2];
 		 Node buffNode= buffDot.nodesFromMe.get(r.nextInt(buffDot.nodesFromMe.size()));//выбор случайной ноды
 		 buffNode.setWeight(0);
 		 buffNode.changeble=false;
@@ -59,15 +62,15 @@ public class NetworkWrapper extends Network {
 	 
 	 private void nodeChange(Random r) {
 		//выбрать случайный столбец dotsArr
-		 int rBuffer1=r.nextInt(dotsArr.size()-1);
+		 int rBuffer1=r.nextInt(dotsArr1.length-1);
 		 //выбрать случайный елемент dotsArr[rBuffer1]
-		 int rBuffer2=r.nextInt( dotsArr.get(rBuffer1).size());
-		 Dot buffDot=dotsArr.get(rBuffer1).get(rBuffer2);
+		 int rBuffer2=r.nextInt( dotsArr1[rBuffer1].length);
+		 Dot buffDot=dotsArr1[rBuffer1][rBuffer2];
 		 Node buffNode= buffDot.nodesFromMe.get(r.nextInt(buffDot.nodesFromMe.size()));//выбор случайной ноды
 		 //прибавить к весу случайной ноды случайное число (не больше MUTATION_MULTIPLIER и не меньше -MUTATION_MULTIPLIER)
 		 buffNode.setWeight(buffNode.getWeight()+rnd(-MUTATION_MULTIPLIER,MUTATION_MULTIPLIER));
 	 }
-	 
+	 static double nodeUnlockMaxValue=0.2;
 	 private void nodeUnlock(Random r) { 
 		 //выбрать случайную заблокированную Node
 		 int rBuff=(int) rnd(0,blockedNodes.size()-1);
@@ -75,7 +78,7 @@ public class NetworkWrapper extends Network {
 		 //разрешить изменение Node
 		 nodeBuff.changeble=true;
 		 //установить вес разблокированого Node на случайное число
-		 nodeBuff.setWeight(rnd(-0.09,0.09));;
+		 nodeBuff.setWeight(rnd(-nodeUnlockMaxValue,nodeUnlockMaxValue));;
 		 //Удалить разблокированную Node из списка 
 		 blockedNodes.remove(rBuff);
 	 }

@@ -1,7 +1,7 @@
 package MyVersion.Core;
 
 import MyVersion.Cells.Directions;
-import MyVersion.Cells.NormCell.DataMethods;
+import MyVersion.Cells.DataMethods;
 import MyVersion.Frame.Action_Boundaries;
 
 import java.util.ArrayList;

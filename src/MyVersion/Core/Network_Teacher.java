@@ -116,7 +116,7 @@ public class Network_Teacher extends JPanel {
 
     void randomize(Network student){
         Random r=new Random();
-        for (ArrayList<Dot> dotM:student.dotsArr) {
+        for (Dot[] dotM:student.dotsArr1) {
             for(Dot dot:dotM) {
                 for(Node node:dot.nodesFromMe){
                 	node.setWeight(r.nextFloat());
@@ -128,19 +128,19 @@ public class Network_Teacher extends JPanel {
         //всю ето парашуу еще и удалить нельзя ,выдает результат неверный
         if(SET_FIRST_LAYER_NODES_NON_RANDOM_VALUE) {
 
-            for (int i = student.dotsArr.get(0).size() - 1 - BIAS; i > 0; i--) {
-                for (int j = 0; j < student.dotsArr.get(1).size() - BIAS; j++) {//"< student.dotsArr.get(1).size()-1" may be changed to "student.dotsArr.get(0).get(i).nodesFromMe.size()"
-                	Node curNode=student.dotsArr.get(0).get(i).nodesFromMe.get(j);
+            for (int i = student.dotsArr1[0].length - 1 - BIAS; i > 0; i--) {
+                for (int j = 0; j < student.dotsArr1[1].length - BIAS; j++) {//"< student.dotsArr.get(1).size()-1" may be changed to "student.dotsArr.get(0).get(i).nodesFromMe.size()"
+                	Node curNode=student.dotsArr1[0][i].nodesFromMe.get(j);
                 	curNode.setWeight(FIRST_LAYER_NODES_VALUE);
                 	curNode.changeble=false;//TODO delete it
                 }
             }
         }	  if(BLOCK_USELESS_INPUTS){
 
-                for (int i = student.dotsArr.get(0).size()-BIAS-1; i >=HOW_MUCH_INPUTS_MUST_BE_USED; i--) {//Запрет на ввод данных из лишних точек
-                    for (int j = 0; j < student.dotsArr.get(1).size()-BIAS; j++) {//"< student.dotsArr.get(1).size()-1" may be changed to "student.dotsArr.get(0).get(i).nodesFromMe.size()"
-                        student.dotsArr.get(0).get(i).nodesFromMe.get(j).setWeight(0d);
-                        student.dotsArr.get(0).get(i).nodesFromMe.get(j).changeble=false;
+                for (int i = student.dotsArr1[0].length-BIAS-1; i >=HOW_MUCH_INPUTS_MUST_BE_USED; i--) {//Запрет на ввод данных из лишних точек
+                    for (int j = 0; j < student.dotsArr1[1].length-BIAS; j++) {//"< student.dotsArr.get(1).size()-1" may be changed to "student.dotsArr.get(0).get(i).nodesFromMe.size()"
+                        student.dotsArr1[0][i].nodesFromMe.get(j).setWeight(0d);
+                        student.dotsArr1[0][i].nodesFromMe.get(j).changeble=false;
                     }
                 }
                 	int it =9;
@@ -156,7 +156,7 @@ public class Network_Teacher extends JPanel {
     
     double teach(Network student,Data_Set data_set,int iteration){//Returns final dot error
         Dot crutch=new Dot(Dot_Type.OUTPUT,func);
-        for(ArrayList<Dot> dotArr: student.dotsArr){//clear dots value 
+        for(Dot[] dotArr: student.dotsArr1){//clear dots value 
             for(Dot dot:dotArr){
                 dot.clear();//сброс данных точки(значение,ошибка,дельта весов)
             }
@@ -168,7 +168,7 @@ public class Network_Teacher extends JPanel {
         student.evaluteFitness(this.keys.get(i),true);
         //outputs correction
         int yy=0;
-        for (Dot dot : student.dotsArr.get(student.dotsArr.size()-1)) {
+        for (Dot dot : student.dotsArr1[student.dotsArr1.length-1]) {
             ArrayList<Double> expected = new ArrayList<>(Arrays.asList(data_set.dataSetInputsOutputs.get( keys.get(i))));
             /*down :for more than one output, dont delete*/
             dot.error=dot.value -expected.get(yy);/*ФУНКЦИЯ ПОТЕРЬ */
@@ -178,8 +178,8 @@ public class Network_Teacher extends JPanel {
 
         }
         /*Происходит взрыв градиента*/
-        for (int j = 1; j < student.dotsArr.size(); j++) {//hidden layer calculation(error,weightsDelta),just calculation, not changing
-            for (Dot dot : student.dotsArr.get(student.dotsArr.size()-(j+1))) {//dotsArr contains Arraylist that contains dots
+        for (int j = 1; j < student.dotsArr1.length; j++) {//hidden layer calculation(error,weightsDelta),just calculation, not changing
+            for (Dot dot : student.dotsArr1[student.dotsArr1.length-(j+1)]) {//dotsArr contains Arraylist that contains dots
                 int counter=0;/*счетчик для подсчета процента готовности*/
                 for (Node node:dot.nodesFromMe) {                	
                 	dot.error+=node.getWeight()*node.to.weightsDelta;
@@ -192,8 +192,8 @@ public class Network_Teacher extends JPanel {
           
         }
 
-        for (int j = 1; j < student.dotsArr.size()+1; j++) {//hidden layer correction ,счетчик обхода массива масивов с точками пропуская входной слой 
-        	for (Dot dot : student.dotsArr.get(student.dotsArr.size()-j)) {//обход масива масивов с точками с конца,используя счетчик из внешнего цыкла,выбор массива с точками с конца и перебор всех точек
+        for (int j = 1; j < student.dotsArr1.length+1; j++) {//hidden layer correction ,счетчик обхода массива масивов с точками пропуская входной слой 
+        	for (Dot dot : student.dotsArr1[student.dotsArr1.length-j]) {//обход масива масивов с точками с конца,используя счетчик из внешнего цыкла,выбор массива с точками с конца и перебор всех точек
                 for (Node node: dot.nodesToMe) {//обход всех связей точки
                 	double weight = 0;       
                 	
@@ -239,7 +239,7 @@ public class Network_Teacher extends JPanel {
     }
 
     private static void testAndPrint(String action, Double[] data, double[] boundaries, Network student) {
-        double weightBuffer = student.evaluteFitness(data, false);
+        double weightBuffer = student.evaluteFitness(data, false)[0];
         String result = (weightBuffer > boundaries[0] && weightBuffer < boundaries[1]) ? "passed" : "failed";
         String toPrint=String.format("%s : %s %.6f (%.6f - %.6f) %s",action,result,weightBuffer,boundaries[0],boundaries[1] ,Arrays.toString(data));
         System.out.println(toPrint);

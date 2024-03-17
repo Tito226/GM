@@ -10,6 +10,7 @@ import MyVersion.Core.Data_Set;
 import MyVersion.Core.Network;
 import MyVersion.Core.Network_Teacher;
 
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowEvent;
@@ -312,7 +313,7 @@ public static Cell[][] getCells(){
             				isStep=true;
             				//получение входной информации ,для диагностики клетки
             				if(Restarts<4 && DEBUG) {
-            					inputData.add(curNormCell.myMethods.getInputData());
+            					inputData.add(curNormCell.getInputData());
             				} else {
             					inputData=null;
             				}

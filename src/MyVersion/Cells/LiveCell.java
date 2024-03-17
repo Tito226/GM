@@ -2,11 +2,8 @@ package MyVersion.Cells;
 
 import java.awt.Color;
 
-import MyVersion.Cells.NormCell.DataMethods;
 
 public interface LiveCell{
-	DataMethods myMethods = null;
-	int energy = 0;
 	void step();
 	void test();
 	int getEnergy();
@@ -14,4 +11,10 @@ public interface LiveCell{
 	void setY(int y);
 	void setX(int x);
 	void kill();
+	Integer getGeneralEnergy();
+	public Double[] getInputData();
+	int getY();
+	int getX();
+	NormCell getHead();
+	int getEnergyToMultiplyMe();
 }

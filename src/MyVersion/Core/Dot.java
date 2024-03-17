@@ -39,14 +39,14 @@ public class Dot implements Serializable {
 		
 	}
 	
-	void clear(){//clears teach values
+	public void clear(){//clears teach values
         if(myType!=Dot_Type.BIAS_TYPE){
          value=0;}
          error=0f;
          weightsDelta=0f;
     }
     
-	void evalute() {
+	public void evalute() {
 	    if (myType == Dot_Type.HIDDEN || myType == Dot_Type.INPUT) {
 	        value = choose.activationFunction(value);
 	        evaluateNodesFromMe();
@@ -65,7 +65,7 @@ public class Dot implements Serializable {
 	    }
 	}
     
-	double getOutpup(){
+	public double getOutput(){
       return value;
     }
 
@@ -77,7 +77,7 @@ public class Dot implements Serializable {
         return value;
     }
     
-    void addNode(Dot to){
+    public void addNode(Dot to){
         if(to.myType==Dot_Type.BIAS_TYPE){
 
         }else {

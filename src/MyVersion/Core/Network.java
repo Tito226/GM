@@ -14,59 +14,55 @@ import static MyVersion.Core.Core_Config.*;
 
 public class Network implements Serializable {
 	public ActivationFunctions myFunc;
-	
+	 double[] outputs;
 	private static final long serialVersionUID = 2L;
-    public ArrayList<ArrayList<Dot>> dotsArr =new ArrayList<>();
+	ArrayList<ArrayList<Dot>> dotsArr=null;
+    public Dot[][] dotsArr1 =new Dot[2+HIDDEN_DOTS/HIDDEN_DOTS_PER_ARRAY][];
+    
+    /*public void clon(){
+
+    	dotsArr1 =new Dot[2+HIDDEN_DOTS/HIDDEN_DOTS_PER_ARRAY][];
+    	for (int i = 0; i < dotsArr.size(); i++) {
+    		dotsArr1[i]=new Dot[dotsArr.get(i).size()];
+			for (int j = 0; j < dotsArr.get(i).size(); j++) {
+				dotsArr1[i][j]=dotsArr.get(i).get(j);
+			}
+		}
+	}*/
     public Network() {//создает пустую нейросеть(массив точек пустой) для клонирования 
     	
    	}
     
     public Network(int iii){
     	myFunc=func;
-    	dotsArr.add(new ArrayList<>());//inputs (0)
+    	dotsArr1[0]=new Dot[INPUTS];//inputs (0)
 
     	for (int i = 1; i <= HIDDEN_DOTS / HIDDEN_DOTS_PER_ARRAY; i++) {//hidden dots (1,2,3,...,HIDDEN_DOTS /HIDDEN_DOTS_PER_MASSIVE-1)
-    		dotsArr.add(new ArrayList<>());
-
+    		dotsArr1[i]=new Dot[HIDDEN_DOTS_PER_ARRAY+BIAS];
+    	}
+    	dotsArr1[dotsArr1.length-1]=new Dot[OUTPUTS];//outputs(HIDDEN_DOTS /HIDDEN_DOTS_PER_MASSIVE)
+    	for (int i = 0; i < INPUTS; i++) {//adding input Dots to array,if bias,add dias Dot and add notes to it
+    		dotsArr1[0][i]=new Dot(Dot_Type.INPUT,myFunc);
     	}
 
-       for (int i = 0; i < INPUTS; i++) {//adding input Dots to array,if bias,add dias Dot and add notes to it
-           dotsArr.get(0).add(new Dot(Dot_Type.INPUT,myFunc));
-       }
-       
-       if(BIAS==1){
-           dotsArr.get(0).add(new Dot(Dot_Type.BIAS_TYPE,myFunc));
-           for (int j = 0; j < dotsArr.get(1).size() ; j++) {
-               dotsArr.get(0).get(dotsArr.size()-1).addNode(dotsArr.get(1).get(j));
-           }
-       }
-
-       dotsArr.add(new ArrayList<>());//outputs(HIDDEN_DOTS /HIDDEN_DOTS_PER_MASSIVE)
-
-
-       for (int i = 1; i <= HIDDEN_DOTS / HIDDEN_DOTS_PER_ARRAY ; i++) {
-           for (int j = 0; j < HIDDEN_DOTS_PER_ARRAY; j++) {
-               dotsArr.get(i).add(new Dot(Dot_Type.HIDDEN,myFunc));
-           }
-
-           if (BIAS==1) {
-               dotsArr.get(i).add(new Dot(Dot_Type.BIAS_TYPE,myFunc));
-               for (int j = 0; j < dotsArr.get(i + 1).size(); j++) {
-                   dotsArr.get(i).get(dotsArr.get(i).size() - 1).addNode(dotsArr.get(i+1).get(j));
-               }
-           }
-
-        }
+    	for (int i = 1; i <= HIDDEN_DOTS / HIDDEN_DOTS_PER_ARRAY ; i++) {
+    		for (int j = 0; j < HIDDEN_DOTS_PER_ARRAY+BIAS; j++) {
+    			dotsArr1[i][j]=new Dot(Dot_Type.HIDDEN,myFunc);
+    		}
+    		if(BIAS==1) {
+    			dotsArr1[i][dotsArr1[i].length-1]=new Dot(Dot_Type.BIAS_TYPE,myFunc);
+    		}
+    	}
+        
         for (int i = 0; i < OUTPUTS; i++) {
-            dotsArr.get(dotsArr.size()-1).add(new Dot(Dot_Type.OUTPUT,myFunc));
+            dotsArr1[dotsArr1.length-1][i]=new Dot(Dot_Type.OUTPUT,myFunc);
         }
-        //
 
-        //ADDING NOTES TO DOTS
+        //ADDING NODES TO DOTS
         for (int i = 0; i < HIDDEN_DOTS/HIDDEN_DOTS_PER_ARRAY+1; i++) {
-            for (int j = 0; j < dotsArr.get(i).size(); j++) {
-                for (int k = 0; k < dotsArr.get(i+1).size(); k++) {
-                    dotsArr.get(i).get(j).addNode(dotsArr.get(i+1).get(k));
+            for (int j = 0; j < dotsArr1[i].length; j++) {
+                for (int k = 0; k < dotsArr1[i+1].length; k++) {
+                    dotsArr1[i][j].addNode(dotsArr1[i+1][k]);
                 }
             }
 
@@ -76,61 +72,61 @@ public class Network implements Serializable {
     }
 
 
-    public ArrayList<ArrayList<Dot>> getDotsArr() {
-        return dotsArr;
+    public Dot[][] getDotsArr() {
+        return dotsArr1;
     }
     
-    ArrayList<Double> outputs;
-    
-    public double evaluteFitness(Double[] inputs,boolean forTeaching){
+   
+    public double[] evaluteFitness(Double[] inputs,boolean forTeaching){
 
       //Dots value , error and weightsDelta clears in next method call
     	if(!forTeaching){
-    		for(ArrayList<Dot> dotArr: dotsArr){
+    		for(Dot[] dotArr: dotsArr1){
     			for(Dot dot:dotArr){
     				dot.clear();
     			}
     		}
     	}
        
-        outputs=new ArrayList<>();
+        outputs=new double[dotsArr1[dotsArr1.length-1].length];
         //Set inputs
         for (int i = 0; i < inputs.length; i++) {
         	 if(FIRST_INPUT_MULTIPLIER && i==0 ) {
-        		 dotsArr.get(0).get(0).setValue(inputs[i]*10);
+        		 dotsArr1[0][0].setValue(inputs[i]*10);//TODO THINK
             }else {
-             	dotsArr.get(0).get(i).setValue(inputs[i]);
+             	dotsArr1[0][i].setValue(inputs[i]);
             }
-            dotsArr.get(0).get(i).evalute();
+            dotsArr1[0][i].evalute();
         }
         //evalute hidden layer
       for (int i = 1; i <HIDDEN_DOTS / HIDDEN_DOTS_PER_ARRAY+1; i++) {
-          for (int j = 0; j < dotsArr.get(i).size() ; j++) {
-        	  dotsArr.get(i).get(j).evalute();
+          for (int j = 0; j < dotsArr1[i].length ; j++) {
+        	  dotsArr1[i][j].evalute();
           }
       }
       //Getting outputs
-      for (int i = 0; i < dotsArr.get(dotsArr.size()-1).size(); i++) {
+      for (int i = 0; i < dotsArr1[dotsArr1.length-1].length; i++) {
           //вызов метода точки(возможно повторный)
-          dotsArr.get(dotsArr.size()-1).get(i).evalute();
+          dotsArr1[dotsArr1.length-1][i].evalute();
           //
-          outputs.add( dotsArr.get(dotsArr.size()-1).get(i).getOutpup());
+          outputs[i]=dotsArr1[dotsArr1.length-1][i].getOutput();
 
       }
       if(!forTeaching){
-    	  for(ArrayList<Dot> dotArr: dotsArr){
+    	  for(Dot[] dotArr: dotsArr1){
     		  for(Dot dot:dotArr){
     			  dot.clear();
     		  }
     	  }
       }
-   return outputs.get(0);
+
+      return outputs;
    }
   
   
 
    public void kill() {
-	   for(ArrayList<Dot> dots : dotsArr) {
+	   for(Dot[] dots : dotsArr1) {
 		   for(Dot dot : dots) {
 			   dot.kill();
 			   dot.nodesFromMe=null;
@@ -142,10 +138,10 @@ public class Network implements Serializable {
    
    public boolean equals(Network net) {
 	   boolean result;
-	   for(int i=0;i<this.dotsArr.size();i++) {
-		   for(int j =0;j<this.dotsArr.get(i).size();j++) {
-			   for(int x =0;x<this.dotsArr.get(i).get(j).nodesFromMe.size();x++) {
-				  if(this.dotsArr.get(i).get(j).nodesFromMe.get(x).getWeight()!=net.dotsArr.get(i).get(j).nodesFromMe.get(x).getWeight()) {
+	   for(int i=0;i<this.dotsArr1.length;i++) {
+		   for(int j =0;j<this.dotsArr1[i].length;j++) {
+			   for(int x =0;x<this.dotsArr1[i][j].nodesFromMe.size();x++) {
+				  if(this.dotsArr1[i][j].nodesFromMe.get(x).getWeight()!=net.dotsArr1[i][j].nodesFromMe.get(x).getWeight()) {
 					  return false;
 				  }
 			   }
@@ -156,6 +152,4 @@ public class Network implements Serializable {
    
 
 }
-interface FunctionChooseInterface {
-    double activationFunction(double a);
-}
+ 

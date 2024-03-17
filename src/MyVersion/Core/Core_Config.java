@@ -12,8 +12,8 @@ public class Core_Config {
     public static final int HIDDEN_DOTS_PER_ARRAY =25;//25
     public static final boolean USE_R_WHILE_LEARNING=false;
     
-    public static final double FADING=5.7/Math.pow(10,21);//0.00000000000000000000000000000007d 6/Math.pow(10,22);
-    public static final int TEACH_ITERATIONS=8000;//800000
+    public static final double FADING=5.7/Math.pow(10,20);//0.00000000000000000000000000000007d 6/Math.pow(10,22);
+    public static final int TEACH_ITERATIONS=800000;//800000
 
     //Realization parameters                                DON'T CHANGE IF YOU DON'T KNOW WHAT THEY DO
     public static final boolean BLOCK_USELESS_INPUTS=true;//TRUE
@@ -25,7 +25,8 @@ public class Core_Config {
     public static final boolean NODES_BECOMES_UNCHANGEBLE_IF_WEIGHT_BIGGER_THAN_THRESHOLD=false;
     public static final boolean FIRST_INPUT_MULTIPLIER=true;//true
     /*возможно нужно перенести в другой конфиг*/
-    public static final double MUTATION_MULTIPLIER=0.23D;/*регулирует максимальную "силу" мутации*///0.4
+    public static final double MUTATION_MULTIPLIER=0.33D;/*регулирует максимальную "силу" мутации*///0.4 0.23
+    
 }
 
 /* //Network

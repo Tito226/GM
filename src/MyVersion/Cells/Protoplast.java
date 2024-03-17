@@ -1,9 +1,13 @@
 package MyVersion.Cells;
 
+import static MyVersion.Frame.GM2_CONFIG.ENERGY_NEEDED_TO_MULTIPLY;
 import static MyVersion.Frame.GM2_CONFIG.ENERGY_NEEDED_TO_MULTIPLY_PROTOPLAST;
+import static MyVersion.Frame.GM2_CONFIG.ORGANIC_PER_CELL_ON_NORMCELL_DEATH;
 import static MyVersion.Frame.GM2_CONFIG.PROTOPLAST_START_ENERGY;
+import static MyVersion.Frame.GM2_CONFIG.SIMPLE_DISTANCE;
 import static MyVersion.Frame.World.cells;
 import static MyVersion.Frame.World.height;
+import static MyVersion.Frame.World.sunny;
 import static MyVersion.Frame.World.width;
 
 import java.awt.Color;
@@ -13,6 +17,7 @@ import MyVersion.Frame.World;
 ///////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////
 public class Protoplast implements LiveCell{
+	
 	private NormCell normCell;
 	int x;
 	int y;
@@ -36,18 +41,15 @@ public class Protoplast implements LiveCell{
 			energy--;
 		}
 		countb++;
-		//normCell.multiCellbrain.evaluteFitness(null, false);
+		normCell.multiCellbrain.evaluteFitness(getInputData(), false);
 	}
 
 	@Override
 	public void test() {
 		try {
-			if( cells[normCell.getX()][normCell.getY()].liveCell==null ){
-				cells[x][y].liveCell=null;
+			if( cells[normCell.getX()][normCell.getY()].liveCell==null || energy<=0){
 				cells[x][y].organic+=energy;
-				if(this.normCell.myParts!=null){
-					this.normCell.myParts.remove(this);
-				}
+				kill();
 			}
 		}catch (Exception e){
 			e.printStackTrace();
@@ -114,9 +116,82 @@ public class Protoplast implements LiveCell{
 
 	@Override
 	public void kill() {
+		Cell.organicSpreadOnDeath(this);
 		cells[x][y].liveCell=null;
 		normCell.myParts.remove(this);
 	}
 
+	@Override
+	public Integer getGeneralEnergy() {
+		return normCell.getGeneralEnergy();
+	}
+
+	@Override
+	public int getY() {
+		return y;
+	}
+
+	@Override
+	public int getX() {
+		return x;
+	}
+
+	@Override
+	public NormCell getHead() {
+		return normCell;
+	}
+	
+	int lastOrganic=0;
+    int lastSize=0;
+    int lastEnergy=0;
+    double lastRightDistance=0d;
+    double lastLeftDistace=0d;
+    double lastUpDistance=0d;
+    double lastDownDistance=0d;  
+    double lastRightUpCell=0d;
+    double lastRightDownCell=0d;
+    double lastLeftUpCell=0d;
+    double lastLeftDownCell=0d;
+    double lastUpCell=0d;
+    double lastDownCell=0d;
+    double lastLeftCell=0d;
+    double lastRightCell=0d;
+    double lastOutput=0d,preLastOutput=0d;
+	@Override
+	public Double[] getInputData() {
+    	Double[] inputs = {DataMethods.isRaedyToMultiply(this) , (double) DataMethods.getEnergy(this), (double) cells[x][y].getOrganic()/DataMethods.organicDil, DataMethods.getUpCell(this), DataMethods.getDownCell(this), DataMethods.getLeftCell(this),
+    			 
+    			 (double) DataMethods.getRightCell(this),lastOutput,preLastOutput,(double) DataMethods.getRightDownCell(this),DataMethods.getRightUpCell(this),DataMethods.getLeftUpCell(this),DataMethods.getLeftDownCell(this), DataMethods.isSpaceAvailable(this), DataMethods.isController(this),
+    			 
+    			 DataMethods.getRightDistance(this),DataMethods.getLeftDistance(this),DataMethods.getUpDistance(this),DataMethods.getDownDistance(this), (double) lastEnergy,lastUpCell,lastDownCell,lastLeftCell,
+    			 
+    			  lastRightCell,lastRightDownCell,lastRightUpCell,lastLeftDownCell,lastLeftUpCell,  (double) lastOrganic, (double) sunny, (double) normCell.myParts.size(),
+    			 
+    			 (double) lastSize,lastRightDistance,lastLeftDistace,lastUpDistance,lastDownDistance};
+    	 return inputs;
+	}
+	
+	void setLastThings(){
+        lastEnergy=energy;
+        lastUpCell=DataMethods.getUpCell(this);
+        lastDownCell=DataMethods.getDownCell(this);
+        lastLeftCell=DataMethods.getLeftCell(this);
+        lastRightCell=DataMethods.getRightCell(this);
+        lastOrganic=cells[x][y].organic;
+        lastSize=normCell.myParts.size();
+        lastRightDistance=DataMethods.getRightDistance(this);
+        lastLeftDistace=DataMethods.getLeftDistance(this);
+        lastUpDistance=DataMethods.getUpDistance(this);
+        lastDownDistance=DataMethods.getDownDistance(this);
+        lastRightUpCell=DataMethods.getRightUpCell(this);
+        lastRightDownCell=DataMethods.getRightDownCell(this);
+        lastLeftUpCell=DataMethods.getLeftUpCell(this);
+        lastLeftDownCell=DataMethods.getLeftDownCell(this);
+    }
+
+	@Override
+	public int getEnergyToMultiplyMe() {
+		return ENERGY_NEEDED_TO_MULTIPLY_PROTOPLAST;
+	}
 	
 }

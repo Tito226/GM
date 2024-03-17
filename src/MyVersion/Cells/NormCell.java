@@ -17,14 +17,14 @@ import static MyVersion.Frame.World.*;
 
 public class NormCell implements  Serializable,LiveCell {
     //*****************************************
-    public NetworkWrapper brain;
-    public NetworkWrapper multiCellbrain;
+    public NetworkWrapper brain;//Use while myParts.size()==0
+    public NetworkWrapper multiCellbrain;//Use while myParts.size()>0
     Random r=new Random();
     //*****************************************
     public int multiplies=0;
     int energy,lifeTime=0,partNum=0;
     private int x,y;
-    byte counter=0,idleEnergyDecreseCounter=0;
+    byte counter=0;
     float readyToMultiply=0.0f;
     float[] outputs;
     long myParentNum,myChildNum=r.nextLong();
@@ -38,22 +38,11 @@ public class NormCell implements  Serializable,LiveCell {
     public DataMethods myMethods=new DataMethods();
     NormCellType normCellType=NormCellType.MOVABLE;
     Color myColor=Color.green;
-    
-    public int getX() {
-        return x;
-    }
-
-    public void setEnergy(int energy) {
-        this.energy = energy;
-    }
-    @Override
-    public int getEnergy() {
-    	return energy;
-    }
    
     public NormCell(Network brain){
     	Random r=new Random();
     	this.brain=new NetworkWrapper(BrainCloneClass.networkClone(brain));
+    	this.multiCellbrain=new NetworkWrapper(BrainCloneClass.networkClone(brain));
         myNum=num;
         num++;
         energy=NORM_CELL_START_ENERGY;
@@ -92,16 +81,21 @@ public class NormCell implements  Serializable,LiveCell {
                 	move(cells[x+1][y]);
                 }            
             }
+        	
         }
+       
+        
         energy-=1; /*TODO ПЕРЕСМОТРЕТЬ*/
         
     }
-    private void move(Cell nextCell) {
+    private void move(Cell nextCell) {//TODO MAKE CELL EAT ON MOVE
     	if (nextCell.liveCell==null && myParts.size()==0){
     		nextCell.setLiveCell(this);
             cells[x][y].setLiveCell(null);
             this.setX(nextCell.getX());
     		this.setY(nextCell.getY());
+        }else if(nextCell.liveCell==null){
+        	eatCell(nextCell);
         }
     }
     
@@ -117,24 +111,20 @@ public class NormCell implements  Serializable,LiveCell {
         this.y = y;
     }
 
-  void step1(){
-    	outputs=new float[brain.getDotsArr().size()];
-        for (int i = 0; i < myParts.size(); i++) {
-          //  cells[myParts.get(i)[0]][myParts.get(i)[1]].partCell.step(outputs[i+1]);
-
+    public void idleEnergyDecrese() {
+    	if(lifeTime%2==0) {//2
+     	   energy--;
         }
-        if(outputs[0]>0.64 && outputs[0]<0.68){
-        	new  Protoplast(this, outputs[0]);
-       //   System.out.println("WRYYYYY");
+    }
+    
+    void step1(){
+    	outputs=new float[brain.getDotsArr().length];
+        for (LiveCell curCell : myParts) {
+        	curCell.step();
         }
-        if (outputs[0]>0.3 && outputs[0]<0.35){
-            multiply();
-        }
-        Random r=new Random();
-
         energy--;
-        lifeTime = getLifeTime() + 1;
-       }
+        lifeTime++;
+    }
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
   	@Override
@@ -146,9 +136,8 @@ public class NormCell implements  Serializable,LiveCell {
         if (normCellType==NormCellType.CONTROLLER){
             setMyColor(Color.darkGray);
             step1();
-        }
-        else {
-        if(myParts.size()>0){
+        }else {
+        	if(myParts.size()>0){
             normCellType=NormCellType.CONTROLLER;
             step1();
             return;
@@ -159,45 +148,53 @@ public class NormCell implements  Serializable,LiveCell {
        }
        double output=evaluateFitness();
        if(DEBUG) {
-    	   double[] inputBuff=new double[HOW_MUCH_INPUTS_MUST_BE_USED+1];
+    	   //if(cells[x][y].organic<=0 && between(Action_Boundaries.eatOrganicBoundaries,output) ) {
+    	   double[] inputBuff=new double[HOW_MUCH_INPUTS_MUST_BE_USED+10];
     	   for (int i = 0; i < inputBuff.length; i++) {
-    		   inputBuff[i]=myMethods.getInputData()[i];
+    		   inputBuff[i]=getInputData()[i];
     	   }
     	   System.out.println(Arrays.toString(inputBuff)+"  ");
     	   System.out.println("output: "+output);
     	   System.out.println("--------------------------------------------------");
     	   try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-    	   
+    		   Thread.sleep(DEBUG_TIME_AFTER_STEP);
+    	   } catch (InterruptedException e) {
+    		   e.printStackTrace();
+    	   }  
+    	  // }
        }
        preLastOutput=lastOutput;
        lastOutput=output;
-       if(output>Action_Boundaries.moveUpBoundaries[0] && output<Action_Boundaries.moveUpBoundaries[1]){
+ 
+       if(DataMethods.between(Action_Boundaries.moveUpBoundaries,output)){
     	   move(Directions.UP);
-       }else if (output>Action_Boundaries.moveDownBoundaries[0] && output<Action_Boundaries.moveDownBoundaries[1]){
+       }else if (DataMethods.between(Action_Boundaries.moveDownBoundaries,output)){
     	   move(Directions.DOWN);
-       }else if (output>Action_Boundaries.moveLeftBoundaries[0] && output<Action_Boundaries.moveLeftBoundaries[1]){
+       }else if (DataMethods.between(Action_Boundaries.moveLeftBoundaries,output)){
     	   move(Directions.LEFT);
-       } else if (output>Action_Boundaries.moveRightBoundaries[0] && output<Action_Boundaries.moveRightBoundaries[1]){
+       } else if (DataMethods.between(Action_Boundaries.moveRightBoundaries,output)){
     	   move(Directions.RIGHT);
-       }
-       if (output>Action_Boundaries.eatOrganicBoundaries[0] && output<Action_Boundaries.eatOrganicBoundaries[1]){
+       }if(DataMethods.between(Action_Boundaries.eatOrganicBoundaries,output)){
     	   eatOrganic();
-       }
-       else  if(output>0.6 && output<0.61){
-    	   if(!eatCell(Directions.RIGHT)){energy--;}
+       }else if(DataMethods.between(Action_Boundaries.eatRightCellBoundaries,output)){
+    	   if(!eatCell(Directions.RIGHT)){
+    		   energy--;
+    	   }
 
-       }else if(output>0.61 && output<0.62){
-    	   if(!eatCell(Directions.LEFT)){energy--;}
+       }else if(DataMethods.between(Action_Boundaries.eatLeftCellBoundaries,output)){
+    	   if(!eatCell(Directions.LEFT)){
+    		   energy--;
+    	   }
 
-       }else if(output>0.62 && output<0.63){
-    	   if(!eatCell(Directions.UP)){energy--;}
+       }else if(DataMethods.between(Action_Boundaries.eatUpCellBoundaries,output)){
+    	   if(!eatCell(Directions.UP)){
+    		   energy--;
+    	   }
 
-       }else if(output>0.63 && output<0.64){
-      	 if (!eatCell(Directions.DOWN)){energy--;}
+       }else if(DataMethods.between(Action_Boundaries.eatDownCellBoundaries,output)){
+      	 if (!eatCell(Directions.DOWN)){
+      		 energy--;
+      	 }
 
        }else if(output>0.64 && output<0.68){
     	   new Protoplast(this, output);
@@ -207,16 +204,15 @@ public class NormCell implements  Serializable,LiveCell {
        } else if(output>Action_Boundaries.multiplyBoundaries[0] && output<Action_Boundaries.multiplyBoundaries[1] ){
     	   multiply();
        }
-       idleEnergyDecreseCounter++;
-       if(idleEnergyDecreseCounter%2==0) {//2
-    	   energy--;
-       }
        setLastThings();
-       lifeTime = getLifeTime() + 1;
+       lifeTime++;
+       idleEnergyDecrese();
        }
    }
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+  	
+  	
     public void setMyColor(Color myColor) {
         this.myColor = myColor;
     }
@@ -244,7 +240,7 @@ public class NormCell implements  Serializable,LiveCell {
     }
 
     public boolean eatCell(Directions dirs){
-
+    	//System.out.println("cell was eaten");
         switch (dirs){
 
             case UP -> {
@@ -280,7 +276,7 @@ public class NormCell implements  Serializable,LiveCell {
 
     private boolean eatCell(Cell nextCell) {//TODO доработать
     	if(nextCell.liveCell!=null ){
-            energy+= nextCell.liveCell.energy;
+            energy+= nextCell.liveCell.getEnergy();
             nextCell.liveCell=null;
             move(nextCell);
             return true;
@@ -378,11 +374,11 @@ public class NormCell implements  Serializable,LiveCell {
 
     
     public double evaluateFitness() {
-       return brain.evaluteFitness(myMethods.getInputData(),false);
+       return brain.evaluteFitness(getInputData(),false)[0];
     }
     
     public double evaluateFitness(Double[] inputData) {
-       return brain.evaluteFitness(inputData,false);
+       return brain.evaluteFitness(inputData,false)[0];
     }
     //*********************************************
     
@@ -396,229 +392,31 @@ public class NormCell implements  Serializable,LiveCell {
 		return lifeTime;
 	}
 
-
-	public class DataMethods{
-    	
-    	static double distanceDill=1000f;//1000
-    	static int maxDistance=50;
-    	public static double organicDil=200f;
-    	//--------------------get...Cell()-----------------
-    	public static double relativesValue=3.4d;//2.5
-    	public static double normCellValue=2.0d;//2
-    	public static double nextOrganicValue=0.25d;//0.5
-    	public static double wallValue=1d;//1
-    	//-------------------------------------------------
-		public Double[] getInputData() {
-    	    	Double[] inputs = {myMethods.isRaedyToMultiply(NormCell.this) , (double) myMethods.getEnergy(NormCell.this), (double) cells[x][y].getOrganic()/organicDil, myMethods.getUpCell(NormCell.this), myMethods.getDownCell(NormCell.this), myMethods.getLeftCell(NormCell.this),
-    	    			 
-    	    			 (double) myMethods.getRightCell(NormCell.this),lastOutput,preLastOutput,(double) myMethods.getRightDownCell(NormCell.this),myMethods.getRightUpCell(NormCell.this),myMethods.getLeftUpCell(NormCell.this),myMethods.getLeftDownCell(NormCell.this), myMethods.isSpaceAvailable(NormCell.this), isController(),
-    	    			 
-    	    			 myMethods.getRightDistance(NormCell.this),myMethods.getLeftDistance(NormCell.this),myMethods.getUpDistance(NormCell.this),myMethods.getDownDistance(NormCell.this), (double) lastEnergy,lastUpCell,lastDownCell,lastLeftCell,
-    	    			 
-    	    			  lastRightCell,lastRightDownCell,lastRightUpCell,lastLeftDownCell,lastLeftUpCell,  (double) lastOrganic, (double) sunny, (double) myParts.size(),
-    	    			 
-    	    			 (double) lastSize,lastRightDistance,lastLeftDistace,lastUpDistance,lastDownDistance};
-    	    	 return inputs;
-    	    }
-
-		boolean isRelatives(NormCell normCell, NormCell normCell1){
-			try {
-			   if(normCell1.myParentNum ==normCell.myParentNum){
-				   return true;
-			   }else if (normCell1.myChildNum ==normCell.myParentNum){
-				   return true;}
-			   else {
-				   return false;
-			   }
-			 }catch(Exception e) {
-				 return false;
-			 }
-		   }
-
-		public int getEnergy(LiveCell liveCell) {
-		    return liveCell.getEnergy();
-		}
-
-		double getDownDistance(NormCell normCell){
-			if(SIMPLE_DISTANCE) {
-				return Math.max(maxDistance,normCell.y)/distanceDill;
-		    }else {
-		    	for (int curY =normCell.y ; curY > 0; curY--) {
-					Cell curCell=cells[normCell.x][curY];
-					if(curCell.liveCell!=null || curY>maxDistance){
-						return curY/distanceDill;
-					}
-				}
-		    	return Math.max(maxDistance, normCell.y)/distanceDill;
-		    }
-		}
-
-		double getUpDistance(NormCell normCell){
-			if(SIMPLE_DISTANCE) {
-				return Math.max( maxDistance, cells[0].length-normCell.y)/distanceDill;
-			}else {
-				for (int curY =normCell.y ; curY < cells[0].length; curY++) {
-					Cell curCell=cells[normCell.x][curY];
-					if(curCell.liveCell!=null || cells[0].length-curY>maxDistance){
-						return (cells[0].length-curY)/distanceDill;
-					}
-				}
-				return Math.max( maxDistance, cells[0].length-normCell.y)/distanceDill;
-		    }
-		}
-
-		double getRightDistance(NormCell normCell){
-			if(SIMPLE_DISTANCE) {
-				return Math.max(maxDistance, cells.length-normCell.x)/distanceDill;
-			}else {
-				for (int curX =normCell.x ; curX < cells.length; curX++) {
-					Cell curCell=cells[curX][normCell.y];
-					if(curCell.liveCell!=null || cells.length-curX>maxDistance){
-						return (cells.length-curX)/distanceDill;
-					}
-				}
-		    	return Math.max(maxDistance, cells.length-normCell.x)/distanceDill;
-		    }
-		}
-
-		double getLeftDistance(NormCell normCell){
-			if(SIMPLE_DISTANCE) {
-				return Math.max(maxDistance, normCell.x)/distanceDill;
-			}else {
-				for (int curX =normCell.x ; curX > 0; curX--) {
-					Cell curCell=cells[curX][normCell.y];
-					if(curCell.liveCell!=null || curX>maxDistance){
-						return curX/distanceDill;
-					}
-				}
-		    	return Math.max(maxDistance, cells.length-normCell.x)/distanceDill;
-		    }
-		}
-
-		public double getLeftDownCell(NormCell normCell){
-			if(  normCell.y<height-1 && normCell.x>1) {
-				Cell nextCell=cells[normCell.x-1][normCell.y+1];
-				return getNextCell(nextCell,normCell);
-			}else {
-				return wallValue;
-			}
-		}
-
-		public double getLeftUpCell(NormCell normCell){
-			if(  normCell.y>1 && normCell.x>1) {
-				Cell nextCell=cells[normCell.x-1][normCell.y-1];
-				return getNextCell(nextCell,normCell);
-			}else {
-				return wallValue;
-			}
-		}
-
-		public double getRightUpCell(NormCell normCell){
-			if(  normCell.y>1 && normCell.x<width-1) {
-				Cell nextCell=cells[normCell.x+1][normCell.y-1];
-				return getNextCell(nextCell,normCell);
-			}else {
-				return wallValue;
-			}
-		}
-
-		public double getRightDownCell(NormCell normCell){
-			if( normCell.y<height-1 && normCell.x<width-1) {
-				Cell nextCell=cells[normCell.x+1][normCell.y+1];
-				return getNextCell(nextCell,normCell);
-			}else {
-				return wallValue;
-			}
-		}
-		//
-
-		public double getDownCell(NormCell normCell){
-			if( normCell.y<height-1) {
-				Cell nextCell=cells[normCell.x][normCell.y+1];
-				return getNextCell(nextCell,normCell);
-			}else {
-				return wallValue;
-			}
-		}
-
-		public double getUpCell(NormCell normCell){
-			if( normCell.y>1) {
-				Cell nextCell=cells[normCell.x][normCell.y-1];
-				return getNextCell(nextCell,normCell);
-			}else {
-				return wallValue;
-			}
-		}
-
-		public double getRightCell(NormCell normCell){
-			
-			if( normCell.x<width-1) {
-				Cell nextCell=cells[normCell.x+1][normCell.y];
-				return getNextCell(nextCell,normCell);
-			}else {
-				return wallValue;
-			}
-		}
-
-		public double getLeftCell(NormCell normCell){
-			if( normCell.x>1) {
-				Cell nextCell=cells[normCell.x-1][normCell.y];
-				return getNextCell(nextCell,normCell);
-			}
-			else {
-				return wallValue;
-			}
-		}
-			
-		public double getNextCell(Cell nextCell,NormCell normCell) {
-			LiveCell nextLiveCell=nextCell.liveCell;
-			if(nextLiveCell!=null){
-				boolean isRelative=nextLiveCell instanceof NormCell? isRelatives(normCell,(NormCell)nextLiveCell) : false;
-	          	if(isRelative || normCell.myMethods.isMyPart(normCell, nextLiveCell) ){
-	          		return relativesValue;
-	          	}else {
-	          		return normCellValue;
-	          	}
-			} 
-			else{
-	    	   if(nextCell.organic>1) {
-					return Math.min(nextCell.organic/organicDil, nextOrganicValue);
-				}
-	    	   return 0d;
-	       }
-		}
-		
-		double isRaedyToMultiply(NormCell normCell){
-		    if(normCell.energy>ENERGY_NEEDED_TO_MULTIPLY+2){
-		        return 1d;
-		    }else
-		        return 0d;
-		}
-
-		boolean isMyPart(NormCell normCell, LiveCell partCell){
-		   if (normCell.myParts.contains(partCell)){
-		       System.out.println("WOOOOOOOOOOOOOOOOOOOOOOOOOOORK");
-		
-		       return true;
-		   } else{
-		       return false;}
-		}
-
-		double isSpaceAvailable(NormCell normCell){
-		     boolean b1=true;
-		     boolean b2=true;
-		     boolean b3=true;
-		     boolean b4=true;
-		     if(normCell.y>0 && cells[normCell.x][normCell.y-1].liveCell==null){}else b1=false;
-		     if(normCell.y<height-1 && cells[normCell.x][normCell.y+1].liveCell==null){}else b2=false;
-		     if(normCell.x<width-1 &&  cells[normCell.x+1][normCell.y].liveCell==null){}else b3=false;
-		     if( normCell.x>0 && cells[normCell.x-1][normCell.y].liveCell==null){}else b4=false;
-		     if(!b1 && !b2 && !b3 && !b4){
-		           return 0.0d;
-		     }else{return 1.0d;}
-		 }
-    	 
+     public int getX() {
+         return x;
      }
+
+     public void setEnergy(int energy) {
+         this.energy = energy;
+     }
+     @Override
+     public int getEnergy() {
+     	return energy;
+     }
+     
+     
+     public Double[] getInputData() {
+	    	Double[] inputs = {myMethods.isRaedyToMultiply(this) , (double) myMethods.getEnergy(this), (double) cells[x][y].getOrganic()/myMethods.organicDil, myMethods.getUpCell(this), myMethods.getDownCell(this), myMethods.getLeftCell(this),
+	    			 
+	    			 (double) myMethods.getRightCell(this),lastOutput,preLastOutput,(double) myMethods.getRightDownCell(this),myMethods.getRightUpCell(this),myMethods.getLeftUpCell(this),myMethods.getLeftDownCell(this), myMethods.isSpaceAvailable(this), isController(),
+	    			 
+	    			 myMethods.getRightDistance(this),myMethods.getLeftDistance(this),myMethods.getUpDistance(this),myMethods.getDownDistance(this), (double) lastEnergy,lastUpCell,lastDownCell,lastLeftCell,
+	    			 
+	    			  lastRightCell,lastRightDownCell,lastRightUpCell,lastLeftDownCell,lastLeftUpCell,  (double) lastOrganic, (double) sunny, (double) myParts.size(),
+	    			 
+	    			 (double) lastSize,lastRightDistance,lastLeftDistace,lastUpDistance,lastDownDistance};
+	    	 return inputs;
+	}
 
 
 	@Override
@@ -637,14 +435,7 @@ public class NormCell implements  Serializable,LiveCell {
 
 	@Override
 	public void kill() {
-		for (int i = -1; i < 2; i++) {
-  			for (int j = -1; j < 2; j++) {
-  				if(x+i<cells.length && x+i>0 && y+j>0 && y+j<cells[1].length) {
-  					cells[x+i][y+j].organic+=this.myMethods.getEnergy(this)+ORGANIC_PER_CELL_ON_NORMCELL_DEATH;
-  					cells[x+i][y+j].setChange(true);
-  				}
-  			}
-		}
+		Cell.organicSpreadOnDeath(this);
   		if(!this.brain.dontDelete) {
   			this.brain.kill();
   		}else {
@@ -652,6 +443,25 @@ public class NormCell implements  Serializable,LiveCell {
   		}
   		cells[x][y].setLiveCell(null);
 		
+	}
+
+	@Override
+	public Integer getGeneralEnergy() {
+		int generalEnergy=energy;
+		for (LiveCell curPart: myParts) {
+			generalEnergy+=curPart.getEnergy();
+		}
+		return generalEnergy;
+	}
+
+	@Override
+	public NormCell getHead() {
+		return this;
+	}
+
+	@Override
+	public int getEnergyToMultiplyMe() {
+		return ENERGY_NEEDED_TO_MULTIPLY;
 	}
 
 	
