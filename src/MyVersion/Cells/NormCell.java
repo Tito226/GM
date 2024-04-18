@@ -7,7 +7,11 @@ import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Random;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+
 import MyVersion.Frame.Action_Boundaries;
 import MyVersion.Frame.NetworkWrapper;
 
@@ -18,11 +22,15 @@ import static MyVersion.Frame.World.*;
 public class NormCell implements  Serializable,LiveCell {
     //*****************************************
     public NetworkWrapper brain;//Use while myParts.size()==0
-    public NetworkWrapper multiCellbrain;//Use while myParts.size()>0
+    public NetworkWrapper multiCellBrain;//Use while myParts.size()>0
+    public String causeOfDeath;
     Random r=new Random();
+    public boolean selected=false;
     //*****************************************
     public int multiplies=0;
-    int energy,lifeTime=0,partNum=0;
+    int energy;
+	public int lifeTime=0;
+	int partNum=0;
     private int x,y;
     byte counter=0;
     float readyToMultiply=0.0f;
@@ -30,19 +38,22 @@ public class NormCell implements  Serializable,LiveCell {
     long myParentNum,myChildNum=r.nextLong();
     static long num = 0L;
     private final long myNum;
-    public boolean stepN=false;
+    private boolean tested=false;
+    public boolean bited=false;
     double lastOutput=0d,preLastOutput=0d;
     public String partName="part";
     //*****************************************
-    ArrayList<LiveCell> myParts=new ArrayList<>();
-    public DataMethods myMethods=new DataMethods();
+    public ArrayList<LiveCell> myParts=new ArrayList<>();
+    ArrayList<LiveCell> myPartsBuffer;
+    public static DataMethods myMethods=new DataMethods();
     NormCellType normCellType=NormCellType.MOVABLE;
+    public Semaphore sem=new Semaphore(1);
     Color myColor=Color.green;
    
-    public NormCell(Network brain){
+    public NormCell(Network brain,Network multiCellBrain){
     	Random r=new Random();
     	this.brain=new NetworkWrapper(BrainCloneClass.networkClone(brain));
-    	this.multiCellbrain=new NetworkWrapper(BrainCloneClass.networkClone(brain));
+    	this.multiCellBrain=new NetworkWrapper(BrainCloneClass.networkClone(multiCellBrain));
         myNum=num;
         num++;
         energy=NORM_CELL_START_ENERGY;
@@ -50,6 +61,12 @@ public class NormCell implements  Serializable,LiveCell {
         	if(r.nextInt(MUTATION_CHANCE)==0) {
         		this.brain.mutate(NUMBER_OF_MUTATIONS);
         	}
+        	if(r.nextInt(MUTATION_CHANCE)==0) {
+        		this.multiCellBrain.mutate(NUMBER_OF_MUTATIONS);
+        	}
+        }
+        synchronized(cells) {
+        	normCells.add(getHead());
         }
     }
     
@@ -89,14 +106,19 @@ public class NormCell implements  Serializable,LiveCell {
         
     }
     private void move(Cell nextCell) {//TODO MAKE CELL EAT ON MOVE
+    	
     	if (nextCell.liveCell==null && myParts.size()==0){
     		nextCell.setLiveCell(this);
             cells[x][y].setLiveCell(null);
             this.setX(nextCell.getX());
     		this.setY(nextCell.getY());
-        }else if(nextCell.liveCell==null){
+        }else if(nextCell.liveCell!=null){
         	eatCell(nextCell);
+        	if(nextCell.liveCell==null) {
+        		move(nextCell);
+        	}
         }
+    	
     }
     
     public int getY() {
@@ -117,101 +139,141 @@ public class NormCell implements  Serializable,LiveCell {
         }
     }
     
+    void doEndThings() {
+    	setLastThings();
+        idleEnergyDecrese();
+        lifeTime++;
+        test();//TODO выяснить причину проблемы которую рещает етот костыль(метод test() должен вызыватся только в Cell)
+    }
+    
     void step1(){
-    	outputs=new float[brain.getDotsArr().length];
-        for (LiveCell curCell : myParts) {
+    	myPartsBuffer=new ArrayList<LiveCell>(myParts);
+    	double output=evaluateFitness();
+    	preLastOutput=lastOutput;
+        lastOutput=output;
+        if(output>Action_Boundaries.multiplyBoundaries[0] && output<Action_Boundaries.multiplyBoundaries[1] ){
+      		myMethods.multiply(this);
+      	}else if(output>0.64 && output<0.68){
+      		new Protoplast(this, output);
+      	}
+        for (LiveCell curCell : myPartsBuffer) {
         	curCell.step();
         }
-        energy--;
-        lifeTime++;
+        doEndThings();
     }
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-  	@Override
-    public void step(){//TODO  Step
-        if(myParts.size()==0){
+    
+    void checkMyType() {
+    	if(myParts.size()==0){
             normCellType=NormCellType.MOVABLE;
             setMyColor(Color.green);
+        }else if (myParts.size()>0){
+        	normCellType=NormCellType.CONTROLLER;
+            setMyColor(Color.ORANGE);
         }
-        if (normCellType==NormCellType.CONTROLLER){
-            setMyColor(Color.darkGray);
-            step1();
-        }else {
-        	if(myParts.size()>0){
-            normCellType=NormCellType.CONTROLLER;
-            step1();
-            return;
-        }
+    }
+    
+  	@Override
+    public void step(){//TODO  Step
+  		if(energy<0) {
+  			System.err.println("I must be dead NormCell: 179");
+  		}
+  		try {
+			sem.acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+  		if(normCells.contains(this) && brain!=null) {
+  			//System.out.println("stepping1 :"+sem.availablePermits());
+  			checkMyType();
+  			if (normCellType==NormCellType.CONTROLLER){
+  				step1();
+  				sem.release();
+         		return;
+  			}
+  			if(myMethods.isSpaceAvailable(this)==0){
+  				energy-=1;
+  			}
+  			double output=evaluateFitness();
+  			if(DEBUG) {
+  				//if(cells[x][y].organic<=0 && between(Action_Boundaries.eatOrganicBoundaries,output) ) {
+  				double[] inputBuff=new double[HOW_MUCH_INPUTS_MUST_BE_USED+10];
+  				for (int i = 0; i < inputBuff.length; i++) {
+  					inputBuff[i]=getInputData()[i];
+  				}
+  				System.out.println(Arrays.toString(inputBuff)+"  ");
+  				System.out.println("output: "+output);
+  				System.out.println("--------------------------------------------------");
+  				try {
+  					Thread.sleep(DEBUG_TIME_AFTER_STEP);
+  				} catch (InterruptedException e) {
+  					e.printStackTrace();
+  				}  
+    	  	// }
+  			}
+  			preLastOutput=lastOutput;
+  			lastOutput=output;
+  		
+  			checkMoveBoundaries(output);
+  			if(DataMethods.between(Action_Boundaries.eatOrganicBoundaries,output)){
+  				myMethods.eatOrganic(this);
+  			}else if(DataMethods.between(Action_Boundaries.eatRightCellBoundaries,output)){
+  				if(!eatCell(Directions.RIGHT)){
+  					energy--;
+  				}
 
-       if(myMethods.isSpaceAvailable(this)==0){
-           energy-=1;
-       }
-       double output=evaluateFitness();
-       if(DEBUG) {
-    	   //if(cells[x][y].organic<=0 && between(Action_Boundaries.eatOrganicBoundaries,output) ) {
-    	   double[] inputBuff=new double[HOW_MUCH_INPUTS_MUST_BE_USED+10];
-    	   for (int i = 0; i < inputBuff.length; i++) {
-    		   inputBuff[i]=getInputData()[i];
-    	   }
-    	   System.out.println(Arrays.toString(inputBuff)+"  ");
-    	   System.out.println("output: "+output);
-    	   System.out.println("--------------------------------------------------");
-    	   try {
-    		   Thread.sleep(DEBUG_TIME_AFTER_STEP);
-    	   } catch (InterruptedException e) {
-    		   e.printStackTrace();
-    	   }  
-    	  // }
-       }
-       preLastOutput=lastOutput;
-       lastOutput=output;
- 
-       if(DataMethods.between(Action_Boundaries.moveUpBoundaries,output)){
-    	   move(Directions.UP);
-       }else if (DataMethods.between(Action_Boundaries.moveDownBoundaries,output)){
-    	   move(Directions.DOWN);
-       }else if (DataMethods.between(Action_Boundaries.moveLeftBoundaries,output)){
-    	   move(Directions.LEFT);
-       } else if (DataMethods.between(Action_Boundaries.moveRightBoundaries,output)){
-    	   move(Directions.RIGHT);
-       }if(DataMethods.between(Action_Boundaries.eatOrganicBoundaries,output)){
-    	   eatOrganic();
-       }else if(DataMethods.between(Action_Boundaries.eatRightCellBoundaries,output)){
-    	   if(!eatCell(Directions.RIGHT)){
-    		   energy--;
-    	   }
+  			}else if(DataMethods.between(Action_Boundaries.eatLeftCellBoundaries,output)){
+  				if(!eatCell(Directions.LEFT)){
+  					energy--;
+  				}
 
-       }else if(DataMethods.between(Action_Boundaries.eatLeftCellBoundaries,output)){
-    	   if(!eatCell(Directions.LEFT)){
-    		   energy--;
-    	   }
+  			}else if(DataMethods.between(Action_Boundaries.eatUpCellBoundaries,output)){
+  				if(!eatCell(Directions.UP)){
+  					energy--;
+  				}
 
-       }else if(DataMethods.between(Action_Boundaries.eatUpCellBoundaries,output)){
-    	   if(!eatCell(Directions.UP)){
-    		   energy--;
-    	   }
-
-       }else if(DataMethods.between(Action_Boundaries.eatDownCellBoundaries,output)){
-      	 if (!eatCell(Directions.DOWN)){
-      		 energy--;
-      	 }
-
-       }else if(output>0.64 && output<0.68){
-    	   new Protoplast(this, output);
-       }else if(output>0.68 && output<0.8){
-
-
-       } else if(output>Action_Boundaries.multiplyBoundaries[0] && output<Action_Boundaries.multiplyBoundaries[1] ){
-    	   multiply();
-       }
-       setLastThings();
-       lifeTime++;
-       idleEnergyDecrese();
-       }
+  			}else if(DataMethods.between(Action_Boundaries.eatDownCellBoundaries,output)){
+  				if (!eatCell(Directions.DOWN)){
+  					energy--;
+  				}
+  			}else if(DataMethods.between(Action_Boundaries.multiplyProtoplastBoundaries,output)){
+  				new Protoplast(this, output);
+  			}else if(DataMethods.between(Action_Boundaries.multiplyRootBoundaries,output)){
+  				new RootCell(this, output);
+  			} else if(DataMethods.between(Action_Boundaries.multiplyBoundaries,output)){
+  				myMethods.multiply(this);
+  			}		
+  			doEndThings();
+  		}else {
+  			//System.err.println("Im dead, leave me alone , harakiri NormCell: 246");
+  			normCells.remove(this);
+  			cells[x][y].setLiveCell(null);
+  		}
+  		sem.release();
+  		//System.out.println("stepped :"+sem.availablePermits());
+  		
    }
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
   	
+  	boolean checkMoveBoundaries(double output) {
+  		
+  		if(DataMethods.between(Action_Boundaries.moveUpBoundaries,output)){
+     	   move(Directions.UP);
+     	   return true;
+        }else if (DataMethods.between(Action_Boundaries.moveDownBoundaries,output)){
+     	   move(Directions.DOWN);
+     	   return true;
+        }else if (DataMethods.between(Action_Boundaries.moveLeftBoundaries,output)){
+     	   move(Directions.LEFT);
+     	   return true;
+        } else if (DataMethods.between(Action_Boundaries.moveRightBoundaries,output)){
+     	   move(Directions.RIGHT);
+     	   return true;
+        }
+  		return false;
+  	}
   	
     public void setMyColor(Color myColor) {
         this.myColor = myColor;
@@ -221,25 +283,7 @@ public class NormCell implements  Serializable,LiveCell {
         return  myColor;    //TODO set Changeable cell color
     }
 
-    void eatOrganic(){
-        if(cells[x][y].getOrganic()!=0  && cells[x][y].getOrganic()>2){
-           energy+=HOW_MUCH_ORGANIC_EATS_PER_STEP;
-            cells[x][y].setOrganic(cells[x][y].getOrganic()-3);
-        }else {
-        	energy+=cells[x][y].getOrganic();
-        	cells[x][y].setOrganic(0);
-        }
-    }
-
-    void transferEnergy(double output){/*TODO ЗАГЛУШКА*/
-    	if (output>0.7 && output>0.72) {
-    		
-    	}else if(output>0.72 && output>0.74){
-    		
-    	}
-    }
-
-    public boolean eatCell(Directions dirs){
+    public synchronized boolean eatCell(Directions dirs){
     	//System.out.println("cell was eaten");
         switch (dirs){
 
@@ -275,62 +319,48 @@ public class NormCell implements  Serializable,LiveCell {
     }
 
     private boolean eatCell(Cell nextCell) {//TODO доработать
-    	if(nextCell.liveCell!=null ){
-            energy+= nextCell.liveCell.getEnergy();
-            nextCell.liveCell=null;
-            move(nextCell);
-            return true;
-        }else { 
-        	return false;
-        }
+    	LiveCell nextLiveCell=nextCell.liveCell;
+    	if(nextLiveCell!=null && normCells.contains(nextLiveCell)) {
+    		Semaphore curSem=nextLiveCell.getHead().sem;
+    		try {
+    			if(!curSem.tryAcquire(100,TimeUnit.MILLISECONDS)) {
+    				System.err.println("conflict");
+    				return false;
+    			}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+    		if(nextLiveCell!=null ){
+    			energy+= nextLiveCell.getEnergy();
+    			nextLiveCell.getHead().bited=true;
+    			if(!normCells.contains(nextLiveCell) &&  nextLiveCell instanceof NormCell){
+    				System.err.println("!normCells.contains(nextLiveCell)"+ nextLiveCell.getEnergy()+" : "+nextLiveCell.getClass()+" : "+((NormCell)nextLiveCell).bited);
+    				return false;
+    			}
+    			
+    			if(nextLiveCell instanceof NormCell) {
+    				NormCell norm=(NormCell)nextLiveCell;
+    				norm.causeOfDeath="was eaten";
+    			}
+    			
+    			nextLiveCell.kill(false);
+    			nextCell.setLiveCell(null);
+    			curSem.release();
+    			return true;
+    			
+    		}else { 
+    			curSem.release();
+    			//System.out.println("Cell eaten :");
+    			return false;
+    		}
+    		
+    	}else {
+    		return false;
+    	}
+    	//return false;
     }
     
-    void multiply(){
-        /*TODO ПЕРЕДЕЛАТЬ*/
-       if(myMethods.isSpaceAvailable(this)==1.00f && energy>ENERGY_NEEDED_TO_MULTIPLY){
-    	   boolean shitHappened=false;
-    	   int xxx =r.nextInt(4);
-    	   	 switch (xxx){
-    	   	 	case 1 -> {
-    	   	 		if( y>0){
-    	   	 			multiply(cells[x][y-1]); 
-    	   	 		}
-    	   	 	}
-
-    	   	 	case 2 -> {
-    	   	 		if(y<height-1 ){
-    			   multiply(cells[x][y+1]);
-    	   	 		}
-    	   	 	}
-
-    	   	 	case 3 -> {
-    	   	 		if( x<width-1 ){
-    	   	 			multiply(cells[x+1][y]);
-    	   	 		}
-    	   	 	}
-
-    	   	 	case 4 -> {
-    	   	 		if(  x>0 ){
-    	   	 			multiply(cells[x-1][y]);
-    	   	 		}
-    	   	 	}
-    	   	 	default->{
-    	   	 		multiply(); 
-    	   	 	}
-    	   	 }
-
-       }
-       else{
-          energy--;
-       } 
-    }
-    private void multiply(Cell nextCell) {
-    	if(nextCell.liveCell ==null){
-    		nextCell.setLiveCell(new NormCell(brain));
-        	energy-=ENERGY_NEEDED_TO_MULTIPLY;
-        	multiplies++;
-        }
-    }
+    
     double isController(){
      if (normCellType==NormCellType.CONTROLLER)  {
          return 10.0f;
@@ -374,11 +404,11 @@ public class NormCell implements  Serializable,LiveCell {
 
     
     public double evaluateFitness() {
-       return brain.evaluteFitness(getInputData(),false)[0];
+       return brain.calculateOutput(getInputData(),false)[0];
     }
     
     public double evaluateFitness(Double[] inputData) {
-       return brain.evaluteFitness(inputData,false)[0];
+       return brain.calculateOutput(inputData,false)[0];
     }
     //*********************************************
     
@@ -418,31 +448,80 @@ public class NormCell implements  Serializable,LiveCell {
 	    	 return inputs;
 	}
 
-
+    public static int maxEnergy=500;
 	@Override
 	public void test() {
-		if (this.myMethods.getEnergy(this) <= 0) {
-			this.kill();
-        }/*else if (this != null && this.myMethods.getEnergy(this) >= 10000) {
-            System.out.println("Cell with 10000 died");
-            organic += liveCell.myMethods.getEnergy(liveCell);
-            liveCell.brain.kill();
-            setSecCell(null);
-
-        }*/
-		
+		if(energy <= 0 || energy >= maxEnergy || lifeTime>NORMCELL_MAX_LIFETIME || myParts.size()>32 || cells[x][y].organic>CRITICAL_ORGANIC_VALUE) {
+			this.kill(true);
+			this.causeOfDeath="Killed by test";
+        }
+		if(bited) {
+			testMyСontinuity();
+			bited=false;
+		}
 	}
 
+	void testMyСontinuity() {//TODO заглушка
+		testNeighbours(this);
+		myPartsBuffer=new ArrayList<LiveCell>(myParts);
+		for(LiveCell curCell : myPartsBuffer) {
+			if(!curCell.getTested()) {
+				curCell.kill(true);
+			}else {
+				curCell.setTested(false);
+			}
+		}
+	}
+	
+	void testNeighbours(LiveCell curCell) {//TODO test it
+		int x=curCell.getX();
+		int y=curCell.getY();
+		if(x-1>0 && cells[x-1][y].liveCell!=null) {
+			testNeighbour(cells[x-1][y].liveCell);
+		}
+		if(x+1<width-1 && cells[x+1][y].liveCell!=null) {
+			testNeighbour(cells[x+1][y].liveCell);
+		}
+		if(y-1>0 && cells[x][y-1].liveCell!=null) {
+			testNeighbour(cells[x][y-1].liveCell);
+		}
+		if(y+1<height-1 && cells[x][y+1].liveCell!=null) {
+			testNeighbour(cells[x][y+1].liveCell);
+		}
+	}
+	void testNeighbour(LiveCell curCell) {
+		if(myParts.contains(curCell) && !curCell.getTested()) {
+			curCell.setTested(true);
+			testNeighbours(curCell);
+		}
+	}
+	
 	@Override
-	public void kill() {
-		Cell.organicSpreadOnDeath(this);
-  		if(!this.brain.dontDelete) {
-  			this.brain.kill();
-  		}else {
-  			this.brain.isDead=true;
-  		}
-  		cells[x][y].setLiveCell(null);
+	public synchronized void kill(boolean spreadOrganic) {
+		this.brain.isDead=true;
+		myPartsBuffer=new ArrayList<LiveCell>(myParts);
+		if(spreadOrganic) {
+			Cell.organicSpreadOnDeath(this);
+		}
 		
+		if(!this.brain.dontDelete) {
+			this.brain.kill();
+			this.brain=null;
+			//this.multiCellBrain.kill();
+			//this.multiCellBrain=null;
+		}
+		synchronized(cells) {
+			for(LiveCell curCell :myPartsBuffer) {
+				curCell.kill(spreadOrganic);//TODO stub
+			}
+			cells[x][y].setLiveCell(null);
+			normCells.remove(this);
+			if(normCells.contains(this)) {
+				while(normCells.contains(this)) {
+					normCells.remove(this);
+				}
+			}
+		}
 	}
 
 	@Override
@@ -456,12 +535,28 @@ public class NormCell implements  Serializable,LiveCell {
 
 	@Override
 	public NormCell getHead() {
-		return this;
+			return this;
 	}
 
 	@Override
 	public int getEnergyToMultiplyMe() {
 		return ENERGY_NEEDED_TO_MULTIPLY;
+	}
+
+	@Override
+	public void apoptosis() {
+		this.causeOfDeath="Killed by apoptosis";
+		this.kill(true);
+	}
+
+	@Override
+	public boolean getTested() {
+		return tested;
+	}
+
+	@Override
+	public void setTested(boolean value) {
+		tested=value;
 	}
 
 	

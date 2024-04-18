@@ -2,9 +2,12 @@ package MyVersion.Core;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import static MyVersion.Core.Core_Config.BIAS_VALUE;
-import static MyVersion.Core.Core_Config.func;
+import static MyVersion.Core.Core_Config.*;
 
 public class Dot implements Serializable {
 	private static final long serialVersionUID = 3L;
@@ -14,8 +17,8 @@ public class Dot implements Serializable {
     Dot_Type myType;
     ActivationFunctions myFunc;
     transient FunctionChooseInterface choose;
-    public ArrayList<Node> nodesFromMe=new ArrayList<>();
-    public ArrayList<Node> nodesToMe=new ArrayList<>();
+    public ArrayList<Node> nodesFromMe=new ArrayList<>(HIDDEN_DOTS_PER_ARRAY+BIAS+1);
+    public ArrayList<Node> nodesToMe=new ArrayList<>(HIDDEN_DOTS_PER_ARRAY+BIAS+1);
     
     public Dot(double weightsDelta,double error,double value,Dot_Type myType,ActivationFunctions myFunc,ArrayList<Node> nodesFromMe,ArrayList<Node> nodesToMe) {
     	this.weightsDelta=weightsDelta;
@@ -60,7 +63,7 @@ public class Dot implements Serializable {
 	private void evaluateNodesFromMe() {
 	    if (nodesFromMe.size() > 0) {
 	        for (Node node : nodesFromMe) {
-	            node.evalute();
+	        	node.evalute();
 	        }
 	    }
 	}
@@ -78,12 +81,11 @@ public class Dot implements Serializable {
     }
     
     public void addNode(Dot to){
-        if(to.myType==Dot_Type.BIAS_TYPE){
-
-        }else {
-        Node node=new Node(this,to);
-        nodesFromMe.add(node);
-        to.nodesToMe.add(node);}
+        if(!(to.myType==Dot_Type.BIAS_TYPE)){
+        	Node node=new Node(this,to);
+        	nodesFromMe.add(node);
+        	to.nodesToMe.add(node);
+        }
     }
     
     void addNodeClone(Dot to,Node nodeToClone){

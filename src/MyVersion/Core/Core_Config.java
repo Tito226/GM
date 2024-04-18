@@ -2,18 +2,21 @@ package MyVersion.Core;
 
 public class Core_Config {
     //Network
-	public static final ActivationFunctions func=ActivationFunctions.Tan;
+	public static final ActivationFunctions ACTIVATION_FUNCTION=ActivationFunctions.Tan;
     public static final int INPUTS =36;
-    public static final int HIDDEN_DOTS=150;//150 MUST DIVIDE ON HIDDEN_DOTS_PER_MASSIVE
+    public static final int HiDDEN_LAUERS=18;
+    public static final int HIDDEN_DOTS_PER_ARRAY =10;//25
+    public static final int HIDDEN_DOTS=HIDDEN_DOTS_PER_ARRAY*HiDDEN_LAUERS;//150 MUST DIVIDE ON HIDDEN_DOTS_PER_MASSIVE
     public static final int OUTPUTS=1;
     public static final int BIAS=1;//MUST BE 0 OR 1
+    
     public static final double BIAS_VALUE=-0.3d;//Value of bias dots//-7 -6 -0.62 0.2
     public static final double LEARNING_RATE =0.000701d;//0.0009  0.002001
-    public static final int HIDDEN_DOTS_PER_ARRAY =25;//25
+    
     public static final boolean USE_R_WHILE_LEARNING=false;
     
     public static final double FADING=5.7/Math.pow(10,20);//0.00000000000000000000000000000007d 6/Math.pow(10,22);
-    public static final int TEACH_ITERATIONS=800000;//800000
+    public static final int TEACH_ITERATIONS=700000;//800000
 
     //Realization parameters                                DON'T CHANGE IF YOU DON'T KNOW WHAT THEY DO
     public static final boolean BLOCK_USELESS_INPUTS=true;//TRUE
@@ -25,7 +28,7 @@ public class Core_Config {
     public static final boolean NODES_BECOMES_UNCHANGEBLE_IF_WEIGHT_BIGGER_THAN_THRESHOLD=false;
     public static final boolean FIRST_INPUT_MULTIPLIER=true;//true
     /*возможно нужно перенести в другой конфиг*/
-    public static final double MUTATION_MULTIPLIER=0.33D;/*регулирует максимальную "силу" мутации*///0.4 0.23
+    public static final double MUTATION_MULTIPLIER=1.0D;/*регулирует максимальную "силу" мутации*///0.4 0.23
     
 }
 

@@ -1,86 +1,54 @@
 package MyVersion.Cells;
 
-import static MyVersion.Frame.GM2_CONFIG.*;
 import static MyVersion.Frame.World.cells;
 import static MyVersion.Frame.World.height;
 import static MyVersion.Frame.World.sunny;
 import static MyVersion.Frame.World.width;
-import MyVersion.Frame.Action_Boundaries;
+import static MyVersion.Frame.GM2_CONFIG.*;
 import java.awt.Color;
 import java.util.Random;
 
 import MyVersion.Frame.Action_Boundaries;
-import MyVersion.Frame.World;
 
-///////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////
-public class Protoplast implements LiveCell{
+public class RootCell implements LiveCell {
 	Random r=new Random();
 	private NormCell normCell;
 	int x;
 	int y;
 	int lifeTime=0,multiplies=0;
+	static Color color=Color.PINK;
 	private boolean tested=false;
-	static Color color=Color.CYAN;
 	String myName;
-	//int energy =PROTOPLAST_START_ENERGY;
-
-	byte countb=0;
-
-
 	@Override
-	public void step() {
-		
-		double output =normCell.multiCellBrain.calculateOutput(getInputData(), false)[0];
-		preLastOutput=lastOutput;
-  		lastOutput=output;
-  		
-  		if(DataMethods.between(Action_Boundaries.eatOrganicBoundaries,output)) {
-  			eatSunE();
-  		}else if(DataMethods.between(Action_Boundaries.multiplyBoundaries,output)){
-			DataMethods.multiply(this);
-      	}else if(DataMethods.between(Action_Boundaries.multiplyProtoplastBoundaries,output)){
-      		new Protoplast(this, output);
-      	}else if(DataMethods.between(Action_Boundaries.apoptosisBoundaries,output)) {
-      		apoptosis();
-      	}
-		idleEnergyDecrese();
-		setLastThings();
-		lifeTime++;
+	public void idleEnergyDecrese() {
+		if(lifeTime%3==0) {
+			decreaseEnergy(1);
+		}
 	}
-	@Override
-	public void test() {
-		normCell=normCell.getHead();
-		if( getEnergy()<=0 || lifeTime>PROTOPLAST_MAX_LIFETIME){
-			kill(true);
-		}else if(cells[x][y].organic>CRITICAL_ORGANIC_VALUE) {//TODO toxic organic
-	       	this.kill(true);
-	    }
-	}
-
-	public Protoplast(LiveCell curCell, double nOutput){
+	
+	public RootCell(LiveCell curCell, double output) {
 		this.normCell = curCell.getHead();
 		int x=curCell.getX();
 		int y=curCell.getY();
-		if(nOutput>Action_Boundaries.multiplyProtoplastUpBoundaries[0] && nOutput<Action_Boundaries.multiplyProtoplastUpBoundaries[1]){
+		if(output>Action_Boundaries.multiplyRootUpBoundaries[0] && output<Action_Boundaries.multiplyRootUpBoundaries[1]){
 			if (y>0) {
 				spawn(cells[x][y-1]);
 			}
-		} else if(nOutput>Action_Boundaries.multiplyProtoplastDownBoundaries[0] && nOutput<Action_Boundaries.multiplyProtoplastDownBoundaries[1]){
+		} else if(output>Action_Boundaries.multiplyRootDownBoundaries[0] && output<Action_Boundaries.multiplyRootDownBoundaries[1]){
 			if (y<height-1) {
 				spawn(cells[x][y+1]);
 			}
-		} else if(nOutput>Action_Boundaries.multiplyProtoplastRightBoundaries[0] && nOutput<Action_Boundaries.multiplyProtoplastRightBoundaries[1]){
+		} else if(output>Action_Boundaries.multiplyRootRightBoundaries[0] && output<Action_Boundaries.multiplyRootRightBoundaries[1]){
 			if (x<width-1) {
 				spawn(cells[x+1][y]);
 			}
-		} else if(nOutput>Action_Boundaries.multiplyProtoplastLeftBoundaries[0] && nOutput<Action_Boundaries.multiplyProtoplastLeftBoundaries[1]){
+		} else if(output>Action_Boundaries.multiplyRootLeftBoundaries[0] && output<Action_Boundaries.multiplyRootLeftBoundaries[1]){
 			if (x>0) {
 				spawn(cells[x-1][y]);
 			}
 		}
 	}
-	
+
 	private void spawn(Cell nextCell) {
 		if ( nextCell.liveCell==null ) {
 			myName = this.normCell.partName + this.normCell.partNum;
@@ -89,21 +57,37 @@ public class Protoplast implements LiveCell{
 			this.x=nextCell.getX();
 			this.y=nextCell.getY();
 			this.normCell.myParts.add(this);
-			this.normCell.energy-=ENERGY_NEEDED_TO_MULTIPLY_PROTOPLAST;
+			this.normCell.energy-=ENERGY_NEEDED_TO_MULTIPLY_ROOT;
+		}
+	}
+	
+	@Override
+	public void step() {
+		double output =normCell.multiCellBrain.calculateOutput(getInputData(), false)[0];
+		preLastOutput=lastOutput;
+  		lastOutput=output;
+  		if(DataMethods.between(Action_Boundaries.multiplyBoundaries,output)){
+      		DataMethods.multiply(this);
+      	}else if(DataMethods.between(Action_Boundaries.multiplyProtoplastBoundaries,output)){
+      		new Protoplast(this, output);
+      	}if(DataMethods.between(Action_Boundaries.eatOrganicBoundaries,output)){
+  			DataMethods.eatOrganicByArea(this);
+  		}else if(DataMethods.between(Action_Boundaries.apoptosisBoundaries,output)) {
+      		apoptosis();
+      	}
+      	idleEnergyDecrese();
+		setLastThings();
+		lifeTime++;
+	}
+
+	@Override
+	public void test() {
+		normCell=normCell.getHead();
+		if( getEnergy()<=0 || lifeTime>ROOT_MAX_LIFETIME){
+			kill(true);
 		}
 	}
 
-	void eatSunE(){
-		increaseEnergy(World.sunny);
-	}
-
-
-	private void increaseEnergy(int incrValue) {
-		normCell.setEnergy(getEnergy()+incrValue);
-	}
-	private void decreaseEnergy(int incrValue) {
-		normCell.setEnergy(getEnergy()-incrValue);
-	}
 	@Override
 	public Color getColor() {
 		return color;
@@ -122,16 +106,10 @@ public class Protoplast implements LiveCell{
 	@Override
 	public void kill(boolean spreadOrganic) {
 		if(spreadOrganic) {
-			Cell.organicSpreadOnDeath(this,ENERGY_NEEDED_TO_MULTIPLY_PROTOPLAST);
+			Cell.organicSpreadOnDeath(this,ENERGY_NEEDED_TO_MULTIPLY_ROOT);
 		}
 		cells[x][y].liveCell=null;
 		normCell.myParts.remove(this);
-	}
-	
-
-	@Override
-	public Integer getGeneralEnergy() {
-		return normCell.getGeneralEnergy();
 	}
 
 	@Override
@@ -146,8 +124,19 @@ public class Protoplast implements LiveCell{
 
 	@Override
 	public NormCell getHead() {
-		
-		return normCell.getHead();
+		return normCell;
+	}
+
+	@Override
+	public int getEnergyToMultiplyMe() {
+		return ENERGY_NEEDED_TO_MULTIPLY_ROOT;
+	}
+	
+	private void increaseEnergy(int incrValue) {
+		normCell.setEnergy(getEnergy()+incrValue);
+	}
+	private void decreaseEnergy(int incrValue) {
+		normCell.setEnergy(getEnergy()-incrValue);
 	}
 	
 	int lastOrganic=0;
@@ -166,7 +155,8 @@ public class Protoplast implements LiveCell{
     double lastLeftCell=0d;
     double lastRightCell=0d;
     double lastOutput=0d,preLastOutput=0d;
-	@Override
+    
+    @Override
 	public Double[] getInputData() {
     	Double[] inputs = {DataMethods.isRaedyToMultiply(this) , (double) DataMethods.getEnergy(this), (double) cells[x][y].getOrganic()/DataMethods.organicDil, DataMethods.getUpCell(this), DataMethods.getDownCell(this), DataMethods.getLeftCell(this),
     			 
@@ -181,7 +171,6 @@ public class Protoplast implements LiveCell{
     			 (double) lastSize,lastRightDistance,lastLeftDistace,lastUpDistance,lastDownDistance};
     	 return inputs;
 	}
-	
 	
 	void setLastThings(){
         lastEnergy=getEnergy();
@@ -202,23 +191,11 @@ public class Protoplast implements LiveCell{
     }
 
 	@Override
-	public int getEnergyToMultiplyMe() {
-		return ENERGY_NEEDED_TO_MULTIPLY_PROTOPLAST;
-	}
-
-	@Override
-	public void idleEnergyDecrese() {
-		if(lifeTime%3==0) {
-			decreaseEnergy(1);
-		}
-		
-	}
-	@Override
 	public void apoptosis() {
 		getHead().energy+=ENERGY_NEEDED_TO_MULTIPLY_ROOT;
-		getHead().bited=true;
 		this.kill(false);
 	}
+
 	@Override
 	public boolean getTested() {
 		return tested;
@@ -228,6 +205,4 @@ public class Protoplast implements LiveCell{
 	public void setTested(boolean value) {
 		tested=value;
 	}
-
-	
 }

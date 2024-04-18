@@ -14,6 +14,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 
 import MyVersion.Cells.Cell;
+import MyVersion.Cells.NormCell;
 
 public class Painter implements ImageObserver {
 	World world;
@@ -26,16 +27,16 @@ public class Painter implements ImageObserver {
 	
 	public static void stringPaint(String[] strings) {}
 	
-	 public void ecoPaint(InfoPanel inf) {
+	 public void ecoPaint() {
 		try {
 			 Graphics g=world.getGraphics();
-			 inf.paint(inf.getGraphics());
+			 world.cell_inf.paint(world.cell_inf.getGraphics());
+			 world.inf.paint(world.inf.getGraphics());
 			 for (int i = 0; i < width; i++) {
 				 for (int j = 0; j < height; j++) {
 					 Cell curCell=cells[i][j];
 					 if (curCell != null && curCell.isChange()) { 
-						 g.setColor(curCell.getColor());
-						 g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+						 paint(g,i,j,curCell);
 						 curCell.setChange(false);
 					 }
 				 }
@@ -48,9 +49,10 @@ public class Painter implements ImageObserver {
  	}
 	 BufferedImage buffer;
 	 
-	 public void fullPaint( InfoPanel inf) {
+	 public void fullPaint() {
 		 Graphics g=world.getGraphics();
-		 inf.paint(inf.getGraphics());
+		 world.cell_inf.paint(world.cell_inf.getGraphics());
+		 world.inf.paint(world.inf.getGraphics());
 	        if (buffer == null || buffer.getWidth() != world.getWidth() || buffer.getHeight() != world.getHeight()) {
 	        	try {
 	        		// Пересоздайте буфер, если он не существует или его размер изменился
@@ -65,8 +67,7 @@ public class Painter implements ImageObserver {
 	        	for (int i = 0; i < width; i++) {
 	            	for (int j = 0; j < height; j++) {
 	                	if (cells[i][j] != null) {
-	                    	bufferGraphics.setColor(cells[i][j].getColor());
-	                    	bufferGraphics.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+	                		paint(bufferGraphics,i,j,cells[i][j]);
 	                	}
 	            	}
 	        	}
@@ -83,11 +84,29 @@ public class Painter implements ImageObserver {
 		return false;
 	}
 	
-	public void combinedPaint( InfoPanel inf) {
+	void paint(Graphics g,int i,int j,Cell curCell) {
+		 g.setColor(curCell.getColor());
+		 g.fillRect(i * cellSize, j * cellSize, cellSize, cellSize);
+		 if(cellSize>=3) {
+			 if(curCell.liveCell==null) {
+			 	g.setColor(Color.LIGHT_GRAY);
+			 	g.drawRect(i * cellSize, j * cellSize, cellSize, cellSize);
+			}else {
+			 	g.setColor(Color.black);
+			 	g.drawRect(i * cellSize, j * cellSize, cellSize, cellSize);
+		 	}
+			if(curCell.selected || (curCell.liveCell!=null && curCell.liveCell instanceof NormCell &&  ((NormCell)curCell.liveCell).selected) ) {
+				g.setColor(Color.red);
+			 	g.drawOval(i * cellSize, j * cellSize, cellSize, cellSize);
+			 	//g.drawOval(j, j, i, i);
+			}
+		 }
+	}
+	public void combinedPaint() {
 		if(paintCount%2==0) {
-			fullPaint(inf);
+			fullPaint();
 		}else {
-			ecoPaint(inf);
+			ecoPaint();
 		}
 		paintCount++;
 	}

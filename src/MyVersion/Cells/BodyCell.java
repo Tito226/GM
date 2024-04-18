@@ -1,4 +1,4 @@
-package MyVersion.Cells;
+ package MyVersion.Cells;
 
 import java.awt.Color;
 
@@ -42,7 +42,7 @@ public class BodyCell implements LiveCell{
 	}
 
 	@Override
-	public void kill() {
+	public void kill(boolean spreadOrganic) {
 		// TODO Автоматически созданная заглушка метода
 		
 	}
@@ -81,6 +81,30 @@ public class BodyCell implements LiveCell{
 	public int getEnergyToMultiplyMe() {
 		// TODO Автоматически созданная заглушка метода
 		return 0;
+	}
+
+	@Override
+	public void idleEnergyDecrese() {
+		// TODO Автоматически созданная заглушка метода
+		
+	}
+
+	@Override
+	public void apoptosis() {
+		// TODO Автоматически созданная заглушка метода
+		
+	}
+
+	@Override
+	public boolean getTested() {
+		// TODO Автоматически созданная заглушка метода
+		return false;
+	}
+
+	@Override
+	public void setTested(boolean value) {
+		// TODO Автоматически созданная заглушка метода
+		
 	}
 
 }

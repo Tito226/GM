@@ -27,7 +27,7 @@ public class InfoPanel extends JPanel {
 		g.drawString("Restarts: " + world.Restarts+" |", 7, 9);
 		g.drawString("Best Life Time: " + bestLifeTime+" |", 7, 19);
 		g.drawString("Step: " +world.stepsAtAll+" |" , 7, 29);
-		g.drawString("| sps: " +world.fps+" |", 7, 39);
+		g.drawString("| sps: " +world.sps+" |", 7, 39);
 		g.drawString("| Live Cells: " +world.liveCells+" |" , 65, 39);
 		g.drawString("| Uptime: " +mxBean.getUptime()/1000/60+":"+mxBean.getUptime()/1000%60+" |" , 107, 9);
 	}

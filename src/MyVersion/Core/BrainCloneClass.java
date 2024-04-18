@@ -8,11 +8,11 @@ import java.util.ArrayList;
 
 public class BrainCloneClass {
 	public static Network networkClone(Network brain) {//клонирует нейросеть
-		ArrayList<ArrayList<Dot>> dotsArrClone =new ArrayList<>();
+
 		Network net =new Network();
-		//brain.clon();
-		for(int i=0;i<brain.dotsArr1.length;i++) {
-			net.dotsArr1[i]=dotArrayClone(brain.dotsArr1[i]);
+		net.dotsArr=new Dot[brain.dotsArr.length][];
+		for(int i=0;i<brain.dotsArr.length;i++) {
+			net.dotsArr[i]=dotArrayClone(brain.dotsArr[i]);
 		}
 		allNodesClone(brain,net,true);
 		return net;
@@ -37,19 +37,19 @@ public class BrainCloneClass {
 	}
 	
 	private static void allNodesClone(Network brain,Network clone,boolean clonesToMeArr) {
-		for (int i = 0; i < brain.dotsArr1.length-1; i++) {/*копирование всех нод кроме тех что ведут к выходам*/
-            for (int j = 0; j < brain.dotsArr1[i].length; j++) {
-                for (int k = 0; k < brain.dotsArr1[i+1].length-BIAS; k++) {
-                    clone.dotsArr1[i][j].addNodeClone(clone.dotsArr1[i+1][k],brain.dotsArr1[i][j].nodesFromMe.get(k));
+		for (int i = 0; i < brain.dotsArr.length-1; i++) {/*копирование всех нод кроме тех что ведут к выходам*/
+            for (int j = 0; j < brain.dotsArr[i].length; j++) {
+                for (int k = 0; k < brain.dotsArr[i+1].length-BIAS; k++) {
+                    clone.dotsArr[i][j].addNodeClone(clone.dotsArr[i+1][k],brain.dotsArr[i][j].nodesFromMe.get(k));
                 }
             }
 
         }
 		
-		for(int i=0;i<brain.dotsArr1[brain.dotsArr1.length-2].length;i++) {//копирование нод которые ведут к выходам
-			for (int j= 0; j < brain.dotsArr1[brain.dotsArr1.length-1].length; j++) {
-				clone.dotsArr1[brain.dotsArr1.length-2][i].addNodeClone(clone.dotsArr1[brain.dotsArr1.length-1][j],
-						brain.dotsArr1[brain.dotsArr1.length-2][i]
+		for(int i=0;i<brain.dotsArr[brain.dotsArr.length-2].length;i++) {//копирование нод которые ведут к выходам
+			for (int j= 0; j < brain.dotsArr[brain.dotsArr.length-1].length; j++) {
+				clone.dotsArr[brain.dotsArr.length-2][i].addNodeClone(clone.dotsArr[brain.dotsArr.length-1][j],
+						brain.dotsArr[brain.dotsArr.length-2][i]
                 			.nodesFromMe.get(j));
             }
 		}
@@ -57,10 +57,10 @@ public class BrainCloneClass {
 	}
 	
 	public static boolean networkCompare(Network first,Network second) {
-		for(int i=0;i<first.dotsArr1.length;i++) {
-			for(int j=0;j<first.dotsArr1[i].length;j++) {
-				for(int y=0;y<first.dotsArr1[i][j].nodesFromMe.size();y++) {
-					if(!nodeCompare(first.dotsArr1[i][j].nodesFromMe.get(y),second.dotsArr1[i][j].nodesFromMe.get(y)))
+		for(int i=0;i<first.dotsArr.length;i++) {
+			for(int j=0;j<first.dotsArr[i].length;j++) {
+				for(int y=0;y<first.dotsArr[i][j].nodesFromMe.size();y++) {
+					if(!nodeCompare(first.dotsArr[i][j].nodesFromMe.get(y),second.dotsArr[i][j].nodesFromMe.get(y)))
 						return false;
 				}
 			}

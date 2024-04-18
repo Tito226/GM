@@ -22,14 +22,16 @@ public class NetworkWrapper extends Network {
 		
 	}
 	public NetworkWrapper(Network network) {
-		this.dotsArr1=network.dotsArr1;
+		this.dotsArr=network.dotsArr;
 		this.myFunc=network.myFunc;
 		blockedNodes=new ArrayList<Node>();
-		for(Dot[] curDots : network.dotsArr1) {
-			for (Dot curDot : curDots) {
-				for (Node curNode : curDot.nodesFromMe) {
-					if(!curNode.changeble) {
-						blockedNodes.add(curNode);
+		for(Dot[] curDots : network.dotsArr) {
+			if(curDots!=null) {
+				for (Dot curDot : curDots) {
+					for (Node curNode : curDot.nodesFromMe) {
+						if(!curNode.changeble) {
+							blockedNodes.add(curNode);
+						}
 					}
 				}
 			}
@@ -49,10 +51,10 @@ public class NetworkWrapper extends Network {
 	 }
 	 private void nodeDeacticate(Random r) {
 		 //выбрать случайный столбец dotsArr
-		 int rBuffer1=r.nextInt(dotsArr1.length-1);
+		 int rBuffer1=r.nextInt(dotsArr.length-1);
 		 //выбрать случайный елемент dotsArr[rBuffer1]
-		 int rBuffer2=r.nextInt( dotsArr1[rBuffer1].length);
-		 Dot buffDot=dotsArr1[rBuffer1][rBuffer2];
+		 int rBuffer2=r.nextInt( dotsArr[rBuffer1].length);
+		 Dot buffDot=dotsArr[rBuffer1][rBuffer2];
 		 Node buffNode= buffDot.nodesFromMe.get(r.nextInt(buffDot.nodesFromMe.size()));//выбор случайной ноды
 		 buffNode.setWeight(0);
 		 buffNode.changeble=false;
@@ -62,10 +64,10 @@ public class NetworkWrapper extends Network {
 	 
 	 private void nodeChange(Random r) {
 		//выбрать случайный столбец dotsArr
-		 int rBuffer1=r.nextInt(dotsArr1.length-1);
+		 int rBuffer1=r.nextInt(dotsArr.length-1);
 		 //выбрать случайный елемент dotsArr[rBuffer1]
-		 int rBuffer2=r.nextInt( dotsArr1[rBuffer1].length);
-		 Dot buffDot=dotsArr1[rBuffer1][rBuffer2];
+		 int rBuffer2=r.nextInt( dotsArr[rBuffer1].length);
+		 Dot buffDot=dotsArr[rBuffer1][rBuffer2];
 		 Node buffNode= buffDot.nodesFromMe.get(r.nextInt(buffDot.nodesFromMe.size()));//выбор случайной ноды
 		 //прибавить к весу случайной ноды случайное число (не больше MUTATION_MULTIPLIER и не меньше -MUTATION_MULTIPLIER)
 		 buffNode.setWeight(buffNode.getWeight()+rnd(-MUTATION_MULTIPLIER,MUTATION_MULTIPLIER));

@@ -9,6 +9,7 @@ public  class Cell {
     int[] color=new int[3];
     //Color myColor ;
     //int energy=1;
+    public boolean selected=false;
     public LiveCell liveCell;
     private int x;
     private int y;
@@ -21,7 +22,7 @@ public  class Cell {
         return y;
     }
 
-    public void setLiveCell(LiveCell liveCell) {
+    public synchronized void setLiveCell(LiveCell liveCell) {
         this.liveCell = liveCell;
         setChange(true);
     }
@@ -61,18 +62,25 @@ public  class Cell {
     public void testCell() {
         lastLCell = getLiveCell();
         lastOrganic = organic;
-        try {
-            if (organic < 255 && organic > 0) {
-                int colorValue = 255 - organic;
-                for (int i = 0; i < color.length; i++) {
-					color[i]=colorValue;
-				}
-            }
-        } catch (IllegalArgumentException e) {
-            System.err.println("Invalid color values");
+        if(organic<CRITICAL_ORGANIC_VALUE) {
+        	try {
+        		if (organic < 255 && organic > 0) {
+                	int colorValue = 255 - organic;
+                	for (int i = 0; i < color.length; i++) {
+						color[i]=colorValue;
+					}
+            	}
+        	} catch (IllegalArgumentException e) {
+        		System.err.println("Invalid color values");
+        	}
+        }else {
+        	color[0]=205;color[1]=0;color[2]=0;//RED
+        	
         }
         if (liveCell != null ) {
-           liveCell.test();
+        	liveCell.setX(x);
+        	liveCell.setY(y);
+        	liveCell.test();
         }
     }
     
@@ -90,6 +98,19 @@ public  class Cell {
 		}
     }
 
+    public static void organicSpreadOnDeath(LiveCell dyingCell,int energyNeededToBorn){
+    	int range=(ORGANIC_ON_DAETH_RANGE-1)/2;
+    	int x=dyingCell.getX();
+    	int y=dyingCell.getY();
+		for (int i = -range; i <=range ; i++) {
+  			for (int j = -range; j <= range; j++) {
+  				if(x+i<cells.length && x+i>0 && y+j>0 && y+j<cells[x+i].length) {
+  					cells[x+i][y+j].organic+=energyNeededToBorn;
+  					cells[x+i][y+j].setChange(true);
+  				}
+  			}
+		}
+    }
   	public Color getColor(){
   		if(liveCell==null) {
   			return new Color(color[0],color[1],color[2]);
