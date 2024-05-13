@@ -9,7 +9,7 @@ public class GM2_CONFIG {
 	public final static int WIDTH=1250;
     public final static int HEIGHT=700;
 	public static final boolean AUTO_SIZE=true;
-    public final static int CELL_SIZE=5;//2 
+    public final static int CELL_SIZE=15;//2 
     public final static int PAINT_MODE=4; //1-one Thread 2-two Threads 0-one tread for all 3-one thread fullPaint 4-one Thread combinedPaint
     public static final boolean DEBUG=false;//TODO DEBUG
     public final static int DEBUG_TIME_AFTER_STEP=500;

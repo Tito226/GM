@@ -130,7 +130,7 @@ public class Dot implements Serializable {
         return sigmoidActivaionFunction(x)*(1-sigmoidActivaionFunction(x));
      }
     
-     void chooseFunction(ActivationFunctions myFunc) {
+     static void chooseFunction(ActivationFunctions myFunc,FunctionChooseInterface choose) {
     	if(myFunc==ActivationFunctions.Tan){
     		choose=(double x)->{
     			return tanActivationFunction(x);

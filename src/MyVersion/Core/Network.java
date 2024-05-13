@@ -1,11 +1,5 @@
 package MyVersion.Core;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Random;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import static MyVersion.Core.Core_Config.*;
@@ -13,7 +7,7 @@ import static MyVersion.Core.Core_Config.*;
   если мало нейронов, то она не достаточно гибкая, не сможет ухватить закономерность
   Лучше мало нейронов но больше слоев чем больше нейронов но 1 слой*/
 
-public class Network implements Serializable {
+public class Network implements Serializable ,Network_Like {
 	public ActivationFunctions myFunc;
 	 double[] outputs;
 	private static final long serialVersionUID = 2L;
