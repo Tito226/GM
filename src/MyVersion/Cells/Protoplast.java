@@ -1,6 +1,6 @@
 package MyVersion.Cells;
 
-import static MyVersion.Frame.GM2_CONFIG.*;
+import static MyVersion.Frame.FRAME_CONFIG.*;
 import static MyVersion.Frame.World.cells;
 import static MyVersion.Frame.World.height;
 import static MyVersion.Frame.World.sunny;
@@ -124,6 +124,7 @@ public class Protoplast implements LiveCell{
 		if(spreadOrganic) {
 			Cell.organicSpreadOnDeath(this,ENERGY_NEEDED_TO_MULTIPLY_PROTOPLAST);
 		}
+		normCell.bited=true;
 		cells[x][y].liveCell=null;
 		normCell.myParts.remove(this);
 	}
@@ -168,7 +169,7 @@ public class Protoplast implements LiveCell{
     double lastOutput=0d,preLastOutput=0d;
 	@Override
 	public Double[] getInputData() {
-    	Double[] inputs = {DataMethods.isRaedyToMultiply(this) , (double) DataMethods.getEnergy(this), (double) cells[x][y].getOrganic()/DataMethods.organicDil, DataMethods.getUpCell(this), DataMethods.getDownCell(this), DataMethods.getLeftCell(this),
+    	Double[] inputs = {DataMethods.isRaedyToMultiply(this) , (double) DataMethods.getEnergy(this), (double) cells[x][y].getOrganic()/DataMethods.ORGANIC_DILL, DataMethods.getUpCell(this), DataMethods.getDownCell(this), DataMethods.getLeftCell(this),
     			 
     			 (double) DataMethods.getRightCell(this),DataMethods.getDeltaX(this),DataMethods.getDeltaY(this),lastOutput,preLastOutput,(double) DataMethods.getRightDownCell(this),DataMethods.getRightUpCell(this),DataMethods.getLeftUpCell(this)
     			 

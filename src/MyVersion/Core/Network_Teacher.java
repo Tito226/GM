@@ -25,7 +25,7 @@ import javax.swing.JPanel;
 
 import static MyVersion.Core.Core_Config.*;
 import static MyVersion.Core.Data_Set.rnd;
-import static MyVersion.Frame.GM2_CONFIG.ENERGY_NEEDED_TO_MULTIPLY;
+import static MyVersion.Frame.FRAME_CONFIG.ENERGY_NEEDED_TO_MULTIPLY;
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 /*TODO сделать библиотекой*/
 public class Network_Teacher extends JPanel {
@@ -98,13 +98,22 @@ public class Network_Teacher extends JPanel {
     	Network_Teacher nt=new Network_Teacher();
         Network student=new Network(ACTIVATION_FUNCTION);
         float[] errors= nt.fullTeach(student);
+        SimplifiedNetwork student2=new SimplifiedNetwork(student.myFunc);
+        student2.dotsArr=BrainCloneClass.convertFromBasicNetworkTo3DArray(student);
         suitabilityTest(student);
-        System.out.println("");
-        System.out.println("");
-        suitabilityTest(student);
-        System.out.println("");
-        System.out.println("");
-        suitabilityTest(student);
+        for(int i=0;i<1;i++) {
+        	 suitabilityTest(student2);
+        	 //student2.print();
+        	 System.out.println("");
+        	 System.out.println("");
+        }
+        /*student.calculateOutput(new Double[]{0d,0d,0d}, false);
+        student2.calculateOutput(new Double[]{0d,0d,0d}, false);
+        System.out.println("------------------------------------------");
+        student.printFull();
+        System.out.println("------------------------------------------");
+        student2.printFull();
+        System.out.println("------------------------------------------");*/
         Graphic_Builder.createGraphic(errors);
     }
     public  Network createAndTeachNetwork() throws IOException {/*create and tune network*/
@@ -114,13 +123,13 @@ public class Network_Teacher extends JPanel {
         Graphic_Builder.createGraphic(errors);
         return student;
     }
-    
+    /**Creates new network with random node values*/
     public Network createRandomNetwork() {
     	Network student=new Network(ACTIVATION_FUNCTION);
     	randomize(student);
     	return student;
     }
-    
+    /**Sets random weight for every node*/
     void randomize(Network student){
         Random r=new Random();
         for (Dot[] dotM:student.dotsArr) {
@@ -137,7 +146,7 @@ public class Network_Teacher extends JPanel {
         }
         
 
-        //всю ето парашуу еще и удалить нельзя ,выдает результат неверный
+        //удалить нельзя ,выдает результат неверный
         if(SET_FIRST_LAYER_NODES_NON_RANDOM_VALUE) {
 
             for (int i = student.dotsArr[0].length - 1 - BIAS; i > 0; i--) {
@@ -149,7 +158,7 @@ public class Network_Teacher extends JPanel {
             }
         }	  if(BLOCK_USELESS_INPUTS){
 
-                for (int i = student.dotsArr[0].length-BIAS-1; i >=HOW_MUCH_INPUTS_MUST_BE_USED; i--) {//Запрет на ввод данных из лишних точек
+                for (int i = student.dotsArr[0].length-BIAS-1; i >HOW_MUCH_INPUTS_MUST_BE_USED; i--) {//Запрет на ввод данных из лишних точек
                     for (int j = 0; j < student.dotsArr[1].length-BIAS; j++) {//"< student.dotsArr.get(1).size()-1" may be changed to "student.dotsArr.get(0).get(i).nodesFromMe.size()"
                         student.dotsArr[0][i].nodesFromMe.get(j).setWeight(0d);
                         student.dotsArr[0][i].nodesFromMe.get(j).changeble=false;
@@ -186,7 +195,7 @@ public class Network_Teacher extends JPanel {
                 	counter++;
                 }
                 // dot.error=dot.error/counter;
-                dot.weightsDelta= dot.error* Dot.activationFunctionDX(dot.value,dot.myFunc);
+                dot.weightsDelta= dot.error* ActivationFunctionUtils.activationFunctionDX(dot.value,dot.myFunc);
 
             }
           
@@ -233,7 +242,7 @@ public class Network_Teacher extends JPanel {
             /*down :for more than one output, dont delete*/
             dot.error=dot.value -expected.get(counter);/*ФУНКЦИЯ ПОТЕРЬ */
             errors[counter]=dot.error;
-            dot.weightsDelta=dot.error* Dot.activationFunctionDX(dot.value,dot.myFunc);
+            dot.weightsDelta=dot.error* ActivationFunctionUtils.activationFunctionDX(dot.value,dot.myFunc);
             counter++;
         }
         
@@ -248,8 +257,9 @@ public class Network_Teacher extends JPanel {
     double learningRateTimeFunction(int iteration,double prevRate) {
     	return prevRate/1+FADING*iteration;
     }
-    
-    public static void suitabilityTest(Network student) {
+    /**Test network ability to do main things*/
+    public static void suitabilityTest(Network_Like student) {
+    	System.out.println("-------------------------------------------------------");
         testAndPrint("Multiply__________________", Data_Set.getMultiplyTrainData()[0], Action_Boundaries.multiplyBoundaries, student);
         testAndPrint("Move up___________________", Data_Set.getMoveUpTrainData()[0], Action_Boundaries.moveUpBoundaries, student);
         testAndPrint("Eat organic0______________", Data_Set.getEatOrganicTrainData0()[0], Action_Boundaries.eatOrganicBoundaries, student);
@@ -264,9 +274,10 @@ public class Network_Teacher extends JPanel {
         testAndPrint("Move Up If food___________", Data_Set.getMoveUpIfFoodTrainData()[0], Action_Boundaries.moveUpBoundaries, student);
         testAndPrint("Move Down If food_________", Data_Set.getMoveDownIfFoodTrainData()[0], Action_Boundaries.moveDownBoundaries, student);
         testAndPrint("Move Up If food everywhere", Data_Set.getMoveUpIfFoodEverywhereTrainData()[0], Action_Boundaries.moveUpBoundaries, student);
+        System.out.println("-------------------------------------------------------");
     }
 
-    private static void testAndPrint(String action, Double[] data, double[] boundaries, Network student) {
+    private static void testAndPrint(String action, Double[] data, double[] boundaries, Network_Like student) {
         double weightBuffer = student.calculateOutput(data, false)[0];
         String result = (weightBuffer > boundaries[0] && weightBuffer < boundaries[1]) ? "passed" : "failed";
         String toPrint=String.format("%s : %s %.6f (%.6f - %.6f) %s",action,result,weightBuffer,boundaries[0],boundaries[1] ,Arrays.toString(data));

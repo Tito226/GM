@@ -4,7 +4,7 @@ import static MyVersion.Frame.World.cells;
 import static MyVersion.Frame.World.height;
 import static MyVersion.Frame.World.sunny;
 import static MyVersion.Frame.World.width;
-import static MyVersion.Frame.GM2_CONFIG.*;
+import static MyVersion.Frame.FRAME_CONFIG.*;
 import java.awt.Color;
 import java.util.Random;
 
@@ -108,6 +108,7 @@ public class RootCell implements LiveCell {
 		if(spreadOrganic) {
 			Cell.organicSpreadOnDeath(this,ENERGY_NEEDED_TO_MULTIPLY_ROOT);
 		}
+		normCell.bited=true;
 		cells[x][y].liveCell=null;
 		normCell.myParts.remove(this);
 	}
@@ -158,7 +159,7 @@ public class RootCell implements LiveCell {
     
     @Override
 	public Double[] getInputData() {
-    	Double[] inputs = {DataMethods.isRaedyToMultiply(this) , (double) DataMethods.getEnergy(this), (double) cells[x][y].getOrganic()/DataMethods.organicDil, DataMethods.getUpCell(this), DataMethods.getDownCell(this), DataMethods.getLeftCell(this),
+    	Double[] inputs = {DataMethods.isRaedyToMultiply(this) , (double) DataMethods.getEnergy(this), (double) cells[x][y].getOrganic()/DataMethods.ORGANIC_DILL, DataMethods.getUpCell(this), DataMethods.getDownCell(this), DataMethods.getLeftCell(this),
     			 
     			 (double) DataMethods.getRightCell(this),DataMethods.getDeltaX(this),DataMethods.getDeltaY(this),lastOutput,preLastOutput,(double) DataMethods.getRightDownCell(this),DataMethods.getRightUpCell(this),DataMethods.getLeftUpCell(this)
     			 

@@ -1,9 +1,9 @@
 package MyVersion.Cells;
 
-import static MyVersion.Frame.GM2_CONFIG.ENERGY_NEEDED_TO_MULTIPLY;
-import static MyVersion.Frame.GM2_CONFIG.HOW_MUCH_ORGANIC_EATS_PER_STEP;
-import static MyVersion.Frame.GM2_CONFIG.ORGANIC_PER_CELL_ON_NORMCELL_DEATH;
-import static MyVersion.Frame.GM2_CONFIG.*;
+import static MyVersion.Frame.FRAME_CONFIG.ENERGY_NEEDED_TO_MULTIPLY;
+import static MyVersion.Frame.FRAME_CONFIG.HOW_MUCH_ORGANIC_EATS_PER_STEP;
+import static MyVersion.Frame.FRAME_CONFIG.ORGANIC_PER_CELL_ON_NORMCELL_DEATH;
+import static MyVersion.Frame.FRAME_CONFIG.*;
 import static MyVersion.Frame.World.cells;
 import static MyVersion.Frame.World.height;
 import static MyVersion.Frame.World.sunny;
@@ -12,15 +12,16 @@ import static MyVersion.Frame.World.width;
 import java.util.Random;
 public class DataMethods{
 	static Random r=new Random();
-	static double distanceDill=1000d;//1000
-	static int maxDistance=50;
-	public static double organicDil=200d;
-	public static double organicCritMassValue=1.5;
+	static final double DISTANCE_DILL=1000d;//1000
+	static final int MAX_DISTANCE=50;
+	public final static double ORGANIC_DILL=200d;
+	public final static double ENERGY_DILL=200d;
+	public static final double ORGANIC_CRIT_MASS_VALUE=1.5;
 	//--------------------get...Cell()-----------------
-	public static double relativesValue=3.4d;//2.5
-	public static double normCellValue=2.0d;//2
-	public static double nextOrganicValue=0.25d;//0.5
-	public static double wallValue=1d;//1
+	public static final double RELATIVES_VALUE=3.4d;//2.5
+	public static final double NORMCELL_VALUE=2.0d;//2
+	public static final double NEXT_ORGANIC_VALUE=0.25d;//0.5
+	public static final double WALL_VALUE=1d;//1
 	//-------------------------------------------------
 	
 
@@ -44,43 +45,43 @@ public class DataMethods{
 
 	static double getDownDistance(LiveCell liveCell){
 		if(SIMPLE_DISTANCE) {
-			return Math.max(maxDistance,liveCell.getY())/distanceDill;
+			return Math.max(MAX_DISTANCE,liveCell.getY())/DISTANCE_DILL;
 	    }else {
 	    	for (int curY =liveCell.getY() ; curY > 0; curY--) {
 				Cell curCell=cells[liveCell.getX()][curY];
-				if(curCell.liveCell!=null || curY>maxDistance){
-					return curY/distanceDill;
+				if(curCell.liveCell!=null || curY>MAX_DISTANCE){
+					return curY/DISTANCE_DILL;
 				}
 			}
-	    	return Math.max(maxDistance, liveCell.getY())/distanceDill;
+	    	return Math.max(MAX_DISTANCE, liveCell.getY())/DISTANCE_DILL;
 	    }
 	}
 
 	static double getUpDistance(LiveCell liveCell){
 		if(SIMPLE_DISTANCE) {
-			return Math.max( maxDistance, cells[0].length-liveCell.getY())/distanceDill;
+			return Math.max( MAX_DISTANCE, cells[0].length-liveCell.getY())/DISTANCE_DILL;
 		}else {
 			for (int curY =liveCell.getY() ; curY < cells[0].length; curY++) {
 				Cell curCell=cells[liveCell.getX()][curY];
-				if(curCell.liveCell!=null || cells[0].length-curY>maxDistance){
-					return (cells[0].length-curY)/distanceDill;
+				if(curCell.liveCell!=null || cells[0].length-curY>MAX_DISTANCE){
+					return (cells[0].length-curY)/DISTANCE_DILL;
 				}
 			}
-			return Math.max( maxDistance, cells[0].length-liveCell.getY())/distanceDill;
+			return Math.max( MAX_DISTANCE, cells[0].length-liveCell.getY())/DISTANCE_DILL;
 	    }
 	}
 
 	static double getRightDistance(LiveCell liveCell){
 		if(SIMPLE_DISTANCE) {
-			return Math.max(maxDistance, cells.length-liveCell.getX())/distanceDill;
+			return Math.max(MAX_DISTANCE, cells.length-liveCell.getX())/DISTANCE_DILL;
 		}else {
 			for (int curX =liveCell.getX() ; curX < cells.length; curX++) {
 				Cell curCell=cells[curX][liveCell.getY()];
-				if(curCell.liveCell!=null || cells.length-curX>maxDistance){
-					return (cells.length-curX)/distanceDill;
+				if(curCell.liveCell!=null || cells.length-curX>MAX_DISTANCE){
+					return (cells.length-curX)/DISTANCE_DILL;
 				}
 			}
-	    	return Math.max(maxDistance, cells.length-liveCell.getX())/distanceDill;
+	    	return Math.max(MAX_DISTANCE, cells.length-liveCell.getX())/DISTANCE_DILL;
 	    }
 	}
 
@@ -122,15 +123,15 @@ public class DataMethods{
 	
 	static double getLeftDistance(LiveCell liveCell){
 		if(SIMPLE_DISTANCE) {
-			return Math.max(maxDistance, liveCell.getX())/distanceDill;
+			return Math.max(MAX_DISTANCE, liveCell.getX())/DISTANCE_DILL;
 		}else {
 			for (int curX =liveCell.getX() ; curX > 0; curX--) {
 				Cell curCell=cells[curX][liveCell.getY()];
-				if(curCell.liveCell!=null || curX>maxDistance){
-					return curX/distanceDill;
+				if(curCell.liveCell!=null || curX>MAX_DISTANCE){
+					return curX/DISTANCE_DILL;
 				}
 			}
-	    	return Math.max(maxDistance, cells.length-liveCell.getX())/distanceDill;
+	    	return Math.max(MAX_DISTANCE, cells.length-liveCell.getX())/DISTANCE_DILL;
 	    }
 	}
 
@@ -139,7 +140,7 @@ public class DataMethods{
 			Cell nextCell=cells[liveCell.getX()-1][liveCell.getY()+1];
 			return getNextCell(nextCell,liveCell);
 		}else {
-			return wallValue;
+			return WALL_VALUE;
 		}
 	}
 
@@ -148,7 +149,7 @@ public class DataMethods{
 			Cell nextCell=cells[liveCell.getX()-1][liveCell.getY()-1];
 			return getNextCell(nextCell,liveCell);
 		}else {
-			return wallValue;
+			return WALL_VALUE;
 		}
 	}
 
@@ -157,7 +158,7 @@ public class DataMethods{
 			Cell nextCell=cells[liveCell.getX()+1][liveCell.getY()-1];
 			return getNextCell(nextCell,liveCell);
 		}else {
-			return wallValue;
+			return WALL_VALUE;
 		}
 	}
 
@@ -166,7 +167,7 @@ public class DataMethods{
 			Cell nextCell=cells[liveCell.getX()+1][liveCell.getY()+1];
 			return getNextCell(nextCell,liveCell);
 		}else {
-			return wallValue;
+			return WALL_VALUE;
 		}
 	}
 	//
@@ -176,7 +177,7 @@ public class DataMethods{
 			Cell nextCell=cells[liveCell.getX()][liveCell.getY()+1];
 			return getNextCell(nextCell,liveCell);
 		}else {
-			return wallValue;
+			return WALL_VALUE;
 		}
 	}
 
@@ -185,7 +186,7 @@ public class DataMethods{
 			Cell nextCell=cells[liveCell.getX()][liveCell.getY()-1];
 			return getNextCell(nextCell,liveCell);
 		}else {
-			return wallValue;
+			return WALL_VALUE;
 		}
 	}
 
@@ -195,7 +196,7 @@ public class DataMethods{
 			Cell nextCell=cells[liveCell.getX()+1][liveCell.getY()];
 			return getNextCell(nextCell,liveCell);
 		}else {
-			return wallValue;
+			return WALL_VALUE;
 		}
 	}
 
@@ -205,7 +206,7 @@ public class DataMethods{
 			return getNextCell(nextCell,liveCell);
 		}
 		else {
-			return wallValue;
+			return WALL_VALUE;
 		}
 	}
 		
@@ -214,16 +215,16 @@ public class DataMethods{
 		if(nextLiveCell!=null){
 			boolean isRelative=nextLiveCell instanceof NormCell? isRelatives(liveCell.getHead(),(NormCell)nextLiveCell) : false;
           	if(isRelative || isMyPart(liveCell.getHead(), nextLiveCell) ){
-          		return relativesValue;
+          		return RELATIVES_VALUE;
           	}else {
-          		return normCellValue;
+          		return NORMCELL_VALUE;
           	}
 		} 
 		else{
     	   if(nextCell.organic>1) {
-				return Math.min(nextCell.organic/organicDil, nextOrganicValue);
+				return Math.min(nextCell.organic/ORGANIC_DILL, NEXT_ORGANIC_VALUE);
     	   }else if(nextCell.organic >= CRITICAL_ORGANIC_VALUE) {
-    		   return organicCritMassValue;
+    		   return ORGANIC_CRIT_MASS_VALUE;
     	   }
     	   return 0d;
        }

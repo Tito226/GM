@@ -1,19 +1,19 @@
 package MyVersion.Frame;
 
-public class GM2_CONFIG {
+public class FRAME_CONFIG {
 	//CELL SETTINGS
     public static final int CELL_START_ORGANIC=6;//6
-	public static final int CELLS_ON_START=900;//900
+	public static final int CELLS_ON_START=7000;//900
 	public static final int ORGANIC_ON_DAETH_RANGE=3;
     //GENERAL
 	public final static int WIDTH=1250;
     public final static int HEIGHT=700;
 	public static final boolean AUTO_SIZE=true;
-    public final static int CELL_SIZE=15;//2 
+    public final static int CELL_SIZE=6;//2 
     public final static int PAINT_MODE=4; //1-one Thread 2-two Threads 0-one tread for all 3-one thread fullPaint 4-one Thread combinedPaint
     public static final boolean DEBUG=false;//TODO DEBUG
     public final static int DEBUG_TIME_AFTER_STEP=500;
-    public static final boolean LOAD_SAVE=true;
+    public static final boolean LOAD_SAVE=false;
     public static final boolean CREATE_SAVES=false;
     public final static int CREATE_SAVE_ON_LIFETIME=4000;
     public final static int MIN_ARRAY_SIZE=1;
@@ -33,11 +33,13 @@ public class GM2_CONFIG {
     //CELL SETTINGS
     public static final int ORGANIC_PER_CELL_ON_NORMCELL_DEATH=ENERGY_NEEDED_TO_MULTIPLY/9;
     //Mutations 
-    public static final int NUMBER_OF_MUTATIONS=20;/*Сколько нод мутируют при делении клетки(в конструкторе)*///5
-    public static final int MUTATION_CHANCE=5;//rand.nextInt(MUTATION_CHANCE)==0 10
+    public static final int NUMBER_OF_MUTATIONS=1;/*Сколько нод мутируют при делении клетки(в конструкторе)*///5
+    public static final int CHANCE_OF_NODE_DEACTIVATE=3;
+    public static final int CHANCE_OF_NODE_ACTIVATE=3;
+    public static final int MUTATION_CHANCE=4;//rand.nextInt(MUTATION_CHANCE)==0 10
     
     //Cell life time
     public static final int NORMCELL_MAX_LIFETIME=10000;
-    public static final int PROTOPLAST_MAX_LIFETIME=1000;
-    public static final int ROOT_MAX_LIFETIME=1000;
+	public static final int PROTOPLAST_MAX_LIFETIME=1000;
+	public static final int ROOT_MAX_LIFETIME=1000;
 }

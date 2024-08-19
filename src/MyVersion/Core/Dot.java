@@ -44,9 +44,10 @@ public class Dot implements Serializable {
 	
 	public void clear(){//clears teach values
         if(myType!=Dot_Type.BIAS_TYPE){
-         value=0;}
-         error=0f;
-         weightsDelta=0f;
+        	value=0;
+        }
+        error=0f;
+        weightsDelta=0f;
     }
     
 	public void evalute() {
@@ -99,53 +100,38 @@ public class Dot implements Serializable {
         node.setWeight(nodeToClone.getWeight());
         }
     }
-
-    static double sigmoidActivaionFunction(double x){
-        return (1/(1+ Math.pow(Math.E,-x)));
-    }
     
-    static double tanActivationFunction(double x) {
-    	return Math.tanh(x);
-    }
-    
-    static double leackyReluActivaionFunction(double x){
-        return Math.max(0.1*x, x);
-    }
-    
-    static double activationFunctionDX(double x,ActivationFunctions myFunc){
-    	if(myFunc==ActivationFunctions.Tan) {
-    		return tanActivationFunctionDX(x);
-    	}else if(myFunc==ActivationFunctions.Sigmoid) {
-    		return sigmoidActivationFunctionDX(x);
-    	}else {
-    		return (Double) null;
-    	}
-    }
-    
-    static double tanActivationFunctionDX(double x) {
-    	return 1/(Math.pow(Math.cosh(x),2));
-    }
-    
-    static double sigmoidActivationFunctionDX(double x){
-        return sigmoidActivaionFunction(x)*(1-sigmoidActivaionFunction(x));
-     }
-    
-     static void chooseFunction(ActivationFunctions myFunc,FunctionChooseInterface choose) {
+     static FunctionChooseInterface chooseFunctionStatic(ActivationFunctions myFunc) {
     	if(myFunc==ActivationFunctions.Tan){
-    		choose=(double x)->{
-    			return tanActivationFunction(x);
+    		return (double x)->{
+    			return ActivationFunctionUtils.tanActivationFunction(x);
     		};
     	}else if(myFunc==ActivationFunctions.Sigmoid) {
-    		choose=(double x)->{
-    			return sigmoidActivaionFunction(x);
+    		return (double x)->{
+    			return ActivationFunctionUtils.sigmoidActivaionFunction(x);
     		};
     	}else if(myFunc==ActivationFunctions.LeackyRelu) {
-    		choose=(double x)->{
-    			return leackyReluActivaionFunction(x);
+    		return (double x)->{
+    			return ActivationFunctionUtils.leackyReluActivaionFunction(x);
     		};
     	}
+    	return null;
     }
-    
+     void chooseFunction(ActivationFunctions myFunc) {
+      	if(myFunc==ActivationFunctions.Tan){
+      		choose=(double x)->{
+      			return ActivationFunctionUtils.tanActivationFunction(x);
+      		};
+      	}else if(myFunc==ActivationFunctions.Sigmoid) {
+      		choose=(double x)->{
+      			return ActivationFunctionUtils.sigmoidActivaionFunction(x);
+      		};
+      	}else if(myFunc==ActivationFunctions.LeackyRelu) {
+      		choose=(double x)->{
+      			return ActivationFunctionUtils.leackyReluActivaionFunction(x);
+      		};
+      	}
+      }
     public void kill() {
     	for(Node node: nodesToMe) {
     		node.kill();
@@ -153,6 +139,8 @@ public class Dot implements Serializable {
     	nodesFromMe=null;
     	nodesToMe=null;
     }
-   
+    public FunctionChooseInterface getChoose() {
+    	return choose;
+    }
     
 }

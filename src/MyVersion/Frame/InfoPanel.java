@@ -10,7 +10,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 
 import javax.swing.JPanel;
-
+/**Paints panel with information about selected cell*/
 public class InfoPanel extends JPanel {
 	World world;
 	RuntimeMXBean mxBean = ManagementFactory.getRuntimeMXBean();

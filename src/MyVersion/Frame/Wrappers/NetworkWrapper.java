@@ -1,4 +1,4 @@
-package MyVersion.Frame;
+package MyVersion.Frame.Wrappers;
 
 import static MyVersion.Core.Core_Config.BIAS;
 import static MyVersion.Core.Core_Config.HOW_MUCH_INPUTS_MUST_BE_USED;
@@ -7,11 +7,14 @@ import static MyVersion.Core.Core_Config.MUTATION_MULTIPLIER;
 import java.util.ArrayList;
 import java.util.Random;
 
+import MyVersion.Core.ActivationFunctions;
+import MyVersion.Core.BrainCloneClass;
 import MyVersion.Core.Dot;
+import MyVersion.Core.FunctionChooseInterface;
 import MyVersion.Core.Network;
 import MyVersion.Core.Node;
 
-public class NetworkWrapper extends Network {
+public class NetworkWrapper extends Network implements NetworkWrapperLike {
 
 	private static final long serialVersionUID = -9082519085580679388l;
 	ArrayList<Node> blockedNodes;
@@ -22,10 +25,11 @@ public class NetworkWrapper extends Network {
 		
 	}
 	public NetworkWrapper(Network network) {
-		this.dotsArr=network.dotsArr;
-		this.myFunc=network.myFunc;
+		Network newNet=BrainCloneClass.networkClone(network);
+		this.dotsArr=newNet.dotsArr;
+		this.myFunc=newNet.myFunc;
 		blockedNodes=new ArrayList<Node>();
-		for(Dot[] curDots : network.dotsArr) {
+		for(Dot[] curDots : newNet.dotsArr) {
 			if(curDots!=null) {
 				for (Dot curDot : curDots) {
 					for (Node curNode : curDot.nodesFromMe) {
@@ -44,9 +48,9 @@ public class NetworkWrapper extends Network {
 			 nodeChange(r);
 		 }
 		 if(r.nextInt(2)==0) {
-			 nodeUnlock(r);
+			 //nodeUnlock(r);
 		 }else if(r.nextInt(2)==0) {
-			 nodeDeacticate(r);
+			 //nodeDeacticate(r);
 		 }
 	 }
 	 private void nodeDeacticate(Random r) {
@@ -93,5 +97,21 @@ public class NetworkWrapper extends Network {
 			max -= min;
 			return (Math.random() * ++max) + min;
 	 }
+	 	@Override
+		public boolean getDontDelete() {
+			return dontDelete;
+		}
+		@Override
+		public void setDontDelete(boolean dontDelete) {
+			this.dontDelete=dontDelete;
+		}
+		@Override
+		public boolean getIsDead() {
+			return isDead;
+		}
+		@Override
+		public void setIsDead(boolean isDead) {
+			this.isDead=isDead;
+		}
 	 
 }
