@@ -49,7 +49,7 @@ public class World implements Runnable {
 	ArrayList<NormCell> buffer;
 	Thread wor;
 
-	public World(int width, int height,int realWidth,int realHeight) throws IOException {
+	public World(int width, int height, int realWidth, int realHeight) throws IOException {
 		Network_Teacher network_teacher=new Network_Teacher();
 		if (!LOAD_SAVE) {
 			Network buff=network_teacher.createAndTeachNetwork();
@@ -76,7 +76,7 @@ public class World implements Runnable {
 		this.realHeight=realHeight;
 		this.realWidth=realWidth;
 		cells=new Cell[width][height];
-		
+
 		WorldFrame.createWorldFrame(this);
 	}
 
@@ -93,7 +93,6 @@ public class World implements Runnable {
 	}
 
 	/** Creates JFrame with all buttons,scrollers and ect. */
-	
 
 	public static void main(String[] args) throws IOException {
 		int width=1250;
@@ -147,7 +146,7 @@ public class World implements Runnable {
 		bestBrainsArrs.add(thisBiggestSizeBrains);
 	}
 
-	//Graphics worldGraphics=worldFrame.getGraphics();
+	// Graphics worldGraphics=worldFrame.getGraphics();
 	boolean tested=false;
 
 	long startTime=System.currentTimeMillis();
@@ -222,19 +221,19 @@ public class World implements Runnable {
 		ArrayList<Double[]> inputData=new ArrayList<Double[]>();
 		worldInitial();
 		long timeBuff=System.currentTimeMillis();
-		/* the main cycle*/
+		/* the main cycle */
 		while (true) {
 			fpsMeter1=System.currentTimeMillis();
 			boolean isStep=false;
 
 			if (!getPause()) {
-				
+
 				if (System.currentTimeMillis()-timeBuff>=300) {
 					timeBuff=System.currentTimeMillis();
 					sps=(int) (stepsAtAll-stepsBuff);
 					stepsBuff=stepsAtAll;
 				}
-				
+
 				Graphics worldGraphics=worldFrame.getGraphics();
 				stepsAtAll++;
 
@@ -271,24 +270,20 @@ public class World implements Runnable {
 
 				testNormCellsArray();
 				Collections.shuffle(normCells);
-				
+
 				if (!(Restarts<4 && DEBUG)) {
 					inputData=null;
 				}
 				/*
-				if (!isStep) {
-					System.out.println("shit");
-				}
-				*/
+				 * if (!isStep) { System.out.println("shit"); }
+				 */
 				liveCells=normCells.size();
 				/* reset field organic */
 				if (normCells.size()==0) {/* on restart */
 					/*
-					if (lastBestLifeTime==thisBestLifeTime && thisBestLifeTime!=0 && !tested) {
-						cellDiagnostic(new NormCell(relative),inputData);
-						tested=true;
-					}
-					*/
+					 * if (lastBestLifeTime==thisBestLifeTime && thisBestLifeTime!=0 && !tested) {
+					 * cellDiagnostic(new NormCell(relative),inputData); tested=true; }
+					 */
 					onRestart();
 				}
 
@@ -326,35 +321,19 @@ public class World implements Runnable {
 	}
 
 	private void onRestart() {
-		Graphics worldGraphics=worldFrame.getGraphics();
-		Random r=new Random();
 		// установка начального состояния органики,если все умерли
-		for (int i=0; i<height; i++) {
-			for (int j=0; j<width; j++) {
-				cells[j][i].organic=CELL_START_ORGANIC;
-			}
-		}
+		resetOrganic();
 		saveBestBrain();
-		//ArrayList<Network> checkGroup=new ArrayList<>();
-		
+
+		ArrayList<Network> checkGroup=new ArrayList<>();
+
 		// Summon cells
-		for (int i=0; i<FRAME_CONFIG.CELLS_ON_START; i++) {
-			NormCell nBuf=null;
-			int buff=r.nextInt(bestBrainsArrs.size());
-			LimitedArrayList<Network_Like[]> bestBrainsArr=bestBrainsArrs.get(buff);
-			if (bestBrainsArr.size()>0) {
-				Network_Like[] curBrain=bestBrainsArr.get(r.nextInt(bestBrainsArr.size()));
-				nBuf=new NormCell(curBrain[0],curBrain[1]);
-				cells[r.nextInt(width)][r.nextInt(height)].setLiveCell(nBuf);
-			} else {
-				i--;
-			}
-		}
-		Restarts++;
-		// +++++++++++++++++++
+		summonCells(FRAME_CONFIG.CELLS_ON_START);
+		
 		worldFrame.painter.fullPaint();
 		
 		checkGroup=null;
+		Restarts++;
 		lastRestarts++;
 		System.out.println("Restarted");
 		System.err.println("Steps :"+stepsAtAll);
@@ -364,19 +343,6 @@ public class World implements Runnable {
 		lastBestLifeTime=bestLifeTime;
 		thisBestLifeTime=0;
 		stepsAtAll=0;
-	}
-
-	void startGC() {
-		System.out.println("Garbage collector started");
-		System.gc();
-		startTime=System.currentTimeMillis();
-	}
-
-	void saveBestBrain() {
-		Random r=new Random();
-		if (thisBestLifeTime>CREATE_SAVE_ON_LIFETIME /* && thisBestLifeTime>lastBestLifeTime */ && CREATE_SAVES) {// TODO
-			BrainSaver.saveBestBrain(thisBiggestSizeBrains.get(0),thisBestLifeTime);// STUB
-		}
 	}
 
 	void testNormCellsArray() {
@@ -404,9 +370,10 @@ public class World implements Runnable {
 	}
 
 	void testCell(Cell curCell) {
-		/*if (curCell.liveCell!=null && curCell.liveCell instanceof NormCell) {
-			NormCell curNormCell=(NormCell) curCell.liveCell;
-		}*/ /* TODO реализовать механизм восстановления органики */
+		/*
+		 * if (curCell.liveCell!=null && curCell.liveCell instanceof NormCell) {
+		 * NormCell curNormCell=(NormCell) curCell.liveCell; }
+		 */ /* TODO реализовать механизм восстановления органики */
 		curCell.testCell();// проверяет на ошибки, убивает клетку ,если кончилась енергия, назначает цвет
 	}
 
@@ -469,7 +436,41 @@ public class World implements Runnable {
 		}
 	}
 
-	
+	public void summonCells(int cellsNum) {
+		Random r=new Random();
+		for (int i=0; i<cellsNum; i++) {
+			NormCell nBuf=null;
+			int buff=r.nextInt(bestBrainsArrs.size());
+			LimitedArrayList<Network_Like[]> bestBrainsArr=bestBrainsArrs.get(buff);
+			if (bestBrainsArr.size()>0) {
+				Network_Like[] curBrain=bestBrainsArr.get(r.nextInt(bestBrainsArr.size()));
+				nBuf=new NormCell(curBrain[0],curBrain[1]);
+				cells[r.nextInt(width)][r.nextInt(height)].setLiveCell(nBuf);
+			} else {
+				i--;
+			}
+		}
+	}
 
+	public void resetOrganic() {
+		for (int i=0; i<height; i++) {
+			for (int j=0; j<width; j++) {
+				cells[j][i].organic=CELL_START_ORGANIC;
+			}
+		}
+	}
+
+	void startGC() {
+		System.out.println("Garbage collector started");
+		System.gc();
+		startTime=System.currentTimeMillis();
+	}
+
+	void saveBestBrain() {
+		Random r=new Random();
+		if (thisBestLifeTime>CREATE_SAVE_ON_LIFETIME /* && thisBestLifeTime>lastBestLifeTime */ && CREATE_SAVES) {// TODO
+			BrainSaver.saveBestBrain(thisBiggestSizeBrains.get(0),thisBestLifeTime);// STUB
+		}
+	}
 
 }

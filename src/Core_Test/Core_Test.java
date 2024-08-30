@@ -1,36 +1,64 @@
 package Core_Test;
 
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.Phaser;
 
 // Simple JscrollPane 
-import javax.swing.*; 
-import java.awt.*; 
 
 // Driver Class 
-public class Core_Test { 
-	// main function 
-	public static void main(String[] args) { 
+public class Core_Test {
+	static Random r=new Random();
+	static int a=100, b=50;
+	static ExecutorService pool=Executors.newFixedThreadPool(3);
+	static Phaser phaser=new Phaser(1);
+	static Runnable task=() -> {
+			someJob();
+			phaser.arriveAndDeregister();
+	};
+	
+	// main function
+	public static void main(String[] args) {
 		
-		JFrame frame = new JFrame("Simple JScrollPane Example"); 
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
-		frame.setSize(300, 200); 
+		long t1=System.currentTimeMillis();
+		singleThreadJob();
+		long t2=System.currentTimeMillis();
+		System.out.println("single thread: "+(t2-t1));
+		ArrayList<Future> fList=new ArrayList();
+
+		long t3=System.currentTimeMillis();
+		multiThreadJob();
+		long t4=System.currentTimeMillis();
+		System.out.println("multi thread: "+(t4-t3));
 		
-		// Create a JPanel to hold a list of labels. 
-		JPanel panel = new JPanel(); 
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS)); 
-		
-		// Add a large number of labels to the panel. 
-		for (int i = 1; i <= 90; i++) { 
-			
-			JLabel label = new JLabel("Label " + i); 
-			panel.add(label); 
-			
-		} 
-		
-		// Create a JScrollPane and set the panel as its viewport. 
-		JScrollPane scrollPane = new JScrollPane(panel); 
-		
-		// Add the JScrollPane to the frame. 
-		frame.add(scrollPane); 
-		frame.setVisible(true); 
-	} 
-} 
+		pool.shutdown();
+	}
+
+	static void singleThreadJob() {
+		for (int i=0; i<a; i++) {
+			for (int j=0; j<b; j++) {
+				someJob();
+			}
+		}
+	}
+	
+	static void multiThreadJob() {
+		for (int i=0; i<a; i++) {
+			phaser.bulkRegister(b);
+			for (int j=0; j<b; j++) {
+				pool.submit(task);
+			}
+		}
+	}
+	
+	static void someJob() {
+		for (int j=0; j<1000; j++) {
+			//System.out.println((r.nextInt()+41223)*3/2);
+			int b=(r.nextInt()+41223)*3/2;
+		}
+	}
+}
