@@ -41,7 +41,7 @@ public class SimplifiedNetwork implements Network_Like {
 		return dotsArr;
 	}
 
-	public double[] calculateOutput(Double[] inputs, boolean forTeaching) {/* TODO неправильно считает */
+	public double[] calculateOutput(Double[] inputs, boolean forTeaching) {
 
 		// Dots value , error and weightsDelta clears in next method call
 		if (!forTeaching) {
@@ -80,17 +80,10 @@ public class SimplifiedNetwork implements Network_Like {
 			int g=dotsArr[x][y].length-1;
 			outputs[y]=dotsArr[x][y][g];
 		}
-		/*
-		 * for(int x=0;x<dotsArr.length;x++) { for(int y=0;y<dotsArr[x].length;y++) {
-		 * System.err.print("x: "+x+" y: "+y+"; "); for(int
-		 * g=0;g<dotsArr[x][y].length;g++) { System.out.print(String.format("%.2f",
-		 * dotsArr[x][y][g])+" "); } System.out.println(" "); System.out.println(" "); }
-		 * }
-		 */
 		return outputs;
 	}
 
-	void calculateDotOutput(int x, int y) {/* TODO неправильно считает */
+	void calculateDotOutput(int x, int y) {
 		if (usingBiasDots==0) {
 			dotsArr[x][y][dotsArr[x][y].length-1]=choose.activationFunction(dotsArr[x][y][dotsArr[x][y].length-1]);
 		} else if (y<dotsArr[x].length-1||x==dotsArr.length-1) {
@@ -98,17 +91,9 @@ public class SimplifiedNetwork implements Network_Like {
 		}
 		double curDotWeight=dotsArr[x][y][dotsArr[x][y].length-1];
 		for (int i=0; i<dotsArr[x][y].length-1; i++) {// обойти все связи,не доходя до веса нейрона(Dot)
-			if (x==dotsArr.length-2) {
-				int sdfg=0;
-				sdfg++;
-			}
 			int nextDotWeightIndex=dotsArr[x+1][i].length-1;
 			double nodeWeight=dotsArr[x][y][i];
 			dotsArr[x+1][i][nextDotWeightIndex]+=curDotWeight*nodeWeight;
-			if (x==dotsArr.length-2) {
-				int sdfg2=0;
-				sdfg2++;
-			}
 		}
 	}
 

@@ -21,6 +21,7 @@ import MyVersion.Cells.NormCell;
 public class Painter implements ImageObserver {
 	WorldFrame worldFrame;
 	World world;
+	volatile boolean stopPainting=false;
 	byte paintCount=0;
 	public Painter(WorldFrame worldFrame) {
 		this.worldFrame=worldFrame;
@@ -36,7 +37,7 @@ public class Painter implements ImageObserver {
 				Graphics worldGraphics=worldFrame.getGraphics();
 				while (true) {
 					while (!worldFrame.isWindowClosed()) {
-						if (!world.getPause()) {
+						if (!world.getPause() && !stopPainting) {
 							if (PAINT_MODE==1) {
 								this.fastPaint();
 							} else if (PAINT_MODE==3) {
@@ -66,7 +67,7 @@ public class Painter implements ImageObserver {
 					}
 				}
 			};
-			new Thread(task).start();
+			new Thread(task,"Painter").start();
 		}
 	}
 	

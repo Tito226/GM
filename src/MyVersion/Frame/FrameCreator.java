@@ -61,16 +61,14 @@ public class FrameCreator {
 		upMenu.add(minusButton);
 
 		saveButton.addActionListener((java.awt.event.ActionEvent e) -> {
-			World.setPause(true);
-		});
-		
-		/*pauseButton.addActionListener((java.awt.event.ActionEvent e) -> {
-			World.setPause(true);
-		});*/
-		
-		saveButton.addActionListener((java.awt.event.ActionEvent e) -> {
 			BrainSaver.saveSelectedBrain(world);
 		});
+		
+		pauseButton.addActionListener((java.awt.event.ActionEvent e) -> {
+			World.setPause(true);
+		});
+		
+		
 		
 		countinueButton.addActionListener((java.awt.event.ActionEvent e) -> {
 			World.setPause(false);

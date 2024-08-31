@@ -10,6 +10,8 @@ import MyVersion.Core.Data_Set;
 import MyVersion.Core.Network;
 import MyVersion.Core.Network_Like;
 import MyVersion.Core.Network_Teacher;
+import MyVersion.NEAT.Pool;
+
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -25,6 +27,9 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Phaser;
 import java.util.concurrent.Semaphore;
 import static MyVersion.Frame.FRAME_CONFIG.CELL_SIZE;
 import static MyVersion.Frame.FRAME_CONFIG.*;
@@ -43,9 +48,10 @@ public class World implements Runnable {
 	public static int height;
 	public static int sunny=1;
 	public static Cell[][] cells;
-	private static boolean pause=false;
+	private static volatile boolean pause=false;
 	public static ArrayList<NormCell> normCells=new ArrayList<>();// TODO fix bugs(contains dead cells,contains cell
-																	// which is not exist in cells)
+	ExecutorService pool=Executors.newFixedThreadPool(1); // which is not exist in cells)
+	Phaser phaser=new Phaser(1);
 	ArrayList<NormCell> buffer;
 	Thread wor;
 
@@ -106,7 +112,7 @@ public class World implements Runnable {
 		System.out.println(width);
 		System.out.println(world.width);
 
-		world.wor=new Thread(world);
+		world.wor=new Thread(world,"World");
 		world.wor.start();
 
 	}
@@ -172,7 +178,6 @@ public class World implements Runnable {
 			return curTopBrain;
 		}
 	}
-	// ExecutorService executor = Executors.newFixedThreadPool(2);
 
 	synchronized void findGoodCell(NormCell curNormCell) {
 		if (curNormCell.getLifeTime()>bestLifeTime) {
@@ -213,7 +218,7 @@ public class World implements Runnable {
 	}
 
 	int maxThreads=1;
-	Semaphore sem=new Semaphore(maxThreads);
+	// Semaphore sem=new Semaphore(maxThreads);
 
 	@Override
 	public void run() {
@@ -233,28 +238,30 @@ public class World implements Runnable {
 					sps=(int) (stepsAtAll-stepsBuff);
 					stepsBuff=stepsAtAll;
 				}
-
-				Graphics worldGraphics=worldFrame.getGraphics();
 				stepsAtAll++;
 
 				testAllCells();
 
+				// pool.execute();
 				buffer=new ArrayList<NormCell>(normCells);// to avoid concurrent modification exception
-				buffer.parallelStream().forEach(curNormCell -> {
-					try {
-						sem.acquire();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					if (normCells.contains(curNormCell) && curNormCell!=null) {
-						curNormCell.step();// TODO понять почему в масиве не удаляются мертвые
-						if (Restarts<4 && DEBUG) {
-							inputData.add(curNormCell.getInputData());
-						}
+				phaser.bulkRegister(buffer.size());// TODO OPTIMIZE PHISER
+				for (NormCell curNormCell : buffer) {
+					long t1=System.currentTimeMillis();
+					Runnable task=() -> {
+						if (normCells.contains(curNormCell) && curNormCell!=null) {
+							curNormCell.step();// TODO понять почему в масиве не удаляются мертвые
+							if (Restarts<4 && DEBUG) {
+								inputData.add(curNormCell.getInputData());
+							}
 
-					}
-					sem.release();
-				});
+						}
+						phaser.arriveAndDeregister();
+						long t2=System.currentTimeMillis();
+						//System.out.println(t2-t1);
+					};
+					pool.execute(task);
+				}
+				phaser.arriveAndAwaitAdvance();
 
 				for (NormCell curCell : normCells) {
 					if (curCell!=null) {
@@ -274,11 +281,8 @@ public class World implements Runnable {
 				if (!(Restarts<4 && DEBUG)) {
 					inputData=null;
 				}
-				/*
-				 * if (!isStep) { System.out.println("shit"); }
-				 */
+
 				liveCells=normCells.size();
-				/* reset field organic */
 				if (normCells.size()==0) {/* on restart */
 					/*
 					 * if (lastBestLifeTime==thisBestLifeTime && thisBestLifeTime!=0 && !tested) {
@@ -297,11 +301,7 @@ public class World implements Runnable {
 					worldFrame.painter.fullPaint();
 				}
 				if (slowdown>0) {
-					try {
-						Thread.sleep(slowdown);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+					sleep(slowdown);
 				}
 				/**********************************************/
 			} else {
@@ -309,42 +309,48 @@ public class World implements Runnable {
 				if (PAINT_MODE==0) {
 					worldFrame.painter.fullPaint();
 				}
-				try {
-					Thread.sleep(400);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				sleep(400);
 			}
 
 		}
 
 	}
 
+
+
 	private void onRestart() {
+		worldFrame.painter.fullPaint();
+		
+		worldFrame.painter.stopPainting=true;
+
 		// установка начального состояния органики,если все умерли
 		resetOrganic();
 		saveBestBrain();
 
-		ArrayList<Network> checkGroup=new ArrayList<>();
-
 		// Summon cells
 		summonCells(FRAME_CONFIG.CELLS_ON_START);
-		
-		worldFrame.painter.fullPaint();
-		
-		checkGroup=null;
+
 		Restarts++;
 		lastRestarts++;
-		System.out.println("Restarted");
-		System.err.println("Steps :"+stepsAtAll);
-		System.out.println("best life time: "+bestLifeTime);
-		System.out.println("this Best Life Time: "+thisBestLifeTime);
+		printRestartInfo();
 		lastLastBestLifeTime=lastBestLifeTime;
 		lastBestLifeTime=bestLifeTime;
 		thisBestLifeTime=0;
 		stepsAtAll=0;
+
+		worldFrame.painter.stopPainting=false;
+
+		sleep(RESTART_DELAY);
 	}
 
+	void printRestartInfo() {
+		System.out.println("Restarted");
+		System.err.println("Steps :"+stepsAtAll);
+		System.out.println("best life time: "+bestLifeTime);
+		System.out.println("this Best Life Time: "+thisBestLifeTime);
+	}
+	
+	/**calls "normCells.clear()" if in normCells left only null values*/
 	void testNormCellsArray() {
 		boolean toClear=true;
 		ArrayList<NormCell> buffer=new ArrayList<>(normCells);
@@ -367,14 +373,6 @@ public class World implements Runnable {
 				curCell.testCell();
 			}
 		}
-	}
-
-	void testCell(Cell curCell) {
-		/*
-		 * if (curCell.liveCell!=null && curCell.liveCell instanceof NormCell) {
-		 * NormCell curNormCell=(NormCell) curCell.liveCell; }
-		 */ /* TODO реализовать механизм восстановления органики */
-		curCell.testCell();// проверяет на ошибки, убивает клетку ,если кончилась енергия, назначает цвет
 	}
 
 	void setCoordinates(NormCell curNormCell, int x, int y) {
@@ -473,4 +471,11 @@ public class World implements Runnable {
 		}
 	}
 
+	void sleep(int miilis) {
+		try {
+			Thread.sleep(miilis);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 }

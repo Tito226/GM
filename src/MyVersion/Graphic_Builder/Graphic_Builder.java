@@ -92,7 +92,7 @@ public class Graphic_Builder {
                     }
                 }
             }
-        });
+        },"Graphic Builder");
         thread.start();
         }
 
