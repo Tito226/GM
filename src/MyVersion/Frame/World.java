@@ -50,7 +50,7 @@ public class World implements Runnable {
 	public static Cell[][] cells;
 	private static volatile boolean pause=false;
 	public static ArrayList<NormCell> normCells=new ArrayList<>();// TODO fix bugs(contains dead cells,contains cell
-	ExecutorService pool=Executors.newFixedThreadPool(1); // which is not exist in cells)
+	ExecutorService pool=Executors.newFixedThreadPool(2); // which is not exist in cells)
 	Phaser phaser=new Phaser(1);
 	ArrayList<NormCell> buffer;
 	Thread wor;
@@ -242,11 +242,10 @@ public class World implements Runnable {
 
 				testAllCells();
 
-				// pool.execute();
 				buffer=new ArrayList<NormCell>(normCells);// to avoid concurrent modification exception
 				phaser.bulkRegister(buffer.size());// TODO OPTIMIZE PHISER
 				for (NormCell curNormCell : buffer) {
-					long t1=System.currentTimeMillis();
+
 					Runnable task=() -> {
 						if (normCells.contains(curNormCell) && curNormCell!=null) {
 							curNormCell.step();// TODO понять почему в масиве не удаляются мертвые
@@ -256,8 +255,7 @@ public class World implements Runnable {
 
 						}
 						phaser.arriveAndDeregister();
-						long t2=System.currentTimeMillis();
-						//System.out.println(t2-t1);
+
 					};
 					pool.execute(task);
 				}
