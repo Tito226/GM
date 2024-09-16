@@ -37,7 +37,7 @@ public class Cell_InfoPanel extends JPanel {
 			g.drawString("Selected: " + selectedNormCell+" |", xGap+3, yGap+10);
 			g.drawString("energy: " + selectedNormCell.getEnergy()+" |", xGap+3, yGap+20);
 			g.drawString("lifeTime: " + selectedNormCell.lifeTime+" |", xGap+3, yGap+30);
-			g.drawString("cause of death: " + selectedNormCell.causeOfDeath+" |", xGap+3, yGap+40);
+			g.drawString("cause of death: " + selectedNormCell.getCauseOfDeath()+" |", xGap+3, yGap+40);
 			g.drawString("brain: " + selectedNormCell.brain+" |", xGap+3, yGap+50);
 			g.drawString("containst(this): " + world.normCells.contains(selectedNormCell) +" |", xGap+3, yGap+60);
 			g.drawString("in cells: " +(curLiveCellInCells!=null ? curLiveCellInCells.equals(selectedNormCell) : false )+" |", xGap+3, yGap+70);

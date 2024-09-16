@@ -3,7 +3,7 @@ package MyVersion.Frame;
 public class FRAME_CONFIG {
 	//CELL SETTINGS
     public static final int CELL_START_ORGANIC=6;//6
-	public static final int CELLS_ON_START=7000;//900
+	public static final int CELLS_ON_START=700;//900
 	public static final int ORGANIC_ON_DAETH_RANGE=3;
     //GENERAL
 	public final static int WIDTH=1250;

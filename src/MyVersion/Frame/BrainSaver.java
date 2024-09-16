@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Random;
 import java.util.Scanner;
+
 import MyVersion.Cells.NormCell;
 import MyVersion.Core.Network_Like;
 import MyVersion.Frame.Wrappers.NetworkWrapperLike;

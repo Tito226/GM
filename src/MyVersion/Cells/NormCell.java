@@ -1,41 +1,42 @@
 package MyVersion.Cells;
 
-import MyVersion.Core.BrainCloneClass;
-import MyVersion.Core.Network;
 import MyVersion.Core.Network_Like;
-
 import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Random;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-
 import MyVersion.Frame.Action_Boundaries;
-import MyVersion.Frame.Wrappers.NetworkWrapper;
 import MyVersion.Frame.Wrappers.NetworkWrapperLike;
 import MyVersion.Frame.Wrappers.WrapperChooser;
-
 import static MyVersion.Core.Core_Config.*;
 import static MyVersion.Frame.FRAME_CONFIG.*;
 import static MyVersion.Frame.World.*;
-
+/*TODO клетки в многоклеточном режиме телепортируются */
 public class NormCell implements Serializable, LiveCell {
 	// *****************************************
 	public NetworkWrapperLike brain;// Use while myParts.size()==0
 	public NetworkWrapperLike multiCellBrain;// Use while myParts.size()>0
-	public String causeOfDeath;
+	
+	Genome genome;
+	byte myChromosomeNum=0;
+	LiveCellType myCellType=LiveCellType.NormCell;
+	
+	NormCellInfo myInfo=new NormCellInfo();
+	private String causeOfDeath;
 	Random r=new Random();
 	public boolean selected=false;
 	// *****************************************
+	
 	public int multiplies=0;
 	int energy;
 	public int lifeTime=0;
 	int partNum=0;
 	private int x, y;
 	byte counter=0;
+	
 	float readyToMultiply=0.0f;
 	float[] outputs;
 	long myParentNum, myChildNum=r.nextLong();
@@ -43,19 +44,20 @@ public class NormCell implements Serializable, LiveCell {
 	private final long myNum;
 	private boolean tested=false;
 	public boolean bited=false;
-	private double lastOutput=0d;
-	double preLastOutput=0d;
-	public String partName="part";
+	private double lastOutput=0d,preLastOutput=0d;
+	public String partName="NormCell";
 	// *****************************************
 	public ArrayList<LiveCell> myParts=new ArrayList<>();
-	ArrayList<LiveCell> myPartsBuffer;
+	private ArrayList<LiveCell> myPartsBuffer;
+	
 	public static DataMethods myMethods=new DataMethods();
 	NormCellType normCellType=NormCellType.MOVABLE;
 	public Semaphore sem=new Semaphore(1);
 	Color myColor=Color.green;
-
-	public NormCell(Network_Like brain, Network_Like multiCellBrain) {
+	/**copys genome, you can put link to genome in cunstructor*/
+	public NormCell(Network_Like brain, Network_Like multiCellBrain,Genome genome) {
 		Random r=new Random();
+		this.genome=new Genome(genome);
 		this.brain=WrapperChooser.getRightWrapper(brain);
 		this.multiCellBrain=WrapperChooser.getRightWrapper(multiCellBrain);
 		myNum=num;
@@ -73,7 +75,7 @@ public class NormCell implements Serializable, LiveCell {
 			normCells.add(getHead());
 		}
 	}
-
+	
 	public long getMyNum() {
 		return myNum;
 	}
@@ -145,7 +147,7 @@ public class NormCell implements Serializable, LiveCell {
 	}
 	/**Do all things,that must be done in the end of step() (set all last variables,idle energy decrese,increse life time,call test() method)*/
 	void doEndThings() {
-		setLastThings();
+		myInfo.setLastThings();
 		idleEnergyDecrese();
 		lifeTime++;
 		test();// TODO выяснить причину проблемы которую рещает етот костыль(метод test()
@@ -158,9 +160,9 @@ public class NormCell implements Serializable, LiveCell {
 		preLastOutput=getLastOutput();
 		lastOutput=output;
 		if (output>Action_Boundaries.multiplyBoundaries[0]&&output<Action_Boundaries.multiplyBoundaries[1]) {
-			myMethods.multiply(this);
+			myMethods.multiply(this,genome.getChromosome(myChromosomeNum));//TODO СДЕЛАТЬ ТАК, ЧТОБЫ МОЖНО ВЫБИРАТЬ НАПРАВЛЕНИЕ ДЕЛЕНИЯ(ПО ГЕНОМУ)
 		} else if (output>0.64&&output<0.68) {
-			new Protoplast(this,output);
+			//new Protoplast(this,output);
 		}
 		for (LiveCell curCell : myPartsBuffer) {
 			curCell.step();
@@ -247,11 +249,12 @@ public class NormCell implements Serializable, LiveCell {
 					energy--;
 				}
 			} else if (DataMethods.between(Action_Boundaries.multiplyProtoplastBoundaries,output)) {
-				new Protoplast(this,output);
+				//new Protoplast(this,output);
 			} else if (DataMethods.between(Action_Boundaries.multiplyRootBoundaries,output)) {
-				new RootCell(this,output);
+				//new RootCell(this,output);
 			} else if (DataMethods.between(Action_Boundaries.multiplyBoundaries,output)) {
-				myMethods.multiply(this);
+				myMethods.multiply(this,
+						genome.getChromosome(myChromosomeNum));
 			}
 			doEndThings();
 		} else {
@@ -377,39 +380,7 @@ public class NormCell implements Serializable, LiveCell {
 			return 0f;
 	}
 
-	int lastOrganic=0;
-	int lastSize=0;
-	int lastEnergy=0;
-	double lastRightDistance=0d;
-	double lastLeftDistace=0d;
-	double lastUpDistance=0d;
-	double lastDownDistance=0d;
-	double lastRightUpCell=0d;
-	double lastRightDownCell=0d;
-	double lastLeftUpCell=0d;
-	double lastLeftDownCell=0d;
-	double lastUpCell=0d;
-	double lastDownCell=0d;
-	double lastLeftCell=0d;
-	double lastRightCell=0d;
-	/**Sets all last... variables (last...=this...)*/
-	void setLastThings() {
-		lastEnergy=energy;
-		lastUpCell=myMethods.getUpCell(this);
-		lastDownCell=myMethods.getDownCell(this);
-		lastLeftCell=myMethods.getLeftCell(this);
-		lastRightCell=myMethods.getRightCell(this);
-		lastOrganic=cells[x][y].organic;
-		lastSize=myParts.size();
-		lastRightDistance=myMethods.getRightDistance(this);
-		lastLeftDistace=myMethods.getLeftDistance(this);
-		lastUpDistance=myMethods.getUpDistance(this);
-		lastDownDistance=myMethods.getDownDistance(this);
-		lastRightUpCell=myMethods.getRightUpCell(this);
-		lastRightDownCell=myMethods.getRightDownCell(this);
-		lastLeftUpCell=myMethods.getLeftUpCell(this);
-		lastLeftDownCell=myMethods.getLeftDownCell(this);
-	}
+	
 	/**calls brain.calculateOutput() method*/
 	public double calculateOutput() {// TODO СДЕЛАТЬ ДЕЛЕНИЕ НА КОНСТАНТУ
 		return brain.calculateOutput(getInputData(),false)[0];
@@ -446,22 +417,25 @@ public class NormCell implements Serializable, LiveCell {
 	}
 
 	public Double[] getInputData() {
-		Double[] inputs= { myMethods.isRaedyToMultiply(this), getEnergyInput(),
-				(double) cells[x][y].getOrganic()/myMethods.ORGANIC_DILL, myMethods.getUpCell(this),
-				myMethods.getDownCell(this), myMethods.getLeftCell(this),
+		Double[] inputs= { 
+				myMethods.isRaedyToMultiply(this), getEnergyInput(),
+				(double) cells[x][y].getOrganic()/myMethods.ORGANIC_DILL,myMethods.getNeighbourCellValue(this,Directions.UP),
+				myMethods.getNeighbourCellValue(this,Directions.DOWN), myMethods.getNeighbourCellValue(this,Directions.LEFT),
 
-				(double) myMethods.getRightCell(this), getLastOutput(), preLastOutput,
-				(double) myMethods.getRightDownCell(this), myMethods.getRightUpCell(this),
-				myMethods.getLeftUpCell(this), myMethods.getLeftDownCell(this), myMethods.isSpaceAvailable(this),
+				myMethods.getNeighbourCellValue(this,Directions.RIGHT), getLastOutput(), preLastOutput,
+				(double) myMethods.getNeighbourCellValue(this,Directions.DOWN_RIGHT),
+				myMethods.getNeighbourCellValue(this,Directions.UP_RIGHT),
+				myMethods.getNeighbourCellValue(this,Directions.UP_LEFT), myMethods.getNeighbourCellValue(this,
+						Directions.DOWN_LEFT), myMethods.isSpaceAvailable(this),
 				isController(),
 
 				myMethods.getRightDistance(this), myMethods.getLeftDistance(this), myMethods.getUpDistance(this),
-				myMethods.getDownDistance(this), (double) lastEnergy, lastUpCell, lastDownCell, lastLeftCell,
+				myMethods.getDownDistance(this), (double) myInfo.lastEnergy, myInfo.lastUpCell, myInfo.lastDownCell, myInfo.lastLeftCell,
 
-				lastRightCell, lastRightDownCell, lastRightUpCell, lastLeftDownCell, lastLeftUpCell,
-				(double) lastOrganic, (double) sunny, (double) myParts.size(),
+				myInfo.lastRightCell, myInfo.lastRightDownCell, myInfo.lastRightUpCell, myInfo.lastLeftDownCell, myInfo.lastLeftUpCell,
+				(double) myInfo.lastOrganic, (double) sunny, (double) myParts.size(),
 
-				(double) lastSize, lastRightDistance, lastLeftDistace, lastUpDistance, lastDownDistance };
+				(double) myInfo.lastSize, myInfo.lastRightDistance, myInfo.lastLeftDistace, myInfo.lastUpDistance, myInfo.lastDownDistance };
 		// System.out.println(Arrays.toString(inputs));
 		return inputs;
 	}
@@ -473,11 +447,10 @@ public class NormCell implements Serializable, LiveCell {
 		if (energy<=0||energy>=maxEnergy||lifeTime>NORMCELL_MAX_LIFETIME||myParts.size()>32
 				||cells[x][y].organic>CRITICAL_ORGANIC_VALUE) {
 			if (brain!=null) {
-				this.kill(true);
+				this.kill(true,"Killed by test");
 			} else {
 				System.out.println("brain is already null");
 			}
-			this.causeOfDeath="Killed by test";
 		}
 		if (bited) {
 			testMyСontinuity();
@@ -549,6 +522,11 @@ public class NormCell implements Serializable, LiveCell {
 		}
 	}
 
+	public synchronized void kill(boolean spreadOrganic,String causeOfDeath) {
+		this.causeOfDeath=causeOfDeath;
+		kill(spreadOrganic);
+	}
+	
 	@Override
 	public Integer getGeneralEnergy() {
 		int generalEnergy=energy;
@@ -570,8 +548,7 @@ public class NormCell implements Serializable, LiveCell {
 	/**Calls this.kill() method */
 	@Override
 	public void apoptosis() {
-		this.causeOfDeath="Killed by apoptosis";
-		this.kill(true);
+		this.kill(true,"Killed by apoptosis");
 	}
 
 	@Override
@@ -588,4 +565,51 @@ public class NormCell implements Serializable, LiveCell {
 		return lastOutput;
 	}
 
+	public String getCauseOfDeath() {
+		return causeOfDeath;
+	}
+
+	@Override
+	public LiveCellType getLiveCellType() {
+		return myCellType;
+	}
+	
+	class NormCellInfo{
+		int lastOrganic=0;
+		int lastSize=0;
+		int lastEnergy=0;
+		double lastRightDistance=0d;
+		double lastLeftDistace=0d;
+		double lastUpDistance=0d;
+		double lastDownDistance=0d;
+		double lastRightUpCell=0d;
+		double lastRightDownCell=0d;
+		double lastLeftUpCell=0d;
+		double lastLeftDownCell=0d;
+		double lastUpCell=0d;
+		double lastDownCell=0d;
+		double lastLeftCell=0d;
+		double lastRightCell=0d;
+		/**Sets all last... variables (last...=this...)*/
+		void setLastThings() {
+			lastEnergy=energy;
+			lastUpCell=myMethods.getNeighbourCellValue(NormCell.this,Directions.UP);
+			lastDownCell=myMethods.getNeighbourCellValue(NormCell.this,Directions.DOWN);
+			lastLeftCell=myMethods.getNeighbourCellValue(NormCell.this,Directions.LEFT);
+			lastRightCell=myMethods.getNeighbourCellValue(NormCell.this,Directions.RIGHT);
+			lastOrganic=cells[x][y].organic;
+			lastSize=myParts.size();
+			lastRightDistance=myMethods.getRightDistance(NormCell.this);
+			lastLeftDistace=myMethods.getLeftDistance(NormCell.this);
+			lastUpDistance=myMethods.getUpDistance(NormCell.this);
+			lastDownDistance=myMethods.getDownDistance(NormCell.this);
+			lastRightUpCell=myMethods.getNeighbourCellValue(NormCell.this,Directions.UP_RIGHT);
+			lastRightDownCell=myMethods.getNeighbourCellValue(NormCell.this,Directions.DOWN_RIGHT);
+			lastLeftUpCell=myMethods.getNeighbourCellValue(NormCell.this,Directions.UP_LEFT);
+			lastLeftDownCell=myMethods.getNeighbourCellValue(NormCell.this,Directions.DOWN_LEFT);
+		}
+	}
+	
 }
+
+

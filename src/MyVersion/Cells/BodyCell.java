@@ -107,4 +107,10 @@ public class BodyCell implements LiveCell{
 		
 	}
 
+	@Override
+	public LiveCellType getLiveCellType() {
+		// TODO Автоматически созданная заглушка метода
+		return null;
+	}
+
 }

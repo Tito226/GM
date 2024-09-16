@@ -6,7 +6,15 @@ public class ActivationFunctionUtils {
     }
     
     static double tanActivationFunction(double x) {
-    	return Math.tanh(x);
+    	//return Math.tanh(x);
+    	return fastTanh(x);
+    }
+    
+    public static double fastTanh(double x) {
+        // Линейная аппроксимация с добавлением гиперболического ограничения
+        if (x < -3.0) return -1.0;
+        if (x > 3.0) return 1.0;
+        return x * (27 + x * x) / (27 + 9 * x * x);
     }
     
     static double leackyReluActivaionFunction(double x){

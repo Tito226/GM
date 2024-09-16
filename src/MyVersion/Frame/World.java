@@ -3,38 +3,26 @@ package MyVersion.Frame;
 import static MyVersion.Frame.FRAME_CONFIG.CELL_START_ORGANIC;
 
 import MyVersion.Cells.Cell;
-import MyVersion.Cells.LiveCell;
+import MyVersion.Cells.Genome;
 import MyVersion.Cells.NormCell;
 import MyVersion.Core.BrainCloneClass;
 import MyVersion.Core.Data_Set;
 import MyVersion.Core.Network;
 import MyVersion.Core.Network_Like;
 import MyVersion.Core.Network_Teacher;
-import MyVersion.NEAT.Pool;
-
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Phaser;
-import java.util.concurrent.Semaphore;
 import static MyVersion.Frame.FRAME_CONFIG.CELL_SIZE;
 import static MyVersion.Frame.FRAME_CONFIG.*;
 import static MyVersion.Frame.FRAME_CONFIG.PAINT_MODE;
-import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 public class World implements Runnable {
 	WorldFrame worldFrame;
@@ -50,7 +38,7 @@ public class World implements Runnable {
 	public static Cell[][] cells;
 	private static volatile boolean pause=false;
 	public static ArrayList<NormCell> normCells=new ArrayList<>();// TODO fix bugs(contains dead cells,contains cell
-	ExecutorService pool=Executors.newFixedThreadPool(2); // which is not exist in cells)
+	ExecutorService pool=Executors.newFixedThreadPool(3); // which is not exist in cells)
 	Phaser phaser=new Phaser(1);
 	ArrayList<NormCell> buffer;
 	Thread wor;
@@ -128,7 +116,7 @@ public class World implements Runnable {
 	public static int lastLastBestLifeTime=0;
 	public static int lastRestarts=0;
 	public static int thisBestSize=0;
-	public long fpsMeter1=0;
+	//public long fpsMeter1=0;
 
 	public static Network_Like[] thisTopLifeTimeBrain=new Network_Like[2];
 	public static Network_Like[] topLifeTimeBrain=new Network_Like[2];
@@ -140,8 +128,7 @@ public class World implements Runnable {
 	LimitedArrayList<Network_Like[]> bestThisLifeTimeBrains=new LimitedArrayList<>(LIMITED_ARRAY_SIZE);
 	LimitedArrayList<Network_Like[]> bestMultipliesBrains=new LimitedArrayList<>(LIMITED_ARRAY_SIZE);
 	LimitedArrayList<Network_Like[]> thisBiggestSizeBrains=new LimitedArrayList<>(LIMITED_ARRAY_SIZE);
-
-	// ExecutorService pool=Executors.newFixedThreadPool(1);
+	ConcurrentHashMap<Network_Like[],Genome> lastBrain=new ConcurrentHashMap<Network_Like[], Genome>();//TODO убрать остальные массивы ,созранять только последние n клеток
 	static FileOutputStream fileOutputStream;
 	static ObjectOutputStream objectOutputStream;
 
@@ -212,69 +199,37 @@ public class World implements Runnable {
 		}
 		for (int i=0; i<CELLS_ON_START; i++) {
 			Random r=new Random();
-			cells[r.nextInt(width)][r.nextInt(height)].setLiveCell(new NormCell(relative[0],relative[1]));
+			cells[r.nextInt(width)][r.nextInt(height)].setLiveCell(new NormCell(relative[0],relative[1],new Genome()));
 		}
 		worldFrame.painter.painterInitial();
 	}
 
 	int maxThreads=1;
 	// Semaphore sem=new Semaphore(maxThreads);
-
+	long timeBuff;
+	long stepsBuff;
 	@Override
 	public void run() {
-		long stepsBuff=0;
+		stepsBuff=0;
 		ArrayList<Double[]> inputData=new ArrayList<Double[]>();
 		worldInitial();
-		long timeBuff=System.currentTimeMillis();
+		timeBuff=System.currentTimeMillis();
 		/* the main cycle */
 		while (true) {
-			fpsMeter1=System.currentTimeMillis();
-			boolean isStep=false;
 
 			if (!getPause()) {
 
-				if (System.currentTimeMillis()-timeBuff>=300) {
-					timeBuff=System.currentTimeMillis();
-					sps=(int) (stepsAtAll-stepsBuff);
-					stepsBuff=stepsAtAll;
-				}
+				calculateSPS();
+				
 				stepsAtAll++;
 
 				testAllCells();
 
-				buffer=new ArrayList<NormCell>(normCells);// to avoid concurrent modification exception
-				phaser.bulkRegister(buffer.size());// TODO OPTIMIZE PHISER
-				for (NormCell curNormCell : buffer) {
+				stepsCycle();
 
-					Runnable task=() -> {
-						if (normCells.contains(curNormCell) && curNormCell!=null) {
-							curNormCell.step();// TODO понять почему в масиве не удаляются мертвые
-							if (Restarts<4 && DEBUG) {
-								inputData.add(curNormCell.getInputData());
-							}
-
-						}
-						phaser.arriveAndDeregister();
-
-					};
-					pool.execute(task);
-				}
-				phaser.arriveAndAwaitAdvance();
-
-				for (NormCell curCell : normCells) {
-					if (curCell!=null) {
-						if (curCell.brain==null) {
-							curCell.selected=true;
-							worldFrame.cell_inf.selectedLiveCell=curCell;
-							System.err.println("shet!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-							Thread.currentThread().stop();
-						}
-						findGoodCell(curCell);
-					}
-				}
+				findArrayProblemsAndGoodCells();
 
 				testNormCellsArray();
-				Collections.shuffle(normCells);
 
 				if (!(Restarts<4 && DEBUG)) {
 					inputData=null;
@@ -282,10 +237,6 @@ public class World implements Runnable {
 
 				liveCells=normCells.size();
 				if (normCells.size()==0) {/* on restart */
-					/*
-					 * if (lastBestLifeTime==thisBestLifeTime && thisBestLifeTime!=0 && !tested) {
-					 * cellDiagnostic(new NormCell(relative),inputData); tested=true; }
-					 */
 					onRestart();
 				}
 
@@ -314,7 +265,13 @@ public class World implements Runnable {
 
 	}
 
-
+	public void calculateSPS() {
+		if (System.currentTimeMillis()-timeBuff>=300) {
+			timeBuff=System.currentTimeMillis();
+			sps=(int) (stepsAtAll-stepsBuff);
+			stepsBuff=stepsAtAll;
+		}
+	}
 
 	private void onRestart() {
 		worldFrame.painter.fullPaint();
@@ -338,7 +295,7 @@ public class World implements Runnable {
 
 		worldFrame.painter.stopPainting=false;
 
-		sleep(RESTART_DELAY);
+		//sleep(RESTART_DELAY);
 	}
 
 	void printRestartInfo() {
@@ -363,6 +320,42 @@ public class World implements Runnable {
 		}
 	}
 
+	public void stepsCycle() {
+		buffer=new ArrayList<NormCell>(normCells);// to avoid concurrent modification exception
+		phaser.bulkRegister(buffer.size());// TODO OPTIMIZE PHISER
+		for (NormCell curNormCell : buffer) {
+
+			Runnable task=() -> {
+				if (normCells.contains(curNormCell) && curNormCell!=null) {
+					curNormCell.step();// TODO понять почему в масиве не удаляются мертвые
+					if (Restarts<4 && DEBUG) {
+						//inputData.add(curNormCell.getInputData());
+					}
+
+				}
+				phaser.arriveAndDeregister();
+
+			};
+			pool.execute(task);
+		}
+		phaser.arriveAndAwaitAdvance();
+		Collections.shuffle(normCells);
+	}
+	
+	private void findArrayProblemsAndGoodCells() {
+		for (NormCell curCell : normCells) {
+			if (curCell!=null) {
+				if (curCell.brain==null) {
+					curCell.selected=true;
+					worldFrame.cell_inf.selectedLiveCell=curCell;
+					System.err.println("shet!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+					Thread.currentThread().stop();
+				}
+				findGoodCell(curCell);
+			}
+		}
+	}
+	
 	/** Calls test() method in every cell in cells[][] */
 	void testAllCells() {
 		for (int i=0; i<width; i++) {// очистка состояния(сделал ход)
@@ -440,7 +433,7 @@ public class World implements Runnable {
 			LimitedArrayList<Network_Like[]> bestBrainsArr=bestBrainsArrs.get(buff);
 			if (bestBrainsArr.size()>0) {
 				Network_Like[] curBrain=bestBrainsArr.get(r.nextInt(bestBrainsArr.size()));
-				nBuf=new NormCell(curBrain[0],curBrain[1]);
+				nBuf=new NormCell(curBrain[0],curBrain[1],new Genome());/*TODO STUB , зделать созхранение генома*/
 				cells[r.nextInt(width)][r.nextInt(height)].setLiveCell(nBuf);
 			} else {
 				i--;

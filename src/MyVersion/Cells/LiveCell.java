@@ -27,4 +27,5 @@ public interface LiveCell{
 	int getEnergyToMultiplyMe();
 	boolean getTested();
 	void setTested(boolean value);
+	LiveCellType getLiveCellType();
 }
