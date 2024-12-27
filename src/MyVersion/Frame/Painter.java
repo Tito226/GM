@@ -1,10 +1,7 @@
 package MyVersion.Frame;
 
-import static MyVersion.Frame.FRAME_CONFIG.CELL_START_ORGANIC;
 import static MyVersion.Frame.FRAME_CONFIG.PAINT_MODE;
-import static MyVersion.Frame.World.bestLifeTime;
 import static MyVersion.Frame.World.cellSize;
-import static MyVersion.Frame.World.cells;
 import static MyVersion.Frame.World.height;
 import static MyVersion.Frame.World.width;
 
@@ -82,7 +79,7 @@ public class Painter implements ImageObserver {
 			worldFrame.inf.paint(worldFrame.inf.getGraphics());
 			for (int i=0; i<width; i++) {
 				for (int j=0; j<height; j++) {
-					Cell curCell=cells[i][j];
+					Cell curCell=world.cells[i][j];
 					if (curCell!=null&&curCell.isChange()) {
 						paint(g,i,j,curCell);
 						curCell.setChange(false);
@@ -116,8 +113,8 @@ public class Painter implements ImageObserver {
 		try {
 			for (int i=0; i<width; i++) {
 				for (int j=0; j<height; j++) {
-					if (cells[i][j]!=null) {
-						paint(bufferGraphics,i,j,cells[i][j]);
+					if (world.cells[i][j]!=null) {
+						paint(bufferGraphics,i,j,world.cells[i][j]);
 					}
 				}
 			}

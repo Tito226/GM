@@ -28,12 +28,12 @@ public class BrainSaver {
 
 	}
 	
-	static void saveSelectedBrain(World world) {
+	static void saveSelectedBrain(World world) {/*TODO make save genome*/
 		System.out.println("please enter save name: ");
     	Scanner scanner=new Scanner(System.in);
     	NormCell cellForSave=world.worldFrame.cell_inf.selectedLiveCell.getHead();
     	Random r=new Random();
-    	if(world.worldFrame.cell_inf.selectedLiveCell!=null && cellForSave!=null) {//TODO STUB
+    	if(world.worldFrame.cell_inf.selectedLiveCell!=null && cellForSave!=null) {
 	 		try {
 	 			world.fileOutputStream = new FileOutputStream("C:\\Users\\Timurs1\\Desktop\\brains\\BrainSave"+scanner.nextLine()+"---"+r.nextLong()+".network");
 	 			world.objectOutputStream = new ObjectOutputStream(world.fileOutputStream);
@@ -43,7 +43,7 @@ public class BrainSaver {
 			} catch (IOException ee) {
 				ee.printStackTrace();
 			}
-	        
+	 		scanner.close();
 	 	}
 	}
 	

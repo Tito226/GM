@@ -11,18 +11,18 @@ public class Core_Config {
 	public static final int OUTPUTS=1;
 	public static final int BIAS=1;// MUST BE 0 OR 1
 
-	public static final double BIAS_VALUE=-0.3d;// Value of bias dots//-7 -6 -0.62 0.2
-	public static final double LEARNING_RATE=0.000551d;// 0.0009 0.002001
+	public static final double BIAS_VALUE=-0.02d;// Value of bias dots -0.3
+	public static final double LEARNING_RATE=0.000751d;// 0.000551d
 
 	public static final boolean USE_R_WHILE_LEARNING=false;
 
 	public static final double FADING=5.7/Math.pow(10,20);// 0.00000000000000000000000000000007d 6/Math.pow(10,22);
-	public static final int TEACH_ITERATIONS=70000;// 800000
+	public static final int TEACH_ITERATIONS=100000;// 800000
 
 	// Realization parameters DON'T CHANGE IF YOU DON'T KNOW WHAT THEY DO
-	public static final boolean BLOCK_USELESS_INPUTS=true;// TRUE
+	public static final boolean BLOCK_USELESS_INPUTS=true;// TRUE in my current data set is less parameters then in real world, if doesnt block them at start 
 	public static final int HOW_MUCH_INPUTS_MUST_BE_USED=7;// 7
-	public static final double THRESHOLD_NODE_VALUE=2.21d;// 2.01 Nodes weight can't become bigger than this,1.41
+	public static final double THRESHOLD_NODE_VALUE=2.51d;// 2.01 Nodes weight can't become bigger than this,1.41
 	public static final boolean SET_FIRST_LAYER_NODES_NON_RANDOM_VALUE=false;// Has more priority than
 																				// BLOCK_USELESS_INPUTS, rules it out
 	public static final double FIRST_LAYER_NODES_VALUE=-0.15d;// -0.15f
@@ -30,7 +30,7 @@ public class Core_Config {
 	public static final boolean NODES_BECOMES_UNCHANGEBLE_IF_WEIGHT_BIGGER_THAN_THRESHOLD=false;
 	public static final boolean FIRST_INPUT_MULTIPLIER=true;// true
 	/* возможно нужно перенести в другой конфиг */
-	public static final double MUTATION_MULTIPLIER=0.38D;/* регулирует максимальную "силу" мутации */// 0.4 0.23
+	public static final double MAX_MUTATION_MULTIPLIER=0.38D;/* регулирует максимальную "силу" мутации */// 0.4 0.23
 
 }
 

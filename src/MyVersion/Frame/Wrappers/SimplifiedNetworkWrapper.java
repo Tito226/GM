@@ -1,6 +1,6 @@
 package MyVersion.Frame.Wrappers;
 
-import static MyVersion.Core.Core_Config.MUTATION_MULTIPLIER;
+import static MyVersion.Core.Core_Config.MAX_MUTATION_MULTIPLIER;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -37,14 +37,15 @@ public class SimplifiedNetworkWrapper extends SimplifiedNetwork implements Netwo
 		}
 	}
 	/*TODO WRITE DOC*/
-	public void mutate(int numberOfMutations) {
+	public void mutate(int maxNumberOfMutations) {
+		//System.out.println("Mutate");
 		Random r=new Random();
-		for (int i=0; i<r.nextInt(numberOfMutations); i++) {
+		for (int i=0; i<r.nextInt(maxNumberOfMutations); i++) {
 			nodeMutate(r);
 		}
-		if (r.nextInt(CHANCE_OF_NODE_ACTIVATE)==0) {
+		if (r.nextInt(100)<CHANCE_OF_NODE_ACTIVATE) {
 			nodeUnlock(r);
-		} else if (r.nextInt(CHANCE_OF_NODE_DEACTIVATE)==0) {
+		} else if (r.nextInt(100)<CHANCE_OF_NODE_DEACTIVATE) {
 			nodeDeacticate(r);
 		}
 	}
@@ -75,7 +76,7 @@ public class SimplifiedNetworkWrapper extends SimplifiedNetwork implements Netwo
 		double buffNode=buffDot[rBuffer3];// выбор случайной ноды
 		// прибавить к весу случайной ноды случайное число (не больше
 		// MUTATION_MULTIPLIER и не меньше -MUTATION_MULTIPLIER)
-		dotsArr[rBuffer1][rBuffer2][rBuffer3]=buffNode+rnd(-MUTATION_MULTIPLIER,MUTATION_MULTIPLIER);
+		dotsArr[rBuffer1][rBuffer2][rBuffer3]=buffNode+rnd(-MAX_MUTATION_MULTIPLIER,MAX_MUTATION_MULTIPLIER);
 	}
 
 	static double nodeUnlockMaxValue=0.2;
@@ -83,11 +84,13 @@ public class SimplifiedNetworkWrapper extends SimplifiedNetwork implements Netwo
 	private void nodeUnlock(Random r) {
 		// выбрать случайную заблокированную Node
 		int rBuff=(int) rnd(0,blockedNodes.size()-1);
-		Integer[] nodeCoords=blockedNodes.get(rBuff);
-		// установить вес разблокированого Node на случайное число
-		dotsArr[nodeCoords[0]][nodeCoords[1]][nodeCoords[2]]=rnd(-nodeUnlockMaxValue,nodeUnlockMaxValue);
-		// Удалить разблокированную Node из списка
-		blockedNodes.remove(rBuff);
+		if(blockedNodes.size()>0) {
+			Integer[] nodeCoords=blockedNodes.get(rBuff);
+			// установить вес разблокированого Node на случайное число
+			dotsArr[nodeCoords[0]][nodeCoords[1]][nodeCoords[2]]=rnd(-nodeUnlockMaxValue,nodeUnlockMaxValue);
+			// Удалить разблокированную Node из списка
+			blockedNodes.remove(rBuff);
+		}
 	}
 
 	@Override

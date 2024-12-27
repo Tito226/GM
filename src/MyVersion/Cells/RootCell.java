@@ -1,6 +1,5 @@
 package MyVersion.Cells;
-
-import static MyVersion.Frame.World.cells;
+                                                                                                                                                
 import static MyVersion.Frame.World.height;
 import static MyVersion.Frame.World.sunny;
 import static MyVersion.Frame.World.width;
@@ -18,12 +17,12 @@ public class RootCell implements LiveCell {
 	private NormCell normCell;
 	int x;
 	int y;
-	byte myChromosomeNum;
+	byte myChromosomeNum;//TODO cant be >chromosomesNum ,but it is
 	int lifeTime=0, multiplies=0;
 	static Color color=Color.PINK;
 	private boolean tested=false;
 	String myName;
-
+	Cell[][] cells;
 	@Override
 	public void idleEnergyDecrese() {
 		if (lifeTime%3==0) {
@@ -34,6 +33,7 @@ public class RootCell implements LiveCell {
 	public RootCell(LiveCell curCell,Cell nextCell, byte myChromosomeNum) {
 		this.myChromosomeNum=myChromosomeNum;
 		this.normCell=curCell.getHead();
+		cells=normCell.cells;
 		spawn(nextCell);
 	}
 
@@ -55,12 +55,9 @@ public class RootCell implements LiveCell {
 		preLastOutput=lastOutput;
 		lastOutput=output;
 		if (DataMethods.between(Action_Boundaries.multiplyBoundaries,output)) {
-			DataMethods.multiply(this,normCell.genome.getChromosome(myChromosomeNum));
-		} else if (DataMethods.between(Action_Boundaries.multiplyProtoplastBoundaries,output)) {
-			// new Protoplast(this, output);
-		}
-		if (DataMethods.between(Action_Boundaries.eatOrganicBoundaries,output)) {
-			DataMethods.eatOrganicByArea(this);
+			Actions.multiply(this,normCell.genome.getChromosome(myChromosomeNum));//TODO getChromosome(...) cause bug, when return null
+		} else if (DataMethods.between(Action_Boundaries.eatOrganicBoundaries,output)) {
+			Actions.eatOrganicByArea(this);
 		} else if (DataMethods.between(Action_Boundaries.apoptosisBoundaries,output)) {
 			apoptosis();
 		}
@@ -68,7 +65,16 @@ public class RootCell implements LiveCell {
 		setLastThings();
 		lifeTime++;
 	}
-
+	/*Exception in thread "pool-1-thread-2" java.lang.NullPointerException: Cannot load from byte/boolean array because "curCellChromosome" is null
+	at MyVersion.Cells.DataMethods.getDirection(DataMethods.java:289)
+	at MyVersion.Cells.DataMethods.multiply(DataMethods.java:371)
+	at MyVersion.Cells.RootCell.step(RootCell.java:58)
+	at MyVersion.Cells.NormCell.step1(NormCell.java:168)
+	at MyVersion.Cells.NormCell.step(NormCell.java:199)
+	at MyVersion.Frame.World.lambda$0(World.java:319)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:833)*/
 	@Override
 	public void test() {
 		normCell=normCell.getHead();

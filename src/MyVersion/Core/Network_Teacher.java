@@ -153,7 +153,7 @@ public class Network_Teacher extends JPanel {
                 for (int j = 0; j < student.dotsArr[1].length - BIAS; j++) {//"< student.dotsArr.get(1).size()-1" may be changed to "student.dotsArr.get(0).get(i).nodesFromMe.size()"
                 	Node curNode=student.dotsArr[0][i].nodesFromMe.get(j);
                 	curNode.setWeight(FIRST_LAYER_NODES_VALUE);
-                	curNode.changeble=false;//TODO delete it
+                	curNode.changeble=false;
                 }
             }
         }	  if(BLOCK_USELESS_INPUTS){

@@ -1,12 +1,10 @@
 package MyVersion.Frame;
 
 import static MyVersion.Frame.FRAME_CONFIG.CELL_START_ORGANIC;
-
 import MyVersion.Cells.Cell;
 import MyVersion.Cells.Genome;
 import MyVersion.Cells.NormCell;
 import MyVersion.Core.BrainCloneClass;
-import MyVersion.Core.Data_Set;
 import MyVersion.Core.Network;
 import MyVersion.Core.Network_Like;
 import MyVersion.Core.Network_Teacher;
@@ -23,7 +21,14 @@ import java.util.concurrent.Phaser;
 import static MyVersion.Frame.FRAME_CONFIG.CELL_SIZE;
 import static MyVersion.Frame.FRAME_CONFIG.*;
 import static MyVersion.Frame.FRAME_CONFIG.PAINT_MODE;
-
+/**
+ * This class represents the world where cells live and interact. 
+ * It handles the simulation, including initializing cells, managing the grid, 
+ * and running the main simulation loop. It also manages important statistics 
+ * like the number of steps and the best-performing cells.
+ * 
+ * Implements Runnable to run the simulation in a separate thread.
+ */
 public class World implements Runnable {
 	WorldFrame worldFrame;
 	public Network_Like[] relative=new Network_Like[2];
@@ -34,16 +39,18 @@ public class World implements Runnable {
 	public static int realHeight;
 	public static int width;
 	public static int height;
-	public static int sunny=1;
-	public static Cell[][] cells;
+	public static int sunny=3;
+	public volatile Cell[][] cells;
 	private static volatile boolean pause=false;
-	public static ArrayList<NormCell> normCells=new ArrayList<>();// TODO fix bugs(contains dead cells,contains cell
-	ExecutorService pool=Executors.newFixedThreadPool(3); // which is not exist in cells)
+	public static ArrayListWrapper<NormCell> normCells;
+	// which is not exist in cells)
+	ExecutorService pool=Executors.newFixedThreadPool(2); //TODO зделать возможным изменение числа потоков в рантайме
 	Phaser phaser=new Phaser(1);
 	ArrayList<NormCell> buffer;
 	Thread wor;
 
 	public World(int width, int height, int realWidth, int realHeight) throws IOException {
+		normCells=new ArrayListWrapper<NormCell>(this);
 		Network_Teacher network_teacher=new Network_Teacher();
 		if (!LOAD_SAVE) {
 			Network buff=network_teacher.createAndTeachNetwork();
@@ -82,7 +89,7 @@ public class World implements Runnable {
 		pause=p;
 	}
 
-	public static Cell[][] getCells() {
+	public Cell[][] getCells() {
 		return cells;
 	}
 
@@ -116,81 +123,27 @@ public class World implements Runnable {
 	public static int lastLastBestLifeTime=0;
 	public static int lastRestarts=0;
 	public static int thisBestSize=0;
-	//public long fpsMeter1=0;
+	// public long fpsMeter1=0;
 
-	public static Network_Like[] thisTopLifeTimeBrain=new Network_Like[2];
-	public static Network_Like[] topLifeTimeBrain=new Network_Like[2];
-	public static Network_Like[] topMultipliesBrain=new Network_Like[2];
-	public static Network_Like[] thisTopSizeBrain=new Network_Like[2];
-
-	ArrayList<LimitedArrayList<Network_Like[]>> bestBrainsArrs=new ArrayList<LimitedArrayList<Network_Like[]>>();
-	LimitedArrayList<Network_Like[]> bestLifeTimeBrains=new LimitedArrayList<>(LIMITED_ARRAY_SIZE);
-	LimitedArrayList<Network_Like[]> bestThisLifeTimeBrains=new LimitedArrayList<>(LIMITED_ARRAY_SIZE);
-	LimitedArrayList<Network_Like[]> bestMultipliesBrains=new LimitedArrayList<>(LIMITED_ARRAY_SIZE);
-	LimitedArrayList<Network_Like[]> thisBiggestSizeBrains=new LimitedArrayList<>(LIMITED_ARRAY_SIZE);
-	ConcurrentHashMap<Network_Like[],Genome> lastBrain=new ConcurrentHashMap<Network_Like[], Genome>();//TODO убрать остальные массивы ,созранять только последние n клеток
+	ConcurrentHashMap<Network_Like[], Genome> lastLeftBrains=new ConcurrentHashMap<Network_Like[], Genome>();
 	static FileOutputStream fileOutputStream;
 	static ObjectOutputStream objectOutputStream;
-
-	void addListsToBestBrains() {
-		bestBrainsArrs.add(bestLifeTimeBrains);
-		bestBrainsArrs.add(bestThisLifeTimeBrains);
-		bestBrainsArrs.add(bestMultipliesBrains);
-		bestBrainsArrs.add(thisBiggestSizeBrains);
-	}
 
 	// Graphics worldGraphics=worldFrame.getGraphics();
 	boolean tested=false;
 
 	long startTime=System.currentTimeMillis();
 
-	Network_Like[] topBrainChoose(NormCell curNormCell, Network_Like[] curTopBrain,
-			LimitedArrayList<Network_Like[]> bestBrains) {
-		synchronized (this) {
-			try {
-				curNormCell.sem.acquire();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			/*
-			 * if(curTopBrain!=null && curNormCell.brain!=null && curNormCell.brain.isDead)
-			 * { for (int k = 0; k < curTopBrain.length; k++) { curTopBrain[k].kill(); } }
-			 */
-			curTopBrain[0]=curNormCell.brain;
-			curTopBrain[1]=curNormCell.multiCellBrain;
-			bestBrains.add(curTopBrain);
-			curNormCell.brain.setDontDelete(true);
-			curNormCell.multiCellBrain.setDontDelete(true);
-			curNormCell.sem.release();
-			return curTopBrain;
-		}
-	}
-
-	synchronized void findGoodCell(NormCell curNormCell) {
-		if (curNormCell.getLifeTime()>bestLifeTime) {
-			bestLifeTime=curNormCell.getLifeTime();
-			topBrainChoose(curNormCell,topLifeTimeBrain,bestLifeTimeBrains);
-		}
-		if (curNormCell.getLifeTime()>thisBestLifeTime) {
-			thisBestLifeTime=curNormCell.getLifeTime();
-			topBrainChoose(curNormCell,thisTopLifeTimeBrain,bestThisLifeTimeBrains);
-		}
-		if (curNormCell.multiplies>bestMultiplies) {
-			bestMultiplies=curNormCell.multiplies;
-			topBrainChoose(curNormCell,topMultipliesBrain,bestMultipliesBrains);
-		}
-		if (curNormCell.myParts.size()>thisBestSize) {
-			thisBestSize=curNormCell.myParts.size();
-			topBrainChoose(curNormCell,thisTopSizeBrain,thisBiggestSizeBrains);
-		}
-	}
-
-	/** Sets cells coordinates(x,y) and calls addListsToBestBrains(); */
+	/**
+	 * Initializes the cells in the world grid, assigning random positions 
+	 * to new cells and preparing the graphical painter.
+	 * This method is typically called at the start of the simulation.
+	 */
 	void worldInitial() {
-		addListsToBestBrains();
+		// addListsToBestBrains();
 		for (int y=0; y<height; y++) {
 			for (int x=0; x<width; x++) {
-				cells[x][y]=new Cell();
+				cells[x][y]=new Cell(this);
 				if (cells[x][y]!=null) {
 					cells[x][y].setX(x);
 					cells[x][y].setY(y);
@@ -199,19 +152,70 @@ public class World implements Runnable {
 		}
 		for (int i=0; i<CELLS_ON_START; i++) {
 			Random r=new Random();
-			cells[r.nextInt(width)][r.nextInt(height)].setLiveCell(new NormCell(relative[0],relative[1],new Genome()));
+			cells[r.nextInt(width)][r.nextInt(height)].setLiveCell(new NormCell(relative[0],relative[1],new Genome(),this));
 		}
 		worldFrame.painter.painterInitial();
 	}
 
-	int maxThreads=1;
-	// Semaphore sem=new Semaphore(maxThreads);
 	long timeBuff;
 	long stepsBuff;
+	public int maxThreads=1;
+	/**
+	 * Compares the current cell's statistics with the best cells so far.
+	 * Updates the best life time, best multiplication count, and best size
+	 * if the current cell exceeds the previous best values.
+	 *
+	 * @param curNormCell The current NormCell being evaluated.
+	 */
+	synchronized void findGoodCell(NormCell curNormCell) {
+		if (curNormCell.getLifeTime()>bestLifeTime) {
+			bestLifeTime=curNormCell.getLifeTime();
+		}
+		if (curNormCell.getLifeTime()>thisBestLifeTime) {
+			thisBestLifeTime=curNormCell.getLifeTime();
+		}
+		if (curNormCell.multiplies>bestMultiplies) {
+			bestMultiplies=curNormCell.multiplies;
+		}
+		if (curNormCell.myParts.size()>thisBestSize) {
+			thisBestSize=curNormCell.myParts.size();
+		}
+	}
+	/**
+	 * Saves the last surviving cells into a map for later use. 
+	 * It stores their neural networks and genomes. 
+	 * If there are more cells than allowed to save, 
+	 * the method will remove older entries from the map.
+	 */
+	void saveLastCells() {
+		if (normCells.size()<=HOW_MANY_LAST_CELLS_TO_SAVE) {
+			for (NormCell n : normCells) {
+				if (n!=null) {
+					lastLeftBrains.put(new Network_Like[] { n.brain, n.multiCellBrain },n.genome);
+				}
+			}
+		} else {
+			for (NormCell n : normCells) {
+				if (n!=null) {
+					Network_Like[] curBrain=new Network_Like[] { n.brain, n.multiCellBrain };
+					if (!lastLeftBrains.containsKey(curBrain)) {
+						lastLeftBrains.remove(curBrain);
+
+					}
+				}
+			}
+		}
+	}
+	/**
+	 * The main loop of the simulation. This method runs continuously while 
+	 * updating the state of the world, including the cells and their interactions. 
+	 * It checks for pauses, manages the cell steps, handles restarts when needed, 
+	 * and performs garbage collection at regular intervals.
+	 */
 	@Override
 	public void run() {
 		stepsBuff=0;
-		ArrayList<Double[]> inputData=new ArrayList<Double[]>();
+		// ArrayList<Double[]> inputData=new ArrayList<Double[]>();
 		worldInitial();
 		timeBuff=System.currentTimeMillis();
 		/* the main cycle */
@@ -220,39 +224,27 @@ public class World implements Runnable {
 			if (!getPause()) {
 
 				calculateSPS();
-				
+
 				stepsAtAll++;
 
 				testAllCells();
 
 				stepsCycle();
 
-				findArrayProblemsAndGoodCells();
+				findArrayNullElements();
 
 				testNormCellsArray();
-
-				if (!(Restarts<4 && DEBUG)) {
-					inputData=null;
-				}
 
 				liveCells=normCells.size();
 				if (normCells.size()==0) {/* on restart */
 					onRestart();
 				}
-
+				
 				if (System.currentTimeMillis()-startTime>30*1000) {
 					startGC();
 				}
-				/**************** 0 thread paint ****************/
-				if (PAINT_MODE==0) {
-					worldFrame.painter.fastPaint();
-				} else if (PAINT_MODE==-1) {// 0
-					worldFrame.painter.fullPaint();
-				}
-				if (slowdown>0) {
-					sleep(slowdown);
-				}
-				/**********************************************/
+				
+				paint();
 			} else {
 
 				if (PAINT_MODE==0) {
@@ -265,37 +257,50 @@ public class World implements Runnable {
 
 	}
 
+	void paint() {
+		/**************** 0 thread paint ****************/
+		if (PAINT_MODE==0) {
+			worldFrame.painter.fastPaint();
+		} else if (PAINT_MODE==-1) {// 0
+			worldFrame.painter.fullPaint();
+		}
+		if (slowdown>0) {
+			sleep(slowdown);
+		}
+		/**********************************************/
+	}
+	/**
+	 * Calculates the number of steps per second (SPS) that the simulation is performing. 
+	 * It updates the SPS value every 400 milliseconds by comparing the number of steps 
+	 * taken in that time.
+	 */
 	public void calculateSPS() {
-		if (System.currentTimeMillis()-timeBuff>=300) {
+		if (System.currentTimeMillis()-timeBuff>=400) {
 			timeBuff=System.currentTimeMillis();
-			sps=(int) (stepsAtAll-stepsBuff);
+			sps=(int) ((stepsAtAll-stepsBuff)*2.5);
 			stepsBuff=stepsAtAll;
 		}
 	}
 
 	private void onRestart() {
 		worldFrame.painter.fullPaint();
-		
 		worldFrame.painter.stopPainting=true;
-
-		// установка начального состояния органики,если все умерли
 		resetOrganic();
 		saveBestBrain();
 
-		// Summon cells
 		summonCells(FRAME_CONFIG.CELLS_ON_START);
 
 		Restarts++;
 		lastRestarts++;
-		printRestartInfo();
+		//printRestartInfo();
 		lastLastBestLifeTime=lastBestLifeTime;
 		lastBestLifeTime=bestLifeTime;
 		thisBestLifeTime=0;
 		stepsAtAll=0;
 
 		worldFrame.painter.stopPainting=false;
-
-		//sleep(RESTART_DELAY);
+		lastLeftBrains.clear();
+		// sleep(RESTART_DELAY);
 	}
 
 	void printRestartInfo() {
@@ -304,8 +309,8 @@ public class World implements Runnable {
 		System.out.println("best life time: "+bestLifeTime);
 		System.out.println("this Best Life Time: "+thisBestLifeTime);
 	}
-	
-	/**calls "normCells.clear()" if in normCells left only null values*/
+
+	/** calls "normCells.clear()" if in normCells left only null values */
 	void testNormCellsArray() {
 		boolean toClear=true;
 		ArrayList<NormCell> buffer=new ArrayList<>(normCells);
@@ -315,11 +320,15 @@ public class World implements Runnable {
 			}
 		}
 		if (toClear) {
-			// System.err.println("giga shit");
 			normCells.clear();
 		}
 	}
-
+	/**
+	 * Executes one cycle of steps for all cells in the simulation. 
+	 * It registers all cells with the Phaser to synchronize the execution.
+	 * After all cells have completed their step, it shuffles the order 
+	 * to avoid predictable patterns in the simulation.
+	 */
 	public void stepsCycle() {
 		buffer=new ArrayList<NormCell>(normCells);// to avoid concurrent modification exception
 		phaser.bulkRegister(buffer.size());// TODO OPTIMIZE PHISER
@@ -328,21 +337,19 @@ public class World implements Runnable {
 			Runnable task=() -> {
 				if (normCells.contains(curNormCell) && curNormCell!=null) {
 					curNormCell.step();// TODO понять почему в масиве не удаляются мертвые
-					if (Restarts<4 && DEBUG) {
-						//inputData.add(curNormCell.getInputData());
-					}
 
 				}
 				phaser.arriveAndDeregister();
 
 			};
 			pool.execute(task);
+
 		}
 		phaser.arriveAndAwaitAdvance();
 		Collections.shuffle(normCells);
 	}
-	
-	private void findArrayProblemsAndGoodCells() {
+
+	private void findArrayNullElements() {
 		for (NormCell curCell : normCells) {
 			if (curCell!=null) {
 				if (curCell.brain==null) {
@@ -355,8 +362,11 @@ public class World implements Runnable {
 			}
 		}
 	}
-	
-	/** Calls test() method in every cell in cells[][] */
+
+	/**
+	 * Calls the `testCell()` method for every cell in the world grid.
+	 * This method ensures that each cell updates its status after each step.
+	 */
 	void testAllCells() {
 		for (int i=0; i<width; i++) {// очистка состояния(сделал ход)
 			for (int j=0; j<height; j++) {
@@ -371,73 +381,22 @@ public class World implements Runnable {
 		curNormCell.setY(y);
 	}
 
-	void cellDiagnostic(NormCell norm, ArrayList<Double[]> inputData) {
-		System.out.println("Run Cell diag.");
-		System.out.print(":::: "+norm.calculateOutput(new Double[] { 0d, 15d, 6d, 0d, 0d, 0d, 0d })+"тест 1     ");
-		System.out.print(":::: "+ // тесты 1 должны быть одинаковыми
-				norm.calculateOutput(new Double[] { 0d, 15d, 6d, 0d, 0d, 0d, 0d, 23456d })+"тест 1     ");
-		Random r=new Random();
-		System.out.print(norm
-				.calculateOutput(new Double[] { 0d, (double) Data_Set.rnd(1,4), (double) Data_Set.rnd(7,100),
-						(double) r.nextInt(2), (double) r.nextInt(2), (double) r.nextInt(2), (double) r.nextInt(2) })
-				+"тест 2               ");
-		if (inputData==null)
-			return;
-		for (int i=0; i<inputData.size(); i++) {
-			if (i%2==1)
-				continue;
-			for (int j=0; j<7; j++) {
-				switch (j) {
-				case 0:
-					System.out.print("multiplyReady:");
-					break;
 
-				case 1:
-					System.out.print("energy:");
-					break;
-
-				case 2:
-					System.out.print("organic:");
-					break;
-
-				case 3:
-					System.out.print("upCell:");
-					break;
-				case 4:
-					System.out.print("downCell:");
-					break;
-
-				case 5:
-					System.out.print("leftCell:");
-					break;
-				case 6:
-					System.out.print("rightCell:");
-					break;
-				}
-				Double[] buf=inputData.get(i);
-				System.out.print(buf[j]+" ");
-			}
-			System.out.println(":::: "+norm.calculateOutput(inputData.get(i)));
-			System.out.print(" ");
-			System.out
-					.print(norm.calculateOutput(new Double[] { 0d, (double) Data_Set.rnd(3,15), 6d, 0d, 0d, 0d, 0d }));
-			System.out.print(" ");
-		}
-	}
-
+	/**summon new cells with genes and network from lastLeftBrains*/
 	public void summonCells(int cellsNum) {
 		Random r=new Random();
+		ArrayList<Network_Like[]> keys=new ArrayList<Network_Like[]>(lastLeftBrains.keySet());
 		for (int i=0; i<cellsNum; i++) {
 			NormCell nBuf=null;
-			int buff=r.nextInt(bestBrainsArrs.size());
-			LimitedArrayList<Network_Like[]> bestBrainsArr=bestBrainsArrs.get(buff);
-			if (bestBrainsArr.size()>0) {
-				Network_Like[] curBrain=bestBrainsArr.get(r.nextInt(bestBrainsArr.size()));
-				nBuf=new NormCell(curBrain[0],curBrain[1],new Genome());/*TODO STUB , зделать созхранение генома*/
-				cells[r.nextInt(width)][r.nextInt(height)].setLiveCell(nBuf);
-			} else {
+			int buff=r.nextInt(keys.size());//keys.size()==0
+			Network_Like[] curKey=keys.get(buff);
+			if(curKey[0]==null) {
 				i--;
+				continue;
 			}
+			nBuf=new NormCell(curKey[0],curKey[1],
+					new Genome(lastLeftBrains.get(curKey)),this);/* TODO STUB , зделать созхранение генома */
+			cells[r.nextInt(width)][r.nextInt(height)].setLiveCell(nBuf);
 		}
 	}
 
@@ -448,7 +407,10 @@ public class World implements Runnable {
 			}
 		}
 	}
-
+	/**
+	 * Triggers the Java garbage collector to clean up memory.Calls after 30 seconds(in main cycle) of simulation time.
+	 * This helps to free up resources and maintain performance in long-running simulations.
+	 */
 	void startGC() {
 		System.out.println("Garbage collector started");
 		System.gc();
@@ -456,10 +418,7 @@ public class World implements Runnable {
 	}
 
 	void saveBestBrain() {
-		Random r=new Random();
-		if (thisBestLifeTime>CREATE_SAVE_ON_LIFETIME /* && thisBestLifeTime>lastBestLifeTime */ && CREATE_SAVES) {// TODO
-			BrainSaver.saveBestBrain(thisBiggestSizeBrains.get(0),thisBestLifeTime);// STUB
-		}
+		// TODO stub
 	}
 
 	void sleep(int miilis) {
@@ -469,4 +428,10 @@ public class World implements Runnable {
 			e.printStackTrace();
 		}
 	}
+
+	public int getStepsAtAll() {
+		return stepsAtAll;
+	}
+
+		
 }

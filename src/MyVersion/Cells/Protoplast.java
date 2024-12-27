@@ -1,16 +1,10 @@
 package MyVersion.Cells;
 
 import static MyVersion.Frame.FRAME_CONFIG.*;
-import static MyVersion.Frame.World.cells;
-import static MyVersion.Frame.World.height;
 import static MyVersion.Frame.World.sunny;
-import static MyVersion.Frame.World.width;
-
 import MyVersion.Frame.Action_Boundaries;
 import java.awt.Color;
 import java.util.Random;
-
-import MyVersion.Frame.Action_Boundaries;
 import MyVersion.Frame.World;
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -26,10 +20,19 @@ public class Protoplast implements LiveCell {
 	private boolean tested=false;
 	static Color color=Color.CYAN;
 	String myName;
+	Cell[][] cells;
 	// int energy =PROTOPLAST_START_ENERGY;
 
 	byte countb=0;
 
+	public Protoplast(LiveCell curCell, Cell nextCell,byte myChromosomeNum) {
+		this.normCell=curCell.getHead();
+		cells=normCell.cells;
+		this.myChromosomeNum=myChromosomeNum;
+		spawn(nextCell);
+		
+	}
+	
 	@Override
 	public void step() {
 
@@ -40,9 +43,7 @@ public class Protoplast implements LiveCell {
 		if (DataMethods.between(Action_Boundaries.eatOrganicBoundaries,output)) {
 			eatSunE();
 		} else if (DataMethods.between(Action_Boundaries.multiplyBoundaries,output)) {
-			DataMethods.multiply(this,normCell.genome.getChromosome(myChromosomeNum));
-		} else if (DataMethods.between(Action_Boundaries.multiplyProtoplastBoundaries,output)) {
-			// new Protoplast(this,output);
+			Actions.multiply(this,normCell.genome.getChromosome(myChromosomeNum));
 		} else if (DataMethods.between(Action_Boundaries.apoptosisBoundaries,output)) {
 			apoptosis();
 		}
@@ -61,12 +62,7 @@ public class Protoplast implements LiveCell {
 		}
 	}
 	/**sets coordinates ,adds to heads parts, decreases energy needed for spawn*/
-	public Protoplast(LiveCell curCell, Cell nextCell,byte myChromosomeNum) {
-		this.normCell=curCell.getHead();
-		this.myChromosomeNum=myChromosomeNum;
-		spawn(nextCell);
-		
-	}
+	
 
 	private void spawn(Cell nextCell) {
 		if (nextCell.liveCell==null) {

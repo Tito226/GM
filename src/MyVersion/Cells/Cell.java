@@ -2,11 +2,15 @@ package MyVersion.Cells;
 
 import java.awt.*;
 import java.util.Random;
+
+import MyVersion.Frame.World;
+
 import static MyVersion.Frame.FRAME_CONFIG.*;
 import static MyVersion.Frame.World.*;
 /**Cell class */
 //TODO  ПРИДУМАТЬ ОПИСАНИЕ КЛАССА
 public class Cell {
+	World world ;
 	int[] color=new int[3];
 	// Color myColor ;
 	// int energy=1;
@@ -16,6 +20,10 @@ public class Cell {
 	private int y;
 	public int organic=CELL_START_ORGANIC;
 
+	public Cell(World world){
+		this.world=world;
+	}
+	
 	public int getX() {
 		return x;
 	}
@@ -93,6 +101,7 @@ public class Cell {
 	}
 
 	public static void organicSpreadOnDeath(LiveCell dyingCell) {
+		Cell[][] cells =dyingCell.getHead().cells;
 		int range=(ORGANIC_ON_DAETH_RANGE-1)/2;
 		int x=dyingCell.getX();
 		int y=dyingCell.getY();
@@ -107,6 +116,7 @@ public class Cell {
 	}
 	
 	public static void organicSpreadOnDeath(LiveCell dyingCell, int energyNeededToBorn) {
+		Cell[][] cells =dyingCell.getHead().cells;
 		int range=(ORGANIC_ON_DAETH_RANGE-1)/2;
 		int x=dyingCell.getX();
 		int y=dyingCell.getY();

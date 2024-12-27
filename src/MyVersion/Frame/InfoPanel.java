@@ -1,9 +1,6 @@
 package MyVersion.Frame;
 
 import static MyVersion.Frame.World.bestLifeTime;
-import static MyVersion.Frame.World.cellSize;
-import static MyVersion.Frame.World.cells;
-
 import java.awt.Color;
 import java.awt.Graphics;
 import java.lang.management.ManagementFactory;

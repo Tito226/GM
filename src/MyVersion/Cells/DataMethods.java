@@ -1,18 +1,12 @@
 package MyVersion.Cells;
 
-import static MyVersion.Frame.FRAME_CONFIG.ENERGY_NEEDED_TO_MULTIPLY;
-import static MyVersion.Frame.FRAME_CONFIG.HOW_MUCH_ORGANIC_EATS_PER_STEP;
-import static MyVersion.Frame.FRAME_CONFIG.ORGANIC_PER_CELL_ON_NORMCELL_DEATH;
 import static MyVersion.Frame.FRAME_CONFIG.*;
-import static MyVersion.Frame.World.cells;
 import static MyVersion.Frame.World.height;
-import static MyVersion.Frame.World.sunny;
 import static MyVersion.Frame.World.width;
 import static MyVersion.Cells.Genome.chromosomesNum;
 
-import java.util.Arrays;
 import java.util.Random;
-
+/**Class for collecting data for network*/
 public class DataMethods {
 	static Random r=new Random();
 	static final double DISTANCE_DILL=1000d;// 1000
@@ -46,6 +40,7 @@ public class DataMethods {
 	}
 
 	static double getDownDistance(LiveCell liveCell) {
+		Cell[][] cells=liveCell.getHead().cells;
 		if (SIMPLE_DISTANCE) {
 			return Math.max(MAX_DISTANCE,liveCell.getY())/DISTANCE_DILL;
 		} else {
@@ -60,6 +55,7 @@ public class DataMethods {
 	}
 
 	static double getUpDistance(LiveCell liveCell) {
+		Cell[][] cells=liveCell.getHead().cells;
 		if (SIMPLE_DISTANCE) {
 			return Math.max(MAX_DISTANCE,cells[0].length-liveCell.getY())/DISTANCE_DILL;
 		} else {
@@ -74,6 +70,7 @@ public class DataMethods {
 	}
 
 	static double getRightDistance(LiveCell liveCell) {
+		Cell[][] cells=liveCell.getHead().cells;
 		if (SIMPLE_DISTANCE) {
 			return Math.max(MAX_DISTANCE,cells.length-liveCell.getX())/DISTANCE_DILL;
 		} else {
@@ -87,43 +84,8 @@ public class DataMethods {
 		}
 	}
 
-	static void eatOrganic(LiveCell curLiveCell) {
-		int x=curLiveCell.getX();
-		int y=curLiveCell.getY();
-		Cell curCell=cells[x][y];
-		NormCell head=curLiveCell.getHead();
-		if (curCell.getOrganic()!=0 && curCell.getOrganic()>2) {
-			head.energy+=HOW_MUCH_ORGANIC_EATS_PER_STEP;
-			curCell.setOrganic(curCell.getOrganic()-HOW_MUCH_ORGANIC_EATS_PER_STEP);
-		} else {
-			head.energy+=curCell.getOrganic();
-			curCell.setOrganic(0);
-		}
-	}
-
-	static void eatOrganicByArea(LiveCell curLiveCell) {
-		int range=1;// 3==1
-		int eatByCell=1;
-		int x=curLiveCell.getX();
-		int y=curLiveCell.getY();
-		NormCell head=curLiveCell.getHead();
-		for (int i=-range; i<=range; i++) {
-			for (int j=-range; j<=range; j++) {
-				if (x+i<cells.length && x+i>0 && y+j>0 && y+j<cells[x+i].length) {
-					Cell curCell=cells[x+i][y+j];
-					if (curCell.getOrganic()!=0 && curCell.getOrganic()>eatByCell) {
-						head.energy+=eatByCell;
-						curCell.setOrganic(curCell.getOrganic()-eatByCell);
-					} else {
-						head.energy+=curCell.getOrganic();
-						curCell.setOrganic(0);
-					}
-				}
-			}
-		}
-	}
-
 	static double getLeftDistance(LiveCell liveCell) {
+		Cell[][] cells=liveCell.getHead().cells;
 		if (SIMPLE_DISTANCE) {
 			return Math.max(MAX_DISTANCE,liveCell.getX())/DISTANCE_DILL;
 		} else {
@@ -139,6 +101,7 @@ public class DataMethods {
 
 	/** if there are no free cells around returns null */
 	public static double getNeighbourCellValue(LiveCell liveCell, Directions direction) {
+		Cell[][] cells=liveCell.getHead().cells;
 		switch (direction) {
 		case UP -> {
 			if (liveCell.getY()>1) {
@@ -247,6 +210,7 @@ public class DataMethods {
 	}
 
 	static double isSpaceAvailable(LiveCell liveCell) {
+		Cell[][] cells=liveCell.getHead().cells;
 		int x=liveCell.getX();
 		int y=liveCell.getY();
 		boolean b1=y>0 && cells[x][y-1].liveCell==null;
@@ -260,7 +224,7 @@ public class DataMethods {
 		}
 	}
 
-	static boolean between(double[] boundaries, double output) {
+	static boolean between(double[] boundaries, double output) {/*Переместить в другой класс*/
 		if (output>boundaries[0] && output<boundaries[1]) {
 			return true;
 		} else {
@@ -280,27 +244,21 @@ public class DataMethods {
 		return curCell.getY()-curCell.getHead().getY();
 	}
 
-	private static Directions getDirection(LiveCell parent,
+	static Directions getDirection(LiveCell parent,
 			byte[] curCellChromosome) {/*
 										 * TODO придумать как зделать деление не по порядку, а сознательным выбором
 										 * клетки
 										 */
-		/*
-		 * System.out.println(Arrays.toString(curCellChromosome));
-		 * System.out.println(getNeighbourCellValue(parent,Directions.UP)+"\n"
-		 * +getNeighbourCellValue(parent,Directions.DOWN)+"\n"+getNeighbourCellValue(
-		 * parent,Directions.LEFT)+"\n"
-		 * +getNeighbourCellValue(parent,Directions.RIGHT));
-		 */
-		if (curCellChromosome[0]<=chromosomesNum && getNeighbourCellValue(parent,Directions.UP)<=NEXT_ORGANIC_VALUE) {
+		
+		if (curCellChromosome[0]<chromosomesNum && getNeighbourCellValue(parent,Directions.UP)<=NEXT_ORGANIC_VALUE) {
 			return Directions.UP;
-		} else if (curCellChromosome[1]<=chromosomesNum
+		} else if (curCellChromosome[1]<chromosomesNum
 				&& getNeighbourCellValue(parent,Directions.DOWN)<=NEXT_ORGANIC_VALUE) {
 			return Directions.DOWN;
-		} else if (curCellChromosome[2]<=chromosomesNum
+		} else if (curCellChromosome[2]<chromosomesNum
 				&& getNeighbourCellValue(parent,Directions.LEFT)<=NEXT_ORGANIC_VALUE) {
 			return Directions.LEFT;
-		} else if (curCellChromosome[3]<=chromosomesNum
+		} else if (curCellChromosome[3]<chromosomesNum
 				&& getNeighbourCellValue(parent,Directions.RIGHT)<=NEXT_ORGANIC_VALUE) {
 			return Directions.RIGHT;
 		} else {
@@ -310,6 +268,7 @@ public class DataMethods {
 
 	/** returns null if direction==null or direction is wrong */
 	static Cell getNextCell(LiveCell parent, Directions direction) {
+		Cell[][] cells=parent.getHead().cells;
 		int x=parent.getX();
 		int y=parent.getY();
 		if (direction==null) {
@@ -345,7 +304,7 @@ public class DataMethods {
 		return null;
 	}
 
-	private static byte getChromosomeNum(byte[] curCellChromosome, Directions direction) {
+	static byte getChromosomeNum(byte[] curCellChromosome, Directions direction) {
 		switch (direction) {
 		case UP -> {
 			return curCellChromosome[0];
@@ -372,49 +331,6 @@ public class DataMethods {
 		return (Byte) null;
 	}
 
-	static void multiply(LiveCell parent, byte[] curCellChromosome) {
-		/* TODO ПЕРЕДЕЛАТЬ */
-		Directions direction=getDirection(parent,curCellChromosome);
-		if (direction!=null && parent.getEnergy()>ENERGY_NEEDED_TO_MULTIPLY) {
-			LiveCellType newCellType=Genome.getCellType(curCellChromosome[curCellChromosome.length-1]);
-			multiply(parent,newCellType,direction,getChromosomeNum(curCellChromosome,direction));
-		} else {
-
-			parent.getHead().energy--;
-		}
-	}
-
-	/** checks if all is ok, multiplies */
-	private static void multiply(LiveCell parent, LiveCellType newCellType, Directions direction,
-			byte myChromosomeNum) {
-		NormCell head=parent.getHead();
-		Cell nextCell=getNextCell(parent,direction);
-
-		if (nextCell!=null && nextCell.liveCell==null) {
-			// System.out.println("multiplied");
-			switch (newCellType) {/* TODO THINK ABOUT */
-
-			case Protoplast -> {
-				nextCell.setLiveCell(new Protoplast(parent,nextCell,myChromosomeNum));
-				head.multiplies++;
-			}
-			case RootCell -> {
-				nextCell.setLiveCell(new RootCell(parent,nextCell,myChromosomeNum));
-				head.multiplies++;
-			}
-			case NormCell -> {
-				nextCell.setLiveCell(new NormCell(head.brain,head.multiCellBrain,
-						head.genome));/* TODO STUB зделать клонирование генома(сейчас только ссылка) */
-				head.energy-=ENERGY_NEEDED_TO_MULTIPLY;
-				head.multiplies++;
-			}
-
-			}
-		} /*
-			 * else { System.out.println("!nextCell.liveCell==null"); }
-			 */
-	}
-
 	static double getMyType(LiveCell curCell) {
 		if (curCell instanceof NormCell) {
 			return 0.1d;
@@ -425,5 +341,5 @@ public class DataMethods {
 		}
 		return 0;
 	}
-
+	
 }

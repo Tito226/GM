@@ -2,7 +2,7 @@ package MyVersion.Frame.Wrappers;
 
 import static MyVersion.Core.Core_Config.BIAS;
 import static MyVersion.Core.Core_Config.HOW_MUCH_INPUTS_MUST_BE_USED;
-import static MyVersion.Core.Core_Config.MUTATION_MULTIPLIER;
+import static MyVersion.Core.Core_Config.MAX_MUTATION_MULTIPLIER;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -74,7 +74,7 @@ public class NetworkWrapper extends Network implements NetworkWrapperLike {
 		 Dot buffDot=dotsArr[rBuffer1][rBuffer2];
 		 Node buffNode= buffDot.nodesFromMe.get(r.nextInt(buffDot.nodesFromMe.size()));//выбор случайной ноды
 		 //прибавить к весу случайной ноды случайное число (не больше MUTATION_MULTIPLIER и не меньше -MUTATION_MULTIPLIER)
-		 buffNode.setWeight(buffNode.getWeight()+rnd(-MUTATION_MULTIPLIER,MUTATION_MULTIPLIER));
+		 buffNode.setWeight(buffNode.getWeight()+rnd(-MAX_MUTATION_MULTIPLIER,MAX_MUTATION_MULTIPLIER));
 	 }
 	 static double nodeUnlockMaxValue=0.2;
 	 private void nodeUnlock(Random r) { 

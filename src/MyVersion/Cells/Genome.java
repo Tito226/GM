@@ -31,8 +31,8 @@ public class Genome {
 				chromosomes[i].genes[j]=genome.chromosomes[i].genes[j];
 				
 				//TODO MUTATION STUB
-				if(r.nextInt(10)==1) {
-					chromosomes[i].genes[j]=(byte) r.nextInt(chromosomesNum);
+				if(r.nextInt(10)==1 && i>0) {
+					chromosomes[i].genes[j]=(byte) r.nextInt(chromosomesNum+unusedGenes);
 				}
 				
 			}
@@ -55,7 +55,7 @@ public class Genome {
 		else
 			return LiveCellType.RootCell;
 	}
-
+	/**returns aray of genes ,if chromosomeNum>chromosomesNum returns null*/
 	byte[] getChromosome(byte chromosomeNum) {
 		//System.out.println(chromosomeNum);
 		if (chromosomeNum>=0 && chromosomeNum<chromosomesNum) {
